@@ -3,23 +3,80 @@ var useState = React.useState;
 var useEffect = React.useEffect;
 var useCallback = React.useCallback;
 var useRef = React.useRef;
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
 function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-// ─── CHAPTER 1 DATA — Full teaching content ────────────────────────
-var CHAPTER_1 = [{
+// ─── SPEAK UTILITY ─────────────────────────────────────────────────
+var speak = function speak(text) {
+  var rate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.75;
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = "ar-SA";
+  u.rate = rate;
+  u.pitch = 1;
+  window.speechSynthesis.speak(u);
+};
+
+// ─── COLOR / STYLE TOKENS ──────────────────────────────────────────
+var C = {
+  gold: "#c9a84c",
+  bg: "#0a0f1a",
+  card: "#141824",
+  border: "#1e2333",
+  text: "#e8e0d4",
+  muted: "#6b6355",
+  green: "#7ac97a",
+  red: "#c97a7a",
+  navy: "#1a1f2e",
+  purple: "#b08bdd",
+  blue: "#6b8bbd"
+};
+
+// ─── CHAPTERS DATA ─────────────────────────────────────────────────
+var CHAPTERS = [{
+  id: "ch1",
+  number: 1,
+  arabic: "الحروف العربية",
+  english: "The Arabic Alphabet",
+  desc: "Learn all 28 letters, vowels, and read Al-Fatiha",
+  lessons: 10,
+  color: C.gold,
+  videoId: "rEOQmQmApOg",
+  data: "ch1"
+}, {
+  id: "ch2",
+  number: 2,
+  arabic: "هَذَا وَهَذِهِ",
+  english: "This Is...",
+  desc: "Madinah Book 1, Lesson 1 — Demonstrative pronouns, nouns, sentences",
+  lessons: 6,
+  color: "#8bbd6b",
+  videoId: "W56bEvyXaVM",
+  data: "ch2"
+}];
+
+// ─── CHAPTER 1 LESSONS (condensed but complete) ────────────────────
+var CH1_LESSONS = [{
   id: "c1-l0",
   title: "Why Learn Arabic?",
   subtitle: "The language of the Quran",
   type: "intro",
   xp: 15,
+  videoId: "rEOQmQmApOg",
   slides: [{
     type: "welcome",
     heading: "مرحباً بك",
@@ -28,16 +85,16 @@ var CHAPTER_1 = [{
   }, {
     type: "fact",
     heading: "Did you know?",
-    points: ["The Quran uses only about 2,000 unique root words", "Learning just 300 words lets you understand 70% of the Quran", "Arabic is written RIGHT to LEFT", "Every Arabic word comes from a 3-letter root"]
+    points: ["Arabic has 28 letters — written right to left", "The Quran uses ~2,000 unique root words", "Learning 300 words = understanding 70% of the Quran", "Every Arabic word comes from a 3-letter root"]
   }, {
     type: "alphabet_overview",
-    heading: "28 Letters",
-    body: "Arabic has 28 letters. Unlike English, most letters change shape depending on where they appear in a word — beginning, middle, or end.",
+    heading: "All 28 Letters",
+    body: "We'll learn them in groups. Each letter changes shape at the start, middle, or end of a word.",
     letters: "ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي"
   }, {
     type: "tip",
-    heading: "How this app works",
-    body: "Each lesson teaches you something new first. Then a short quiz tests only what you just learned. You cannot skip — each lesson unlocks the next.",
+    heading: "How this works",
+    body: "Each lesson teaches first. Then a quiz tests only what you just saw. Tap 🔊 on any Arabic word to hear it pronounced.",
     tip: "Aim for one lesson per day. Consistency beats speed."
   }],
   quiz: [{
@@ -51,11 +108,6 @@ var CHAPTER_1 = [{
     ans: 1,
     exp: "Arabic is always written right to left."
   }, {
-    q: "What language is the Quran written in?",
-    opts: ["Urdu", "Persian", "Arabic", "Hebrew"],
-    ans: 2,
-    exp: "Allah revealed the Quran in Arabic."
-  }, {
     q: "Most Arabic words come from a root of how many letters?",
     opts: ["2", "3", "4", "5"],
     ans: 1,
@@ -64,66 +116,67 @@ var CHAPTER_1 = [{
 }, {
   id: "c1-l1",
   title: "Letters: أ ب ت ث",
-  subtitle: "Your first 4 Arabic letters",
+  subtitle: "Your first 4 letters",
   type: "letters",
   xp: 25,
+  videoId: "rEOQmQmApOg",
   slides: [{
     type: "letter_intro",
     heading: "Group 1 — 4 Letters",
-    body: "We'll learn 4 letters today. For each one, study its shape, its name, its sound, and a real word from Islamic vocabulary."
+    body: "Study each letter: its name, shape, sound, and a Quranic word. Tap 🔊 to hear."
   }, {
     type: "letter",
     arabic: "أ",
     name: "Alif",
-    sound: "'a' or silent — like the letter A",
-    shape: "A single vertical stroke — the simplest letter",
+    sound: "'a' or silent",
+    shape: "Single vertical stroke — simplest letter",
     word: "أَحَد",
     wordRoman: "Ahad",
-    wordMeaning: "One (referring to Allah)",
-    context: "This word appears in Surah Al-Ikhlas: قُلْ هُوَ اللهُ أَحَد — Say: He is Allah, the One."
+    wordMeaning: "One (Allah)",
+    context: "قُلْ هُوَ اللهُ أَحَد — Say: He is Allah, the One. (Surah Al-Ikhlas)"
   }, {
     type: "letter",
     arabic: "ب",
     name: "Ba",
-    sound: "'b' — exactly like English B",
-    shape: "A bowl shape with ONE dot BELOW",
+    sound: "'b' — like English B",
+    shape: "Bowl shape with ONE dot BELOW",
     word: "بِسْمِ",
     wordRoman: "Bismi",
     wordMeaning: "In the name of",
-    context: "بِسْمِ اللهِ — In the name of Allah. You say this before doing anything."
+    context: "بِسْمِ اللهِ — In the name of Allah. Said before every action."
   }, {
     type: "letter",
     arabic: "ت",
     name: "Ta",
-    sound: "'t' — exactly like English T",
-    shape: "Same bowl as Ba but TWO dots ABOVE",
+    sound: "'t' — like English T",
+    shape: "Same bowl as Ba, TWO dots ABOVE",
     word: "تَوْبَة",
     wordRoman: "Tawbah",
     wordMeaning: "Repentance",
-    context: "اَلتَّوَّابُ — Al-Tawwaab is one of Allah's names: The Ever-Accepting of Repentance."
+    context: "اَلتَّوَّابُ — Al-Tawwaab: The Ever-Accepting of Repentance (Allah's name)."
   }, {
     type: "letter",
     arabic: "ث",
     name: "Tha",
-    sound: "'th' — like 'th' in 'three'",
-    shape: "Same bowl as Ba/Ta but THREE dots ABOVE",
+    sound: "'th' — like 'th' in three",
+    shape: "Same bowl, THREE dots ABOVE",
     word: "ثَوَاب",
     wordRoman: "Thawaab",
-    wordMeaning: "Reward (from Allah)",
-    context: "When you do a good deed, you earn ثَوَاب — reward from Allah."
+    wordMeaning: "Reward from Allah",
+    context: "Good deeds earn ثَوَاب — reward from Allah on the Day of Judgement."
   }, {
     type: "pattern",
-    heading: "Notice the pattern!",
-    body: "Ba, Ta, and Tha are the SAME shape — only the dots change:",
+    heading: "Same shape — different dots!",
+    body: "Ba, Ta, Tha share one base. Dots change the letter:",
     items: [{
       arabic: "ب",
-      label: "1 dot below = Ba (ب)"
+      label: "1 dot BELOW = Ba (ب)"
     }, {
       arabic: "ت",
-      label: "2 dots above = Ta (ت)"
+      label: "2 dots ABOVE = Ta (ت)"
     }, {
       arabic: "ث",
-      label: "3 dots above = Tha (ث)"
+      label: "3 dots ABOVE = Tha (ث)"
     }],
     tip: "Dots are everything in Arabic. One wrong dot changes the entire word."
   }],
@@ -131,27 +184,22 @@ var CHAPTER_1 = [{
     q: "Which letter has ONE dot BELOW?",
     opts: ["أ (Alif)", "ب (Ba)", "ت (Ta)", "ث (Tha)"],
     ans: 1,
-    exp: "Ba (ب) has one dot below. Ta has 2 dots above, Tha has 3 dots above."
+    exp: "Ba (ب) has one dot below. Ta has 2 above, Tha has 3 above."
   }, {
-    q: "The word أَحَد (Ahad) means:",
+    q: "أَحَد (Ahad) means:",
     opts: ["Praise", "One", "Lord", "Merciful"],
     ans: 1,
-    exp: "أَحَد means 'One' — referring to the Oneness of Allah in Surah Al-Ikhlas."
+    exp: "أَحَد means 'One' — Allah the One, in Surah Al-Ikhlas."
   }, {
-    q: "Which letter makes the 'th' sound (like in 'three')?",
+    q: "Which letter makes the 'th' sound (as in 'three')?",
     opts: ["أ", "ب", "ت", "ث"],
     ans: 3,
-    exp: "Tha (ث) makes the 'th' sound. It has 3 dots above."
+    exp: "Tha (ث) makes the 'th' sound and has 3 dots above."
   }, {
     q: "بِسْمِ اللهِ means:",
     opts: ["In the name of Allah", "Praise be to Allah", "Allah is One", "Allah is Great"],
     ans: 0,
-    exp: "بِسْمِ اللهِ means 'In the name of Allah' — said before any action."
-  }, {
-    q: "Alif (أ) looks like:",
-    opts: ["A bowl with dots", "A vertical stroke", "A curved hook", "Two lines"],
-    ans: 1,
-    exp: "Alif (أ) is the simplest letter — just a single vertical stroke."
+    exp: "بِسْمِ اللهِ = In the name of Allah."
   }]
 }, {
   id: "c1-l2",
@@ -159,543 +207,104 @@ var CHAPTER_1 = [{
   subtitle: "Three throat sounds",
   type: "letters",
   xp: 25,
+  videoId: "rEOQmQmApOg",
   slides: [{
     type: "letter_intro",
     heading: "Group 2 — 3 Letters",
-    body: "These 3 letters share the same base shape but different dots. Pay special attention to ح and خ — these sounds don't exist in English."
+    body: "These share one base shape. ح and خ have no English equivalent — they come from the throat."
   }, {
     type: "letter",
     arabic: "ج",
     name: "Jim",
-    sound: "'j' — like English J or G in 'gem'",
-    shape: "A curved shape with ONE dot INSIDE/BELOW",
+    sound: "'j' — like English J",
+    shape: "Curved shape with ONE dot INSIDE",
     word: "جَنَّة",
     wordRoman: "Jannah",
-    wordMeaning: "Paradise / Heaven",
-    context: "جَنَّة is the Arabic word for Paradise — what every Muslim strives to reach."
+    wordMeaning: "Paradise",
+    context: "جَنَّة is Paradise — the eternal reward for the believers."
   }, {
     type: "letter",
     arabic: "ح",
     name: "Ha (deep)",
-    sound: "A strong 'h' from deep in your throat — like breathing on cold glass",
-    shape: "Same curved shape as Jim but NO dot",
+    sound: "Strong 'h' from the throat — breathe hard on cold glass",
+    shape: "Same curved shape, NO dot",
     word: "حَمْد",
     wordRoman: "Hamd",
     wordMeaning: "Praise",
-    context: "اَلْحَمْدُ لِلّٰهِ — Alhamdulillah: All praise belongs to Allah. You say this countless times daily."
+    context: "اَلْحَمْدُ لِلّٰهِ — All praise belongs to Allah. (Opening of Al-Fatiha)"
   }, {
     type: "letter",
     arabic: "خ",
     name: "Kha",
-    sound: "A rasping 'kh' from the back of throat — like the Scottish 'loch'",
-    shape: "Same curved shape with ONE dot ABOVE",
+    sound: "Rasping 'kh' from back of throat — like Scottish 'loch'",
+    shape: "Same curved shape, ONE dot ABOVE",
     word: "خَيْر",
     wordRoman: "Khayr",
     wordMeaning: "Goodness / Blessing",
-    context: "اَللّٰهُ خَيْر — Allah is the best. Khayr means goodness and blessing."
+    context: "اَللّٰهُ خَيْر — Allah is the best of all good."
   }, {
     type: "pattern",
-    heading: "Same shape — 3 different letters",
-    body: "Jim, Ha, and Kha share one base shape. The dot tells you which letter it is:",
+    heading: "One shape — 3 letters",
+    body: "The dot position is everything:",
     items: [{
       arabic: "ج",
-      label: "1 dot inside = Jim (ج)"
+      label: "Dot inside = Jim (ج)"
     }, {
       arabic: "ح",
       label: "No dot = Ha (ح)"
     }, {
       arabic: "خ",
-      label: "1 dot above = Kha (خ)"
+      label: "Dot above = Kha (خ)"
     }],
-    tip: "ح without a dot is the deeper, breathy H. Don't confuse it with ه (Ha) which comes later and is a lighter sound."
+    tip: "ح (no dot) is a breathy H. It appears in اَلْحَمْدُ, رَحْمَة, مُحَمَّد."
   }],
   quiz: [{
     q: "Which letter has NO dot?",
     opts: ["ج (Jim)", "ح (Ha)", "خ (Kha)", "ب (Ba)"],
     ans: 1,
-    exp: "Ha (ح) has no dot. Jim has a dot inside, Kha has a dot above."
+    exp: "Ha (ح) has no dot. Jim has a dot inside, Kha has one above."
   }, {
     q: "جَنَّة (Jannah) means:",
     opts: ["Hellfire", "Prayer", "Paradise", "Fasting"],
     ans: 2,
-    exp: "جَنَّة means Paradise — the eternal reward for believers."
+    exp: "جَنَّة means Paradise."
   }, {
     q: "اَلْحَمْد means:",
     opts: ["One", "Praise", "Mercy", "Guidance"],
     ans: 1,
-    exp: "الحمد means 'The Praise' — as in Alhamdulillah: All praise belongs to Allah."
+    exp: "الحمد = The Praise. Alhamdulillah = All praise is for Allah."
   }, {
     q: "Kha (خ) sounds like:",
-    opts: ["J in 'jam'", "H in 'hot'", "Kh in 'loch' (Scottish)", "Ch in 'cheese'"],
+    opts: ["J in jam", "H in hot", "Kh in loch (Scottish)", "Ch in cheese"],
     ans: 2,
-    exp: "Kha (خ) is a rasping throat sound like the Scottish 'loch' or clearing your throat gently."
-  }, {
-    q: "خَيْر means:",
-    opts: ["Repentance", "Reward", "Goodness/Blessing", "Knowledge"],
-    ans: 2,
-    exp: "خَيْر means goodness or blessing. A common Islamic word."
+    exp: "Kha (خ) is a rasping throat sound, like the Scottish 'loch'."
   }]
 }, {
   id: "c1-l3",
-  title: "Letters: د ذ ر ز",
-  subtitle: "Four familiar sounds",
-  type: "letters",
-  xp: 25,
-  slides: [{
-    type: "letter_intro",
-    heading: "Group 3 — 4 Letters",
-    body: "Good news — these 4 letters have sounds you already know from English: D, Dh, R, and Z. But notice: Dal and Dhal share a shape. Ra and Zay share a shape."
-  }, {
-    type: "letter",
-    arabic: "د",
-    name: "Dal",
-    sound: "'d' — exactly like English D",
-    shape: "A small angular wedge or boomerang shape — NO dot",
-    word: "دِيْن",
-    wordRoman: "Deen",
-    wordMeaning: "Religion / Way of life",
-    context: "اَلْإِسْلَامُ دِيْن — Islam is a Deen (a complete way of life, not just rituals)."
-  }, {
-    type: "letter",
-    arabic: "ذ",
-    name: "Dhal",
-    sound: "'dh' — like 'th' in 'the' or 'this' (voiced)",
-    shape: "Same wedge as Dal but ONE dot ABOVE",
-    word: "ذِكْر",
-    wordRoman: "Dhikr",
-    wordMeaning: "Remembrance of Allah",
-    context: "اَلا بِذِكْرِ اللهِ تَطْمَئِنُّ الْقُلُوْب — Verily in the remembrance of Allah do hearts find rest. (Quran 13:28)"
-  }, {
-    type: "letter",
-    arabic: "ر",
-    name: "Ra",
-    sound: "'r' — a slightly rolled R, like Spanish R",
-    shape: "A small curved tail swooping to the right — NO dot",
-    word: "رَحْمَة",
-    wordRoman: "Rahmah",
-    wordMeaning: "Mercy",
-    context: "اَلرَّحْمٰنُ الرَّحِيْم — Ar-Rahman Ar-Raheem: The Most Gracious, The Most Merciful. (Surah Al-Fatiha)"
-  }, {
-    type: "letter",
-    arabic: "ز",
-    name: "Zay",
-    sound: "'z' — exactly like English Z",
-    shape: "Same curved tail as Ra but ONE dot ABOVE",
-    word: "زَكَاة",
-    wordRoman: "Zakah",
-    wordMeaning: "Obligatory charity",
-    context: "زَكَاة is one of the 5 pillars of Islam — giving 2.5% of wealth to those in need."
-  }],
-  quiz: [{
-    q: "دِيْن (Deen) means:",
-    opts: ["Prayer", "Religion/Way of life", "Fasting", "Pilgrimage"],
-    ans: 1,
-    exp: "دِيْن means religion or way of life. Islam is described as a complete Deen."
-  }, {
-    q: "Which letter is Dal (د)?",
-    opts: ["A curved tail with no dot", "A wedge with a dot above", "A wedge with no dot", "A bowl with dots"],
-    ans: 2,
-    exp: "Dal (د) is a small wedge/boomerang shape with no dot. Dhal (ذ) has a dot above."
-  }, {
-    q: "ذِكْر (Dhikr) means:",
-    opts: ["Charity", "Remembrance of Allah", "Mercy", "Guidance"],
-    ans: 1,
-    exp: "ذِكْر is remembrance of Allah — through saying SubhanAllah, Alhamdulillah, Allahu Akbar etc."
-  }, {
-    q: "رَحْمَة (Rahmah) means:",
-    opts: ["Praise", "One", "Mercy", "Paradise"],
-    ans: 2,
-    exp: "رَحْمَة means mercy. Allah's names Ar-Rahman and Ar-Raheem both come from this root."
-  }, {
-    q: "Zay (ز) and Ra (ر) have the same base shape. What distinguishes Zay?",
-    opts: ["It has a dot below", "It has a dot above", "It has two dots", "It has no dot"],
-    ans: 1,
-    exp: "Zay (ز) has one dot above. Ra (ر) has no dot."
-  }]
-}, {
-  id: "c1-l4",
-  title: "Letters: س ش ص ض",
-  subtitle: "Teeth, tongue, and emphasis",
-  type: "letters",
-  xp: 30,
-  slides: [{
-    type: "letter_intro",
-    heading: "Group 4 — 4 Letters",
-    body: "This group introduces something important: EMPHATIC letters. Sin sounds like S in English. Sad looks different and sounds deeper — your tongue presses the roof of your mouth. This matters greatly for Tajweed."
-  }, {
-    type: "letter",
-    arabic: "س",
-    name: "Sin",
-    sound: "'s' — like English S in 'sun'",
-    shape: "Three small bumps/teeth followed by a tail",
-    word: "سُبْحَان",
-    wordRoman: "Subhaan",
-    wordMeaning: "Glory be to / Far above any imperfection",
-    context: "سُبْحَانَ اللهِ — SubhanAllah: Glory be to Allah. Said in amazement or appreciation."
-  }, {
-    type: "letter",
-    arabic: "ش",
-    name: "Shin",
-    sound: "'sh' — like English SH in 'ship'",
-    shape: "Same three bumps as Sin but THREE dots ABOVE",
-    word: "شُكْر",
-    wordRoman: "Shukr",
-    wordMeaning: "Gratitude / Thankfulness",
-    context: "اَلْحَمْدُ لِلّٰهِ is a form of شُكْر — expressing gratitude to Allah."
-  }, {
-    type: "letter",
-    arabic: "ص",
-    name: "Sad (emphatic)",
-    sound: "A heavy 'S' — tongue pressed to roof of mouth, lips rounded",
-    shape: "An oval loop with a small extension and NO dot",
-    word: "صَلَاة",
-    wordRoman: "Salah",
-    wordMeaning: "Prayer",
-    context: "صَلَاة is the 2nd pillar of Islam — the 5 daily prayers. The Quran says: أَقِيمُوا الصَّلَاة — Establish the prayer."
-  }, {
-    type: "letter",
-    arabic: "ض",
-    name: "Dad (emphatic)",
-    sound: "A heavy emphatic 'D' — Arabic is sometimes called 'the language of Dad'",
-    shape: "Same oval loop as Sad but ONE dot ABOVE",
-    word: "ضُحَى",
-    wordRoman: "Duhaa",
-    wordMeaning: "The morning light / Forenoon",
-    context: "وَالضُّحَى — Wad-Duhaa: By the morning light. Allah swears by it in Surah Ad-Duhaa (Chapter 93)."
-  }, {
-    type: "rule",
-    heading: "Emphatic vs Normal",
-    body: "Arabic has 4 'emphatic' letters: ص ض ط ظ. When you say them, your voice becomes heavier and deeper. This affects ALL surrounding vowels in the word — making them sound deeper too. This is crucial in Tajweed.",
-    tip: "Practice: Say 'seen' then 'saad'. Feel how your throat changes? That depth is the emphatic sound."
-  }],
-  quiz: [{
-    q: "سُبْحَان (Subhaan) means:",
-    opts: ["Praise", "One", "Glory be to / Far above imperfection", "Mercy"],
-    ans: 2,
-    exp: "سُبْحَانَ اللهِ means 'Glory be to Allah' — expressing that Allah is above all imperfections."
-  }, {
-    q: "Which letter is Shin (ش)?",
-    opts: ["Three bumps, no dots", "Three bumps, three dots above", "Oval loop, no dot", "Oval loop, one dot"],
-    ans: 1,
-    exp: "Shin (ش) is the same as Sin (س) but with 3 dots above."
-  }, {
-    q: "صَلَاة (Salah) means:",
-    opts: ["Fasting", "Charity", "Pilgrimage", "Prayer"],
-    ans: 3,
-    exp: "صَلَاة is prayer — the 5 daily prayers, the 2nd pillar of Islam."
-  }, {
-    q: "Arabic is sometimes called 'the language of' which letter?",
-    opts: ["ص Sad", "ض Dad", "س Sin", "ش Shin"],
-    ans: 1,
-    exp: "Arabic is called 'Lughat al-Daad' (language of Dad ض) because this emphatic letter exists in no other language."
-  }, {
-    q: "What makes ص and ض 'emphatic' letters?",
-    opts: ["They are silent", "They deepen the sound — tongue presses roof of mouth", "They have dots", "They are only used in the Quran"],
-    ans: 1,
-    exp: "Emphatic letters are pronounced with the tongue pressing the roof of the mouth, creating a heavier, deeper sound."
-  }]
-}, {
-  id: "c1-l5",
-  title: "Letters: ط ظ ع غ",
-  subtitle: "The powerful letters",
-  type: "letters",
-  xp: 30,
-  slides: [{
-    type: "letter_intro",
-    heading: "Group 5 — 4 Letters",
-    body: "This group has two more emphatic letters (ط ظ) and two letters unique to Arabic that don't exist in English at all: Ayn (ع) and Ghayn (غ). Pay special attention — these are key to proper recitation."
-  }, {
-    type: "letter",
-    arabic: "ط",
-    name: "Ta (emphatic)",
-    sound: "A heavy 'T' — like T but tongue pushes roof of mouth firmly",
-    shape: "A loop with a vertical stroke rising from it — NO dot",
-    word: "طَرِيْق",
-    wordRoman: "Tareeq",
-    wordMeaning: "Path / Way",
-    context: "اِهْدِنَا الصِّرَاطَ الْمُسْتَقِيْم — Guide us to the straight path. (Surah Al-Fatiha, verse 6)"
-  }, {
-    type: "letter",
-    arabic: "ظ",
-    name: "Dha (emphatic)",
-    sound: "A heavy 'Dh' — like 'th' in 'the' but deeper and emphatic",
-    shape: "Same loop as Ta with a dot ABOVE the vertical stroke",
-    word: "ظُلْم",
-    wordRoman: "Dhulm",
-    wordMeaning: "Injustice / Oppression",
-    context: "اَللّٰهُمَّ لَا تَجْعَلْ ظُلْماً — O Allah, do not inflict injustice. Dhulm is wrong deeply condemned in Islam."
-  }, {
-    type: "letter",
-    arabic: "ع",
-    name: "Ayn",
-    sound: "A deep squeezed sound from the throat — no English equivalent. Constrict your throat.",
-    shape: "Like a small eye or fish shape — NO dot",
-    word: "عِلْم",
-    wordRoman: "'Ilm",
-    wordMeaning: "Knowledge",
-    context: "طَلَبُ الْعِلْمِ فَرِيْضَة — Seeking knowledge is an obligation. (Hadith) علم is one of Islam's highest values."
-  }, {
-    type: "letter",
-    arabic: "غ",
-    name: "Ghayn",
-    sound: "A gargling sound from the back of the throat — like a French R or gargling water",
-    shape: "Same eye shape as Ayn but ONE dot ABOVE",
-    word: "غَيْب",
-    wordRoman: "Ghayb",
-    wordMeaning: "The Unseen",
-    context: "عَالِمُ الْغَيْب — Aalim ul-Ghayb: The Knower of the Unseen. Only Allah knows the غَيْب."
-  }, {
-    type: "rule",
-    heading: "Ayn (ع) — The most important unique letter",
-    body: "Ayn has no equivalent in any other language. To produce it: open your mouth, constrict the middle of your throat, and push sound through. You'll feel a slight pressure. This letter appears everywhere in the Quran — including in اَللهُ عَلِيم (Allah is All-Knowing).",
-    tip: "Practice Ayn by saying 'aaah' and slowly squeezing your throat mid-sound. That constriction IS the Ayn sound."
-  }],
-  quiz: [{
-    q: "عِلْم ('Ilm) means:",
-    opts: ["Prayer", "Knowledge", "Patience", "Paradise"],
-    ans: 1,
-    exp: "عِلْم means knowledge. Seeking knowledge is obligatory in Islam."
-  }, {
-    q: "Which letter requires constricting the throat — unique to Arabic?",
-    opts: ["ط (Ta)", "ظ (Dha)", "ع (Ayn)", "غ (Ghayn)"],
-    ans: 2,
-    exp: "Ayn (ع) is produced by constricting the throat — it has no equivalent in English or most other languages."
-  }, {
-    q: "غَيْب (Ghayb) means:",
-    opts: ["The Prayer", "The Quran", "The Unseen", "The Guidance"],
-    ans: 2,
-    exp: "الغَيْب is the Unseen — matters beyond human perception that only Allah knows."
-  }, {
-    q: "Tha (ط) and Dha (ظ) are both:",
-    opts: ["Throat letters", "Emphatic letters", "Lip letters", "Silent letters"],
-    ans: 1,
-    exp: "Ta (ط) and Dha (ظ) are emphatic letters — pronounced with the tongue pressing firmly on the roof of the mouth."
-  }, {
-    q: "Ghayn (غ) sounds like:",
-    opts: ["Hard G in 'go'", "Gargling from the back of throat", "Gh in 'ghost' (silent)", "J in 'job'"],
-    ans: 1,
-    exp: "Ghayn (غ) is a gargling/rasping sound from the back of the throat — like a French R or very gentle gargling."
-  }]
-}, {
-  id: "c1-l6",
-  title: "Letters: ف ق ك ل",
-  subtitle: "Familiar and unfamiliar",
-  type: "letters",
-  xp: 25,
-  slides: [{
-    type: "letter_intro",
-    heading: "Group 6 — 4 Letters",
-    body: "Fa is straightforward like F. Qaf is a deep Q from the very back of your throat. Kaf is like K. Lam is L — but when Lam and Alif combine, they make a special shape you'll see constantly in the Quran."
-  }, {
-    type: "letter",
-    arabic: "ف",
-    name: "Fa",
-    sound: "'f' — exactly like English F",
-    shape: "A curved loop with ONE dot ABOVE",
-    word: "فَلَاح",
-    wordRoman: "Falaah",
-    wordMeaning: "Success / Prosperity",
-    context: "حَيَّ عَلَى الْفَلَاح — Hayya 'alal Falaah: Come to success! Called out in the Adhan (call to prayer)."
-  }, {
-    type: "letter",
-    arabic: "ق",
-    name: "Qaf",
-    sound: "A deep 'Q' pressed from the very back of the tongue against the throat",
-    shape: "A round bowl with TWO dots BELOW",
-    word: "قُرْآن",
-    wordRoman: "Qur'aan",
-    wordMeaning: "The Quran — 'that which is recited'",
-    context: "Qaf (ق) is the first letter of Quran. The sound comes from your uvula — the very back of your mouth."
-  }, {
-    type: "letter",
-    arabic: "ك",
-    name: "Kaf",
-    sound: "'k' — like English K or C in 'cat'",
-    shape: "An angular shape — like a backwards C with a small stroke",
-    word: "كَرِيْم",
-    wordRoman: "Kareem",
-    wordMeaning: "Generous / Noble",
-    context: "اَلْكَرِيْم — Al-Kareem: The Most Generous. One of Allah's 99 names."
-  }, {
-    type: "letter",
-    arabic: "ل",
-    name: "Lam",
-    sound: "'l' — exactly like English L",
-    shape: "A curved upward stroke to the right",
-    word: "لِلّٰه",
-    wordRoman: "Lillah",
-    wordMeaning: "For Allah / Belonging to Allah",
-    context: "اَلْحَمْدُ لِلّٰهِ — All praise is FOR ALLAH. The لِ means 'for/belonging to'."
-  }, {
-    type: "pattern",
-    heading: "Special: لا Lam-Alif",
-    body: "When Lam (ل) is followed by Alif (ا), they join into a special combined shape:",
-    items: [{
-      arabic: "لا",
-      label: "Lam + Alif = لا (No / None)"
-    }, {
-      arabic: "لَا إِلٰهَ إِلَّا اللهُ",
-      label: "There is no god except Allah"
-    }],
-    tip: "لَا إِلٰهَ إِلَّا اللهُ — the Shahada. Spot the لا in it!"
-  }],
-  quiz: [{
-    q: "فَلَاح (Falaah) means:",
-    opts: ["Prayer", "Knowledge", "Success/Prosperity", "Guidance"],
-    ans: 2,
-    exp: "فَلَاح means success/prosperity. 'Come to success!' is called in the Adhan."
-  }, {
-    q: "Qaf (ق) has:",
-    opts: ["1 dot above", "1 dot below", "2 dots below", "No dots"],
-    ans: 2,
-    exp: "Qaf (ق) has TWO dots below. This is different from Fa (ف) which has one dot above."
-  }, {
-    q: "كَرِيْم (Kareem) means:",
-    opts: ["Strong", "Generous/Noble", "Merciful", "Forgiving"],
-    ans: 1,
-    exp: "كَرِيْم means generous or noble. Al-Kareem is one of Allah's beautiful names."
-  }, {
-    q: "In لَا إِلٰهَ إِلَّا اللهُ, what does لَا mean?",
-    opts: ["Yes", "All", "No/None", "One"],
-    ans: 2,
-    exp: "لَا means 'no' or 'none'. The Shahada means: There is NO god EXCEPT Allah."
-  }, {
-    q: "Where is Qaf (ق) produced in the mouth?",
-    opts: ["Lips", "Tip of tongue", "Teeth", "Very back of tongue near throat"],
-    ans: 3,
-    exp: "Qaf is produced at the very back of the tongue, pressing against the throat area — much deeper than English K."
-  }]
-}, {
-  id: "c1-l7",
-  title: "Letters: م ن ه و ي",
-  subtitle: "The final five — including vowel letters",
-  type: "letters",
-  xp: 25,
-  slides: [{
-    type: "letter_intro",
-    heading: "Group 7 — The Last 5 Letters",
-    body: "Congratulations — this is your last group of letters! After this, you'll know all 28. Three of these (ا و ي) are special — they act as both consonants AND long vowels."
-  }, {
-    type: "letter",
-    arabic: "م",
-    name: "Mim",
-    sound: "'m' — exactly like English M",
-    shape: "A small circle with a short tail",
-    word: "مَسْجِد",
-    wordRoman: "Masjid",
-    wordMeaning: "Mosque",
-    context: "اَلْمَسَاجِد بُيُوْتُ اللهِ — Mosques are the houses of Allah. Masjid literally means 'place of prostration'."
-  }, {
-    type: "letter",
-    arabic: "ن",
-    name: "Nun",
-    sound: "'n' — exactly like English N",
-    shape: "A small bowl with ONE dot ABOVE (inside the bowl when connected)",
-    word: "نُوْر",
-    wordRoman: "Noor",
-    wordMeaning: "Light",
-    context: "اَللهُ نُوْرُ السَّمَاوَاتِ وَالأَرْض — Allah is the Light of the heavens and the earth. (Surah An-Nur 24:35)"
-  }, {
-    type: "letter",
-    arabic: "ه",
-    name: "Ha (light)",
-    sound: "A light 'h' — like a sigh, air barely touching",
-    shape: "Two connected loops in the middle of a word — a single loop at the end",
-    word: "هِدَايَة",
-    wordRoman: "Hidaayah",
-    wordMeaning: "Guidance",
-    context: "اِهْدِنَا الصِّرَاطَ الْمُسْتَقِيْم — Guide us to the straight path. (Al-Fatiha) The root is ه-د-ي."
-  }, {
-    type: "letter",
-    arabic: "و",
-    name: "Waw",
-    sound: "'w' as a consonant — or 'oo' as a long vowel",
-    shape: "A small circle with a descending tail",
-    word: "وَحْي",
-    wordRoman: "Wahy",
-    wordMeaning: "Divine Revelation",
-    context: "وَحْي is the revelation Allah sent to the prophets. The Quran came through وَحْي to Prophet Muhammad ﷺ."
-  }, {
-    type: "letter",
-    arabic: "ي",
-    name: "Ya",
-    sound: "'y' as a consonant — or 'ee' as a long vowel",
-    shape: "A curved tail with TWO dots BELOW",
-    word: "يَوْم",
-    wordRoman: "Yawm",
-    wordMeaning: "Day",
-    context: "يَوْمُ الْقِيَامَة — Yawm al-Qiyaamah: The Day of Resurrection / Judgement Day."
-  }, {
-    type: "rule",
-    heading: "The 3 Long Vowel Letters",
-    body: "Three letters double as long vowels in Arabic:",
-    items: [{
-      arabic: "ا",
-      label: "Alif = long 'aa' sound — e.g. كِتَاب (kitaab)"
-    }, {
-      arabic: "و",
-      label: "Waw = long 'oo' sound — e.g. نُوْر (noor)"
-    }, {
-      arabic: "ي",
-      label: "Ya = long 'ee' sound — e.g. دِيْن (deen)"
-    }],
-    tip: "You've now seen all 28 letters! Next: vowel marks (harakat) that tell you HOW to pronounce each letter."
-  }],
-  quiz: [{
-    q: "مَسْجِد (Masjid) literally means:",
-    opts: ["House of Allah", "Place of prostration", "Place of prayer", "Holy building"],
-    ans: 1,
-    exp: "مَسْجِد comes from the root س-ج-د meaning to prostrate. It means 'place of prostration'."
-  }, {
-    q: "نُوْر (Noor) means:",
-    opts: ["Darkness", "Light", "Sky", "Star"],
-    ans: 1,
-    exp: "نُوْر means light. Allah is described as the Light of the heavens and the earth in Surah An-Nur."
-  }, {
-    q: "Which letter makes both a 'w' consonant sound AND a long 'oo' vowel sound?",
-    opts: ["ن (Nun)", "م (Mim)", "و (Waw)", "ي (Ya)"],
-    ans: 2,
-    exp: "Waw (و) acts as the consonant 'w' and also as the long 'oo' vowel."
-  }, {
-    q: "يَوْم (Yawm) means:",
-    opts: ["Night", "Month", "Year", "Day"],
-    ans: 3,
-    exp: "يَوْم means day. يَوْمُ الْقِيَامَة is the Day of Resurrection."
-  }, {
-    q: "هِدَايَة (Hidaayah) means:",
-    opts: ["Light", "Knowledge", "Guidance", "Mercy"],
-    ans: 2,
-    exp: "هِدَايَة means guidance. We ask for it every day in Al-Fatiha: 'Guide us to the straight path'."
-  }]
-}, {
-  id: "c1-l8",
-  title: "Short Vowels (Harakat)",
-  subtitle: "فَتْحَة — ضَمَّة — كَسْرَة",
+  title: "Short Vowels — حَرَكَات",
+  subtitle: "Fatha · Damma · Kasra",
   type: "grammar",
   xp: 35,
+  videoId: "rEOQmQmApOg",
   slides: [{
     type: "rule",
-    heading: "What are Harakat?",
-    body: "Arabic letters are CONSONANTS only. The small marks written above or below them — called حَرَكَات (harakat) — tell you which VOWEL sound to add. Without harakat, you cannot read Arabic correctly."
+    heading: "Arabic Letters Need Vowels",
+    body: "Arabic letters are consonants only. The tiny marks written above or below — حَرَكَات (harakat) — add the vowel sound. Without them, you cannot read correctly."
   }, {
     type: "vowel",
     arabic: "فَتْحَة",
     symbol: "َ",
     name: "Fatha",
-    sound: "Short 'a' — like 'a' in 'cat'",
+    sound: "Short 'a' — like 'a' in cat",
     position: "Written ABOVE the letter",
     examples: [{
       arabic: "بَ",
       roman: "ba",
       breakdown: "ب + fatha = 'ba'"
     }, {
-      arabic: "كَ",
-      roman: "ka",
-      breakdown: "ك + fatha = 'ka'"
-    }, {
-      arabic: "رَب",
-      roman: "rab",
-      breakdown: "ر+fatha + ب = 'rab'"
+      arabic: "كَتَبَ",
+      roman: "kataba",
+      breakdown: "He wrote — k+a, t+a, b+a"
     }],
     qExample: {
       arabic: "رَبّ",
@@ -707,20 +316,16 @@ var CHAPTER_1 = [{
     arabic: "ضَمَّة",
     symbol: "ُ",
     name: "Damma",
-    sound: "Short 'u' — like 'u' in 'put'",
-    position: "Written ABOVE the letter (looks like a small waw و)",
+    sound: "Short 'u' — like 'u' in put",
+    position: "Written ABOVE (looks like a small و)",
     examples: [{
       arabic: "بُ",
       roman: "bu",
       breakdown: "ب + damma = 'bu'"
     }, {
-      arabic: "كُ",
-      roman: "ku",
-      breakdown: "ك + damma = 'ku'"
-    }, {
       arabic: "نُوْر",
       roman: "noor",
-      breakdown: "نُ = nu, وْر = or → noor"
+      breakdown: "نُ=nu, وْر=or → noor"
     }],
     qExample: {
       arabic: "نُوْر",
@@ -732,7 +337,7 @@ var CHAPTER_1 = [{
     arabic: "كَسْرَة",
     symbol: "ِ",
     name: "Kasra",
-    sound: "Short 'i' — like 'i' in 'sit'",
+    sound: "Short 'i' — like 'i' in sit",
     position: "Written BELOW the letter",
     examples: [{
       arabic: "بِ",
@@ -750,8 +355,8 @@ var CHAPTER_1 = [{
     }
   }, {
     type: "reading_practice",
-    heading: "Practice: Read These Words",
-    instruction: "Use the harakat to sound out each word, then check the meaning.",
+    heading: "Read These Words",
+    instruction: "Use the vowel marks. Tap 🔊 to check your pronunciation.",
     words: [{
       arabic: "كِتَاب",
       roman: "ki-taab",
@@ -765,66 +370,58 @@ var CHAPTER_1 = [{
       roman: "ra-jul",
       meaning: "Man"
     }, {
-      arabic: "كَبِير",
-      roman: "ka-beer",
-      meaning: "Big/Great"
+      arabic: "مَسْجِد",
+      roman: "mas-jid",
+      meaning: "Mosque"
     }]
   }],
   quiz: [{
     q: "Fatha (فَتْحَة) produces which sound?",
     opts: ["Short 'u' (put)", "Short 'a' (cat)", "Short 'i' (sit)", "Long 'aa'"],
     ans: 1,
-    exp: "Fatha is written above the letter and produces a short 'a' sound like 'a' in 'cat'."
+    exp: "Fatha is above the letter and gives a short 'a' sound."
   }, {
     q: "Where is Kasra (كَسْرَة) written?",
     opts: ["Above the letter", "Below the letter", "Inside the letter", "After the letter"],
     ans: 1,
-    exp: "Kasra is written BELOW the letter, producing a short 'i' sound like 'i' in 'sit'."
-  }, {
-    q: "What does the Damma (ضَمَّة) look like?",
-    opts: ["A diagonal line above", "A small waw (و) above the letter", "A line below the letter", "A dot above"],
-    ans: 1,
-    exp: "Damma looks like a miniature Waw (و) written above the letter. It produces 'u' as in 'put'."
+    exp: "Kasra is written BELOW the letter, giving a short 'i' sound."
   }, {
     q: "How do you read بِسْمِ?",
     opts: ["basma", "busmu", "bismi", "besme"],
     ans: 2,
-    exp: "بِ = bi (kasra under ba), سْ = s (sukoon), مِ = mi (kasra under mim) → bismi."
+    exp: "بِ=bi (kasra), سْ=s (sukoon), مِ=mi (kasra) → bismi"
   }, {
-    q: "The word رَبّ (with fatha) is pronounced:",
-    opts: ["rub", "rib", "rab", "rob"],
-    ans: 2,
-    exp: "Ra + fatha = 'ra'. Ba = 'b'. So رَبّ = 'Rabb' (Lord). Fatha gives the 'a' sound."
+    q: "نُوْر (Noor) means:",
+    opts: ["Darkness", "Light", "Sky", "Star"],
+    ans: 1,
+    exp: "نُوْر means Light. Allah is the Light of the heavens and the earth."
   }]
 }, {
-  id: "c1-l9",
+  id: "c1-l4",
   title: "Sukoon & Shadda",
-  subtitle: "سُكُوْن — شَدَّة",
+  subtitle: "سُكُوْن · شَدَّة",
   type: "grammar",
   xp: 30,
+  videoId: "rEOQmQmApOg",
   slides: [{
     type: "rule",
-    heading: "Two More Marks",
-    body: "Besides the three short vowels, Arabic has two more vital marks: Sukoon tells you a letter has NO vowel — it stops the sound. Shadda tells you a letter is DOUBLED — pronounced with double emphasis."
+    heading: "Two More Vital Marks",
+    body: "Sukoon = no vowel, the letter stops the sound. Shadda = doubled consonant, emphasised."
   }, {
     type: "vowel",
     arabic: "سُكُوْن",
     symbol: "ْ",
     name: "Sukoon",
-    sound: "No vowel — the letter STOPS the sound",
-    position: "A small circle written ABOVE the letter",
+    sound: "No vowel — the letter stops",
+    position: "Small circle ABOVE the letter",
     examples: [{
       arabic: "مِنْ",
       roman: "min",
-      breakdown: "مِ=mi, نْ=n (stops) → 'min'"
-    }, {
-      arabic: "عَنْ",
-      roman: "'an",
-      breakdown: "عَ='a, نْ=n (stops) → 'an'"
+      breakdown: "مِ=mi, نْ=n(stop) → min"
     }, {
       arabic: "قُلْ",
       roman: "qul",
-      breakdown: "قُ=qu, لْ=l (stops) → 'qul'"
+      breakdown: "قُ=qu, لْ=l(stop) → qul"
     }],
     qExample: {
       arabic: "قُلْ هُوَ اللهُ أَحَد",
@@ -836,16 +433,16 @@ var CHAPTER_1 = [{
     arabic: "شَدَّة",
     symbol: "ّ",
     name: "Shadda",
-    sound: "Doubled/emphasised consonant — hold the sound longer",
-    position: "A small 'w' shape written ABOVE the letter",
+    sound: "Doubled consonant — hold the sound",
+    position: "Small 'w' shape ABOVE the letter",
     examples: [{
       arabic: "رَبّ",
       roman: "Rabb",
-      breakdown: "ر+fatha, بّ = doubled ba → 'Rabb'"
+      breakdown: "رَ=ra, بّ=doubled ba → Rabb"
     }, {
-      arabic: "اللهِ",
-      roman: "Allahi",
-      breakdown: "The lam (ل) in Allah has a shadda → strong 'll'"
+      arabic: "إِنَّ",
+      roman: "Inna",
+      breakdown: "إِ=i, نَّ=doubled na → Inna"
     }],
     qExample: {
       arabic: "إِنَّ اللهَ",
@@ -854,58 +451,54 @@ var CHAPTER_1 = [{
     }
   }, {
     type: "reading_practice",
-    heading: "Spot the Sukoon and Shadda",
-    instruction: "Can you identify the sukoon (ْ) and shadda (ّ) in these Quranic phrases?",
+    heading: "Spot Sukoon & Shadda",
+    instruction: "Find the ْ (sukoon) and ّ (shadda) in each phrase:",
     words: [{
       arabic: "بِسْمِ اللهِ",
       roman: "Bismillah",
-      meaning: "In the name of Allah — سْ has sukoon"
+      meaning: "سْ has sukoon"
     }, {
       arabic: "الرَّحْمَن",
       roman: "Ar-Rahman",
-      meaning: "The Most Gracious — رّ has shadda, حْ has sukoon"
+      meaning: "رّ has shadda, حْ has sukoon"
     }, {
-      arabic: "قُلْ أَعُوْذُ",
-      roman: "Qul a'oodhu",
-      meaning: "Say: I seek refuge — لْ has sukoon"
+      arabic: "رَبِّ الْعَالَمِيْن",
+      roman: "Rabbil 'aalameen",
+      meaning: "بّ has shadda"
     }]
   }],
   quiz: [{
-    q: "Sukoon (سُكُوْن) means the letter has:",
-    opts: ["A long vowel", "No vowel — stops the sound", "A doubled sound", "A nasal sound"],
+    q: "Sukoon means the letter has:",
+    opts: ["A long vowel", "No vowel — stops", "A doubled sound", "A nasal sound"],
     ans: 1,
-    exp: "Sukoon means 'stillness' — the letter has no vowel and acts as a stop consonant."
+    exp: "Sukoon means stillness — no vowel, the letter acts as a stop."
   }, {
-    q: "What does Shadda (شَدَّة) indicate?",
-    opts: ["The letter is silent", "A short 'a' vowel", "The letter is doubled/emphasized", "A long vowel follows"],
+    q: "What does Shadda indicate?",
+    opts: ["Letter is silent", "Short 'a' vowel", "Doubled/emphasized consonant", "Long vowel follows"],
     ans: 2,
-    exp: "Shadda doubles the consonant. رَبّ is pronounced 'Rabb' not 'Rab' — the ba is held double."
+    exp: "Shadda doubles the consonant. رَبّ = Rabb (not Rab)."
   }, {
-    q: "In قُلْ (Qul — Say!), which letter has a Sukoon?",
+    q: "In قُلْ (Qul), which letter has sukoon?",
     opts: ["ق (Qaf)", "ل (Lam)", "Both", "Neither"],
     ans: 1,
-    exp: "Lam (لْ) has the sukoon in قُلْ — so you say 'qu' then stop at 'l': Qul."
+    exp: "Lam (لْ) has the sukoon in قُلْ."
   }, {
     q: "Shadda looks like:",
-    opts: ["A small circle above", "A diagonal line", "A small 'w' shape above the letter", "A dot below"],
+    opts: ["Small circle", "Diagonal line", "Small 'w' shape above", "Dot below"],
     ans: 2,
-    exp: "Shadda (ّ) looks like a small 'w' or curved 'sh' shape written above the letter."
-  }, {
-    q: "In اللهِ (Allahi), the doubled Lam sound is because of:",
-    opts: ["Sukoon", "Fatha", "Shadda", "Kasra"],
-    ans: 2,
-    exp: "The Lam in Allah has a shadda (ّ) making it a strong doubled 'll' sound."
+    exp: "Shadda (ّ) looks like a small curved 'w' above the letter."
   }]
 }, {
-  id: "c1-l10",
+  id: "c1-l5",
   title: "Reading Al-Fatiha",
-  subtitle: "Your first full Quranic reading",
+  subtitle: "Word by word",
   type: "quran",
   xp: 50,
+  videoId: "rEOQmQmApOg",
   slides: [{
     type: "rule",
-    heading: "You're Ready",
-    body: "You now know all 28 letters and all the harakat marks. Al-Fatiha is the opening chapter of the Quran — 7 verses, recited 17 times daily in Salah. Let's read it word by word using everything you've learned."
+    heading: "You're Ready to Read",
+    body: "You know all vowel marks now. Al-Fatiha is recited 17 times daily in Salah. Let's break it down word by word. Tap 🔊 on any phrase to hear it."
   }, {
     type: "quran_verse",
     arabic: "بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ",
@@ -914,19 +507,19 @@ var CHAPTER_1 = [{
     breakdown: [{
       word: "بِسْمِ",
       meaning: "In the name of",
-      note: "بِ = in, سْمِ = name"
+      note: "بِ=in, اِسْم=name"
     }, {
       word: "اللهِ",
       meaning: "Allah",
-      note: "The Lam has a shadda"
+      note: "The lam has a shadda"
     }, {
       word: "الرَّحْمٰنِ",
       meaning: "The Most Gracious",
-      note: "رّ has shadda, حْ has sukoon"
+      note: "رّ has shadda"
     }, {
       word: "الرَّحِيْمِ",
       meaning: "The Most Merciful",
-      note: "يْمِ = long ee + mim + kasra"
+      note: "Ongoing mercy"
     }]
   }, {
     type: "quran_verse",
@@ -936,33 +529,19 @@ var CHAPTER_1 = [{
     breakdown: [{
       word: "اَلْحَمْدُ",
       meaning: "All praise",
-      note: "الْ = 'the', حَمْدُ = praise"
+      note: "الْ=the, حَمْد=praise"
     }, {
       word: "لِلّٰهِ",
       meaning: "for Allah",
-      note: "لِ = for/to + اللهِ = Allah"
+      note: "لِ=for"
     }, {
       word: "رَبِّ",
       meaning: "Lord of",
-      note: "rabba = Lord, بّ has shadda"
+      note: "بّ has shadda"
     }, {
       word: "الْعَالَمِيْن",
       meaning: "all the worlds",
-      note: "عَالَم = world, يْن = plural"
-    }]
-  }, {
-    type: "quran_verse",
-    arabic: "اَلرَّحْمٰنِ الرَّحِيْم",
-    roman: "Ar-Rahmanir Raheem",
-    meaning: "The Most Gracious, the Most Merciful",
-    breakdown: [{
-      word: "اَلرَّحْمٰن",
-      meaning: "The Most Gracious",
-      note: "رّ = shadda, massive mercy"
-    }, {
-      word: "الرَّحِيْم",
-      meaning: "The Most Merciful",
-      note: "رَّ = shadda, ongoing mercy"
+      note: "يْن=plural ending"
     }]
   }, {
     type: "quran_verse",
@@ -972,51 +551,560 @@ var CHAPTER_1 = [{
     breakdown: [{
       word: "مَالِك",
       meaning: "Master/Owner",
-      note: "From root م-ل-ك (power/ownership)"
+      note: "Root: م-ل-ك"
     }, {
       word: "يَوْم",
       meaning: "Day",
-      note: "yawm — you learned this word!"
+      note: "Learned in alphabet chapter"
     }, {
       word: "الدِّيْن",
-      meaning: "The Judgement/Religion",
-      note: "دِّ has shadda, يْن = long ee + nun"
+      meaning: "Judgement/Religion",
+      note: "دّ has shadda"
     }]
   }, {
-    type: "rule",
-    heading: "مَا شَاءَ اللهُ",
-    body: "You just read 4 verses of Al-Fatiha with understanding! Every time you now recite Al-Fatiha in Salah, you know WHAT you are saying to Allah. This is exactly the purpose of learning Arabic.",
-    tip: "Next chapter: We go deeper into Quranic vocabulary — the 100 most repeated words in the Quran."
+    type: "quran_verse",
+    arabic: "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِيْن",
+    roman: "Iyyaaka na'budu wa iyyaaka nasta'een",
+    meaning: "You alone we worship, and You alone we ask for help",
+    breakdown: [{
+      word: "إِيَّاكَ",
+      meaning: "You alone",
+      note: "Emphatic — only You"
+    }, {
+      word: "نَعْبُدُ",
+      meaning: "we worship",
+      note: "نَـ prefix = we (present)"
+    }, {
+      word: "نَسْتَعِيْن",
+      meaning: "we seek help",
+      note: "Root: ع-و-ن (help)"
+    }]
   }],
   quiz: [{
     q: "اَلْحَمْدُ لِلّٰهِ means:",
-    opts: ["In the name of Allah", "All praise is for Allah", "Guide us to the straight path", "The Most Merciful"],
+    opts: ["In the name of Allah", "All praise is for Allah", "Guide us to the path", "The Most Merciful"],
     ans: 1,
-    exp: "اَلْحَمْدُ لِلّٰهِ = Alhamdulillah = All praise is for Allah."
+    exp: "الحمد لله = Alhamdulillah = All praise is for Allah."
   }, {
-    q: "In the Fatiha, مَالِك means:",
+    q: "مَالِك in مَالِكِ يَوْمِ الدِّيْن means:",
     opts: ["Merciful", "Gracious", "Master/Owner", "Guide"],
     ans: 2,
-    exp: "مَالِك means Master or Owner. Allah is the Maalik (Master) of the Day of Judgement."
+    exp: "مَالِك means Master or Owner. Allah is the Master of the Day of Judgement."
   }, {
-    q: "يَوْم in يَوْمِ الدِّيْن means:",
-    opts: ["Lord", "Day", "Judgement", "Religion"],
+    q: "إِيَّاكَ نَعْبُدُ means:",
+    opts: ["Guide us to the path", "You alone we worship", "All praise for Allah", "The Most Merciful"],
     ans: 1,
-    exp: "يَوْم means Day. You learned this in Lesson 7 — يَوْمُ الْقِيَامَة = Day of Resurrection."
+    exp: "إِيَّاكَ نَعْبُدُ = You alone we worship — exclusive devotion to Allah."
   }, {
-    q: "The two names الرَّحْمٰن الرَّحِيْم both come from the root meaning:",
-    opts: ["Knowledge", "Mercy", "Power", "Praise"],
-    ans: 1,
-    exp: "Both Rahman and Raheem come from رحم (rahm) — the root meaning mercy/womb. Allah's mercy is overwhelming."
-  }, {
-    q: "Al-Fatiha is recited how many times daily in the 5 prayers?",
-    opts: ["5 times", "10 times", "17 times", "25 times"],
+    q: "Al-Fatiha is recited how many times daily?",
+    opts: ["5", "10", "17", "25"],
     ans: 2,
-    exp: "Al-Fatiha is recited in every rak'ah — 17 times across the 5 daily prayers."
+    exp: "Al-Fatiha is recited in every rak'ah — 17 times across 5 prayers."
   }]
 }];
 
-// ─── Utility ───────────────────────────────────────────────────────
+// ─── CHAPTER 2 LESSONS ─────────────────────────────────────────────
+var CH2_LESSONS = [{
+  id: "c2-l0",
+  title: "What is هَذَا?",
+  subtitle: "Demonstrative pronouns — intro",
+  type: "intro",
+  xp: 20,
+  videoId: "W56bEvyXaVM",
+  slides: [{
+    type: "welcome",
+    heading: "هَذَا",
+    subheading: "This is...",
+    body: "In this chapter we learn the most important sentence pattern in Arabic: هَذَا (this — masculine) and هَذِهِ (this — feminine). These two words unlock hundreds of sentences."
+  }, {
+    type: "fact",
+    heading: "What you'll learn",
+    points: ["هَذَا — 'this' for masculine nouns", "هَذِهِ — 'this' for feminine nouns", "Tanween (ٌ) — how to say 'a house', 'a book'", "The definite article الـ — 'the house', 'the book'", "Building simple sentences: هَذَا بَيْتٌ = This is a house"]
+  }, {
+    type: "rule",
+    heading: "Arabic Nouns Have Gender",
+    body: "Every noun in Arabic is either masculine (مُذَكَّر) or feminine (مُؤَنَّث). You must use the right 'this' for each.\n\nهَذَا + masculine noun\nهَذِهِ + feminine noun",
+    tip: "Feminine nouns usually end in ة (ta marbuta). When you see ة at the end, use هَذِهِ."
+  }],
+  quiz: [{
+    q: "هَذَا is used with which type of noun?",
+    opts: ["Feminine", "Masculine", "Both", "Neither"],
+    ans: 1,
+    exp: "هَذَا is the masculine 'this'. هَذِهِ is the feminine 'this'."
+  }, {
+    q: "Feminine nouns in Arabic usually end with:",
+    opts: ["ب", "ا", "ة", "ن"],
+    ans: 2,
+    exp: "Feminine nouns usually end in ة (ta marbuta). e.g. مَدْرَسَة (school), غُرْفَة (room)."
+  }, {
+    q: "How do you say 'This is...' for a masculine noun?",
+    opts: ["هَذِهِ", "تِلْكَ", "هَذَا", "ذَلِكَ"],
+    ans: 2,
+    exp: "هَذَا = This is (masculine). هَذِهِ = This is (feminine)."
+  }]
+}, {
+  id: "c2-l1",
+  title: "Masculine Nouns",
+  subtitle: "هَذَا + 10 essential words",
+  type: "vocab",
+  xp: 30,
+  videoId: "W56bEvyXaVM",
+  slides: [{
+    type: "letter_intro",
+    heading: "10 Masculine Nouns",
+    body: "All these nouns are masculine — used with هَذَا. Tap 🔊 to hear each word. Notice the ٌ ending — that means 'a ___' (indefinite)."
+  }, {
+    type: "vocab_list",
+    words: [{
+      arabic: "بَيْتٌ",
+      roman: "baytun",
+      meaning: "a house",
+      note: "هَذَا بَيْتٌ = This is a house"
+    }, {
+      arabic: "مَسْجِدٌ",
+      roman: "masjidun",
+      meaning: "a mosque",
+      note: "هَذَا مَسْجِدٌ = This is a mosque"
+    }, {
+      arabic: "بَابٌ",
+      roman: "baabun",
+      meaning: "a door",
+      note: "هَذَا بَابٌ = This is a door"
+    }, {
+      arabic: "كِتَابٌ",
+      roman: "kitaabun",
+      meaning: "a book",
+      note: "هَذَا كِتَابٌ = This is a book"
+    }, {
+      arabic: "قَلَمٌ",
+      roman: "qalamun",
+      meaning: "a pen",
+      note: "هَذَا قَلَمٌ = This is a pen"
+    }]
+  }, {
+    type: "vocab_list",
+    words: [{
+      arabic: "مِفْتَاحٌ",
+      roman: "miftaahun",
+      meaning: "a key",
+      note: "هَذَا مِفْتَاحٌ = This is a key"
+    }, {
+      arabic: "كُرْسِيٌّ",
+      roman: "kursiyyun",
+      meaning: "a chair",
+      note: "هَذَا كُرْسِيٌّ = This is a chair"
+    }, {
+      arabic: "كَلْبٌ",
+      roman: "kalbun",
+      meaning: "a dog",
+      note: "هَذَا كَلْبٌ = This is a dog"
+    }, {
+      arabic: "رَجُلٌ",
+      roman: "rajulun",
+      meaning: "a man",
+      note: "هَذَا رَجُلٌ = This is a man"
+    }, {
+      arabic: "وَلَدٌ",
+      roman: "waladun",
+      meaning: "a boy",
+      note: "هَذَا وَلَدٌ = This is a boy"
+    }]
+  }, {
+    type: "rule",
+    heading: "The Tanween ٌ",
+    body: "The double damma ٌ on the end of a word means 'a ___' (indefinite, like English 'a house').\n\nبَيْتٌ = a house\nكِتَابٌ = a book\nقَلَمٌ = a pen\n\nWhen reading, pronounce it as 'un' at the end:\nbay-TUN, ki-TAA-bun, qa-LA-mun",
+    tip: "In the Quran you see tanween everywhere. Now you know what it means."
+  }],
+  quiz: [{
+    q: "كِتَابٌ means:",
+    opts: ["a door", "a pen", "a book", "a chair"],
+    ans: 2,
+    exp: "كِتَابٌ = a book. هَذَا كِتَابٌ = This is a book."
+  }, {
+    q: "The ٌ on the end of a noun means:",
+    opts: ["the (definite)", "a/an (indefinite)", "two", "plural"],
+    ans: 1,
+    exp: "Tanween ٌ = indefinite 'a/an'. It's pronounced 'un': baytUN = a house."
+  }, {
+    q: "هَذَا رَجُلٌ means:",
+    opts: ["This is a boy", "This is a man", "This is a teacher", "This is a book"],
+    ans: 1,
+    exp: "رَجُلٌ = a man. هَذَا رَجُلٌ = This is a man."
+  }, {
+    q: "قَلَمٌ means:",
+    opts: ["a key", "a door", "a chair", "a pen"],
+    ans: 3,
+    exp: "قَلَمٌ = a pen. هَذَا قَلَمٌ = This is a pen."
+  }, {
+    q: "مَسْجِدٌ means:",
+    opts: ["a house", "a mosque", "a book", "a door"],
+    ans: 1,
+    exp: "مَسْجِدٌ = a mosque. هَذَا مَسْجِدٌ = This is a mosque."
+  }]
+}, {
+  id: "c2-l2",
+  title: "Feminine Nouns",
+  subtitle: "هَذِهِ + 10 essential words",
+  type: "vocab",
+  xp: 30,
+  videoId: "W56bEvyXaVM",
+  slides: [{
+    type: "letter_intro",
+    heading: "10 Feminine Nouns",
+    body: "These nouns all end in ة (ta marbuta) — the mark of femininity. Use هَذِهِ with all of them. Tap 🔊 to hear."
+  }, {
+    type: "vocab_list",
+    words: [{
+      arabic: "مَدْرَسَةٌ",
+      roman: "madrasatun",
+      meaning: "a school",
+      note: "هَذِهِ مَدْرَسَةٌ = This is a school"
+    }, {
+      arabic: "غُرْفَةٌ",
+      roman: "ghurfatun",
+      meaning: "a room",
+      note: "هَذِهِ غُرْفَةٌ = This is a room"
+    }, {
+      arabic: "سَيَّارَةٌ",
+      roman: "sayyaaratun",
+      meaning: "a car",
+      note: "هَذِهِ سَيَّارَةٌ = This is a car"
+    }, {
+      arabic: "شَجَرَةٌ",
+      roman: "shajaratun",
+      meaning: "a tree",
+      note: "هَذِهِ شَجَرَةٌ = This is a tree"
+    }, {
+      arabic: "طَاوِلَةٌ",
+      roman: "taawilatun",
+      meaning: "a table",
+      note: "هَذِهِ طَاوِلَةٌ = This is a table"
+    }]
+  }, {
+    type: "vocab_list",
+    words: [{
+      arabic: "نَافِذَةٌ",
+      roman: "naafidhatan",
+      meaning: "a window",
+      note: "هَذِهِ نَافِذَةٌ = This is a window"
+    }, {
+      arabic: "بِنْتٌ",
+      roman: "bintun",
+      meaning: "a girl",
+      note: "هَذِهِ بِنْتٌ = This is a girl (exception: no ة)"
+    }, {
+      arabic: "امْرَأَةٌ",
+      roman: "imraatun",
+      meaning: "a woman",
+      note: "هَذِهِ امْرَأَةٌ = This is a woman"
+    }, {
+      arabic: "هِرَّةٌ",
+      roman: "hirratun",
+      meaning: "a cat",
+      note: "هَذِهِ هِرَّةٌ = This is a cat"
+    }, {
+      arabic: "حَقِيبَةٌ",
+      roman: "haqeebatun",
+      meaning: "a bag",
+      note: "هَذِهِ حَقِيبَةٌ = This is a bag"
+    }]
+  }, {
+    type: "rule",
+    heading: "بِنْتٌ — The Exception",
+    body: "Most feminine words end in ة, but some don't. بِنْتٌ (girl) has no ة but is still feminine. How do you know? Memorize these exceptions or check with a dictionary.\n\nOther exceptions: أُمٌّ (mother), أَرْضٌ (earth), شَمْسٌ (sun).",
+    tip: "When in doubt — if it's naturally female (woman, girl, mother) it's feminine regardless of ending."
+  }],
+  quiz: [{
+    q: "مَدْرَسَةٌ means:",
+    opts: ["a mosque", "a house", "a school", "a room"],
+    ans: 2,
+    exp: "مَدْرَسَةٌ = a school. هَذِهِ مَدْرَسَةٌ = This is a school."
+  }, {
+    q: "هَذِهِ سَيَّارَةٌ means:",
+    opts: ["This is a house", "This is a car", "This is a tree", "This is a school"],
+    ans: 1,
+    exp: "سَيَّارَةٌ = a car. هَذِهِ سَيَّارَةٌ = This is a car."
+  }, {
+    q: "Why is بِنْتٌ (girl) feminine even though it has no ة?",
+    opts: ["It's not feminine", "It naturally refers to a female", "It has a hidden ة", "It's a mistake"],
+    ans: 1,
+    exp: "Words that naturally refer to females are feminine even without ة. بِنْت = girl is always feminine."
+  }, {
+    q: "Which of these is feminine?",
+    opts: ["كِتَابٌ (book)", "قَلَمٌ (pen)", "غُرْفَةٌ (room)", "بَابٌ (door)"],
+    ans: 2,
+    exp: "غُرْفَةٌ ends in ة (ta marbuta), making it feminine. The others are masculine."
+  }, {
+    q: "هَذِهِ هِرَّةٌ means:",
+    opts: ["This is a dog", "This is a cat", "This is a tree", "This is a window"],
+    ans: 1,
+    exp: "هِرَّةٌ = a cat. هَذِهِ هِرَّةٌ = This is a cat."
+  }]
+}, {
+  id: "c2-l3",
+  title: "الـ — The Definite Article",
+  subtitle: "بَيْتٌ → البَيْتُ",
+  type: "grammar",
+  xp: 30,
+  videoId: "W56bEvyXaVM",
+  slides: [{
+    type: "rule",
+    heading: "From 'a' to 'the'",
+    body: "In English: 'a house' → 'the house'\nIn Arabic: بَيْتٌ → البَيْتُ\n\nAdd الـ to the front and the tanween ٌ disappears.\n\nبَيْتٌ = a house\nاَلْبَيْتُ = the house\n\nكِتَابٌ = a book\naَلْكِتَابُ = the book"
+  }, {
+    type: "rule",
+    heading: "Sun Letters & Moon Letters",
+    body: "When الـ attaches to certain letters, the lam (ل) becomes silent — absorbed into the next letter. These are called Sun Letters (الحروف الشمسية).\n\nWith Moon Letters the lam stays clear.",
+    items: [{
+      arabic: "اَلشَّمْس",
+      label: "Sun Letter — الشَّمْس (the sun). Lam absorbed → 'ash-SHAMS'"
+    }, {
+      arabic: "اَلْقَمَر",
+      label: "Moon Letter — الْقَمَر (the moon). Lam clear → 'al-QAMAR'"
+    }],
+    tip: "Sun letters: ت ث د ذ ر ز س ش ص ض ط ظ ل ن — letters that sound like 'ts/ds/rs' where tongue touches teeth/ridge."
+  }, {
+    type: "reading_practice",
+    heading: "بَيْتٌ vs اَلْبَيْتُ",
+    instruction: "Compare indefinite and definite. Tap 🔊 to hear the difference:",
+    words: [{
+      arabic: "بَيْتٌ ← اَلْبَيْتُ",
+      roman: "baytun → al-baytu",
+      meaning: "a house → the house"
+    }, {
+      arabic: "كِتَابٌ ← اَلْكِتَابُ",
+      roman: "kitaabun → al-kitaabu",
+      meaning: "a book → the book"
+    }, {
+      arabic: "مَسْجِدٌ ← اَلْمَسْجِدُ",
+      roman: "masjidun → al-masjidu",
+      meaning: "a mosque → the mosque"
+    }, {
+      arabic: "شَمْسٌ ← اَلشَّمْسُ",
+      roman: "shamsun → ash-shamsu",
+      meaning: "a sun → the sun (sun letter!)"
+    }]
+  }],
+  quiz: [{
+    q: "What happens to tanween ٌ when you add الـ?",
+    opts: ["It doubles", "It disappears", "It moves below", "Nothing changes"],
+    ans: 1,
+    exp: "Tanween ٌ means indefinite ('a'). When you add الـ for 'the', the tanween disappears."
+  }, {
+    q: "اَلْكِتَابُ means:",
+    opts: ["a book", "the book", "books", "this book"],
+    ans: 1,
+    exp: "اَلْكِتَابُ = the book (definite). كِتَابٌ = a book (indefinite)."
+  }, {
+    q: "In اَلشَّمْسُ (the sun), the lam is:",
+    opts: ["Clearly pronounced", "Silent — absorbed into Shin", "Dropped completely", "Doubled"],
+    ans: 1,
+    exp: "Shin (ش) is a Sun Letter. The lam of الـ is absorbed: al-Shams → ASH-shams."
+  }, {
+    q: "Which is correct for 'the mosque'?",
+    opts: ["مَسْجِدٌ", "اَلْمَسْجِدُ", "هَذَا مَسْجِدٌ", "مَسَاجِد"],
+    ans: 1,
+    exp: "اَلْمَسْجِدُ = the mosque. The الـ makes it definite."
+  }]
+}, {
+  id: "c2-l4",
+  title: "Building Sentences",
+  subtitle: "هَذَا/هَذِهِ in action",
+  type: "grammar",
+  xp: 35,
+  videoId: "W56bEvyXaVM",
+  slides: [{
+    type: "rule",
+    heading: "The Arabic Sentence",
+    body: "Arabic doesn't need 'is' in a simple sentence.\n\nEnglish: 'This is a house'\nArabic: هَذَا بَيْتٌ\n(literally: 'This a-house')\n\nNo verb needed. This is called a جُمْلَة اِسْمِيَّة (nominal sentence)."
+  }, {
+    type: "vocab_list",
+    heading: "Sentences — Masculine",
+    words: [{
+      arabic: "هَذَا بَيْتٌ",
+      roman: "haadha baytun",
+      meaning: "This is a house"
+    }, {
+      arabic: "هَذَا كِتَابٌ",
+      roman: "haadha kitaabun",
+      meaning: "This is a book"
+    }, {
+      arabic: "هَذَا مَسْجِدٌ",
+      roman: "haadha masjidun",
+      meaning: "This is a mosque"
+    }, {
+      arabic: "هَذَا قَلَمٌ",
+      roman: "haadha qalamun",
+      meaning: "This is a pen"
+    }, {
+      arabic: "هَذَا رَجُلٌ",
+      roman: "haadha rajulun",
+      meaning: "This is a man"
+    }]
+  }, {
+    type: "vocab_list",
+    heading: "Sentences — Feminine",
+    words: [{
+      arabic: "هَذِهِ مَدْرَسَةٌ",
+      roman: "haadhihi madrasatun",
+      meaning: "This is a school"
+    }, {
+      arabic: "هَذِهِ سَيَّارَةٌ",
+      roman: "haadhihi sayyaaratun",
+      meaning: "This is a car"
+    }, {
+      arabic: "هَذِهِ غُرْفَةٌ",
+      roman: "haadhihi ghurfatun",
+      meaning: "This is a room"
+    }, {
+      arabic: "هَذِهِ شَجَرَةٌ",
+      roman: "haadhihi shajaratun",
+      meaning: "This is a tree"
+    }, {
+      arabic: "هَذِهِ بِنْتٌ",
+      roman: "haadhihi bintun",
+      meaning: "This is a girl"
+    }]
+  }, {
+    type: "rule",
+    heading: "Ask a Question: مَا هَذَا؟",
+    body: "To ask 'What is this?'\n\nمَا هَذَا؟ = What is this? (masculine)\nمَا هَذِهِ؟ = What is this? (feminine)\n\nAnswer: هَذَا بَيْتٌ = This is a house.",
+    tip: "مَا means 'what'. You'll see مَا throughout the Quran: مَا خَلَقَ = what He created."
+  }],
+  quiz: [{
+    q: "هَذَا كِتَابٌ means:",
+    opts: ["This is a pen", "This is a book", "This is a school", "What is this?"],
+    ans: 1,
+    exp: "هَذَا كِتَابٌ = This is a book. هَذَا = this (m), كِتَابٌ = a book."
+  }, {
+    q: "How do you say 'This is a car' in Arabic?",
+    opts: ["هَذَا سَيَّارَةٌ", "هَذِهِ سَيَّارَةٌ", "هَذِهِ كِتَابٌ", "هَذَا مَدْرَسَةٌ"],
+    ans: 1,
+    exp: "سَيَّارَة is feminine (ends in ة), so use هَذِهِ → هَذِهِ سَيَّارَةٌ."
+  }, {
+    q: "In Arabic, a simple 'This is a house' sentence needs:",
+    opts: ["A verb", "No verb", "Two verbs", "A pronoun"],
+    ans: 1,
+    exp: "Arabic nominal sentences don't need 'is'. هَذَا بَيْتٌ literally means 'This a-house'."
+  }, {
+    q: "مَا هَذَا؟ means:",
+    opts: ["This is a house", "What is this?", "That is a book", "What is that?"],
+    ans: 1,
+    exp: "مَا = what, هَذَا = this → مَا هَذَا؟ = What is this?"
+  }, {
+    q: "Which sentence is correct for 'This is a room'?",
+    opts: ["هَذَا غُرْفَةٌ", "هَذِهِ غُرْفَةٌ", "هَذَا غُرْفَةُ", "هَذِهِ غُرْفَةْ"],
+    ans: 1,
+    exp: "غُرْفَةٌ is feminine (ends in ة) → هَذِهِ غُرْفَةٌ = This is a room."
+  }]
+}, {
+  id: "c2-l5",
+  title: "مَنْ هَذَا؟ — Who is this?",
+  subtitle: "Professions & identities",
+  type: "vocab",
+  xp: 40,
+  videoId: "W56bEvyXaVM",
+  slides: [{
+    type: "rule",
+    heading: "مَنْ — Who",
+    body: "You learned مَا (what). Now learn مَنْ (who).\n\nمَا هَذَا؟ = What is this?\nمَنْ هَذَا؟ = Who is this?\n\nمَنْ is used for people."
+  }, {
+    type: "vocab_list",
+    heading: "People & Professions",
+    words: [{
+      arabic: "مُدَرِّسٌ",
+      roman: "mudarrisun",
+      meaning: "a teacher (m)",
+      note: "هَذَا مُدَرِّسٌ = This is a teacher"
+    }, {
+      arabic: "مُدَرِّسَةٌ",
+      roman: "mudarrisatun",
+      meaning: "a teacher (f)",
+      note: "هَذِهِ مُدَرِّسَةٌ = This is a teacher (f)"
+    }, {
+      arabic: "طَالِبٌ",
+      roman: "taalibun",
+      meaning: "a student (m)",
+      note: "هَذَا طَالِبٌ = This is a student"
+    }, {
+      arabic: "طَالِبَةٌ",
+      roman: "taalibatun",
+      meaning: "a student (f)",
+      note: "هَذِهِ طَالِبَةٌ = This is a student (f)"
+    }, {
+      arabic: "طَبِيبٌ",
+      roman: "tabeebun",
+      meaning: "a doctor (m)",
+      note: "هَذَا طَبِيبٌ = This is a doctor"
+    }]
+  }, {
+    type: "vocab_list",
+    heading: "More People",
+    words: [{
+      arabic: "تَاجِرٌ",
+      roman: "taajirun",
+      meaning: "a merchant",
+      note: "هَذَا تَاجِرٌ = This is a merchant"
+    }, {
+      arabic: "كَاتِبٌ",
+      roman: "kaatibun",
+      meaning: "a writer/secretary",
+      note: "Root: ك-ت-ب (to write)"
+    }, {
+      arabic: "وَزِيرٌ",
+      roman: "wazeerun",
+      meaning: "a minister",
+      note: "هَذَا وَزِيرٌ = This is a minister"
+    }, {
+      arabic: "أُسْتَاذٌ",
+      roman: "ustadhun",
+      meaning: "a professor",
+      note: "The word Ustad comes from here!"
+    }, {
+      arabic: "مُهَنْدِسٌ",
+      roman: "muhandisun",
+      meaning: "an engineer",
+      note: "هَذَا مُهَنْدِسٌ = This is an engineer"
+    }]
+  }, {
+    type: "rule",
+    heading: "Pattern: مُـَـِّسٌ = Doer",
+    body: "Notice مُدَرِّسٌ (teacher) and مُهَنْدِسٌ (engineer) both start with مُـ.\n\nIn Arabic, مُـ at the start often means 'one who does ___'. This is from Verb Form II — you'll learn this in Book 2.",
+    tip: "طَالِبٌ comes from the root ط-ل-ب meaning 'to seek/request'. A طَالِب is a seeker of knowledge."
+  }],
+  quiz: [{
+    q: "مَنْ هَذَا؟ means:",
+    opts: ["What is this?", "Who is this?", "Where is this?", "How is this?"],
+    ans: 1,
+    exp: "مَنْ = who. مَنْ هَذَا؟ = Who is this?"
+  }, {
+    q: "طَالِبٌ means:",
+    opts: ["a teacher", "a doctor", "a student", "a merchant"],
+    ans: 2,
+    exp: "طَالِبٌ = a student. It comes from the root ط-ل-ب meaning 'to seek'."
+  }, {
+    q: "How do you say 'This is a female teacher'?",
+    opts: ["هَذَا مُدَرِّسٌ", "هَذِهِ مُدَرِّسَةٌ", "هَذَا مُدَرِّسَةٌ", "هَذِهِ مُدَرِّسٌ"],
+    ans: 1,
+    exp: "Female teacher = مُدَرِّسَةٌ (with ة). هَذِهِ مُدَرِّسَةٌ = This is a (female) teacher."
+  }, {
+    q: "أُسْتَاذٌ means:",
+    opts: ["student", "engineer", "minister", "professor/teacher"],
+    ans: 3,
+    exp: "أُسْتَاذٌ = professor or respected teacher. You say 'Ustad' in Urdu — same Arabic origin!"
+  }, {
+    q: "طَبِيبٌ means:",
+    opts: ["a teacher", "a doctor", "a student", "a writer"],
+    ans: 1,
+    exp: "طَبِيبٌ = a doctor. هَذَا طَبِيبٌ = This is a doctor."
+  }]
+}];
+var ALL_LESSONS = {
+  ch1: CH1_LESSONS,
+  ch2: CH2_LESSONS
+};
+
+// ─── STORE / LOAD ──────────────────────────────────────────────────
 var store = function store(k, v) {
   try {
     localStorage.setItem(k, JSON.stringify(v));
@@ -1033,10 +1121,10 @@ var load = function load(k, d) {
 
 // ─── ICONS ─────────────────────────────────────────────────────────
 var IC = {
-  Fire: function Fire() {
+  Arrow: function Arrow() {
     return /*#__PURE__*/React.createElement("svg", {
-      width: "18",
-      height: "18",
+      width: "20",
+      height: "20",
       viewBox: "0 0 24 24",
       fill: "none",
       stroke: "currentColor",
@@ -1044,13 +1132,13 @@ var IC = {
       strokeLinecap: "round",
       strokeLinejoin: "round"
     }, /*#__PURE__*/React.createElement("path", {
-      d: "M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"
+      d: "m15 18-6-6 6-6"
     }));
   },
   Check: function Check() {
     return /*#__PURE__*/React.createElement("svg", {
-      width: "16",
-      height: "16",
+      width: "15",
+      height: "15",
       viewBox: "0 0 24 24",
       fill: "none",
       stroke: "currentColor",
@@ -1081,21 +1169,7 @@ var IC = {
       d: "M7 11V7a5 5 0 0 1 10 0v4"
     }));
   },
-  Arrow: function Arrow() {
-    return /*#__PURE__*/React.createElement("svg", {
-      width: "20",
-      height: "20",
-      viewBox: "0 0 24 24",
-      fill: "none",
-      stroke: "currentColor",
-      strokeWidth: "2",
-      strokeLinecap: "round",
-      strokeLinejoin: "round"
-    }, /*#__PURE__*/React.createElement("path", {
-      d: "m15 18-6-6 6-6"
-    }));
-  },
-  ChevR: function ChevR() {
+  Fire: function Fire() {
     return /*#__PURE__*/React.createElement("svg", {
       width: "16",
       height: "16",
@@ -1106,86 +1180,200 @@ var IC = {
       strokeLinecap: "round",
       strokeLinejoin: "round"
     }, /*#__PURE__*/React.createElement("path", {
-      d: "m9 18 6-6-6-6"
+      d: "M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"
     }));
   },
-  Star: function Star() {
+  Play: function Play() {
     return /*#__PURE__*/React.createElement("svg", {
-      width: "18",
-      height: "18",
+      width: "14",
+      height: "14",
       viewBox: "0 0 24 24",
       fill: "currentColor"
     }, /*#__PURE__*/React.createElement("polygon", {
-      points: "12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+      points: "5 3 19 12 5 21 5 3"
     }));
   },
-  Book: function Book() {
+  Speaker: function Speaker() {
     return /*#__PURE__*/React.createElement("svg", {
-      width: "18",
-      height: "18",
+      width: "14",
+      height: "14",
       viewBox: "0 0 24 24",
       fill: "none",
       stroke: "currentColor",
       strokeWidth: "2",
       strokeLinecap: "round",
       strokeLinejoin: "round"
-    }, /*#__PURE__*/React.createElement("path", {
-      d: "M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"
+    }, /*#__PURE__*/React.createElement("polygon", {
+      points: "11 5 6 9 2 9 2 15 6 15 11 19 11 5"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: "M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"
+    }));
+  },
+  Video: function Video() {
+    return /*#__PURE__*/React.createElement("svg", {
+      width: "14",
+      height: "14",
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: "2",
+      strokeLinecap: "round",
+      strokeLinejoin: "round"
+    }, /*#__PURE__*/React.createElement("polygon", {
+      points: "23 7 16 12 23 17 23 7"
+    }), /*#__PURE__*/React.createElement("rect", {
+      width: "15",
+      height: "14",
+      x: "1",
+      y: "5",
+      rx: "2"
     }));
   }
 };
-var C = {
-  gold: "#c9a84c",
-  bg: "#0a0f1a",
-  card: "#141824",
-  border: "#1e2333",
-  text: "#e8e0d4",
-  muted: "#6b6355",
-  green: "#7ac97a",
-  red: "#c97a7a",
-  navy: "#1a1f2e"
-};
+
+// ─── SPEAK BUTTON ──────────────────────────────────────────────────
+function SpeakBtn(_ref) {
+  var text = _ref.text,
+    _ref$style = _ref.style,
+    style = _ref$style === void 0 ? {} : _ref$style;
+  var _useState = useState(false),
+    _useState2 = _slicedToArray(_useState, 2),
+    active = _useState2[0],
+    setActive = _useState2[1];
+  var handleSpeak = function handleSpeak(e) {
+    e.stopPropagation();
+    setActive(true);
+    speak(text);
+    setTimeout(function () {
+      return setActive(false);
+    }, 1200);
+  };
+  return /*#__PURE__*/React.createElement("button", {
+    onClick: handleSpeak,
+    style: _objectSpread({
+      background: active ? "".concat(C.gold, "33") : "".concat(C.gold, "15"),
+      border: "1px solid ".concat(active ? C.gold : C.gold + "44"),
+      borderRadius: 8,
+      padding: "5px 10px",
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 5,
+      color: active ? C.gold : C.muted,
+      cursor: "pointer",
+      fontSize: 12,
+      transition: "all 0.2s"
+    }, style)
+  }, /*#__PURE__*/React.createElement(IC.Speaker, null), " ", active ? "▶" : "🔊");
+}
+
+// ─── VIDEO PLAYER ──────────────────────────────────────────────────
+function VideoPlayer(_ref2) {
+  var videoId = _ref2.videoId;
+  var _useState3 = useState(false),
+    _useState4 = _slicedToArray(_useState3, 2),
+    show = _useState4[0],
+    setShow = _useState4[1];
+  if (!videoId) return null;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 16
+    }
+  }, !show ? /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return setShow(true);
+    },
+    style: {
+      width: "100%",
+      background: "#0f1520",
+      border: "1px solid ".concat(C.border),
+      borderRadius: 14,
+      padding: "16px",
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      cursor: "pointer",
+      color: C.text
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 44,
+      height: 44,
+      borderRadius: 10,
+      background: "#cc0000",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement(IC.Play, null)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "left"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      color: C.text
+    }
+  }, "Watch Video Lesson"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: C.muted,
+      marginTop: 2,
+      display: "flex",
+      alignItems: "center",
+      gap: 4
+    }
+  }, /*#__PURE__*/React.createElement(IC.Video, null), " Free lesson on YouTube")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginLeft: "auto",
+      fontSize: 11,
+      color: C.gold,
+      padding: "4px 10px",
+      background: "".concat(C.gold, "15"),
+      borderRadius: 6
+    }
+  }, "Tap to load")) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderRadius: 14,
+      overflow: "hidden",
+      background: "#000",
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("iframe", {
+    src: "https://www.youtube.com/embed/".concat(videoId, "?autoplay=1&rel=0"),
+    title: "Lesson Video",
+    width: "100%",
+    height: "220",
+    frameBorder: "0",
+    allowFullScreen: true,
+    allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+    style: {
+      display: "block"
+    }
+  })));
+}
 
 // ─── HOME SCREEN ───────────────────────────────────────────────────
-function HomeScreen(_ref) {
-  var onStart = _ref.onStart;
-  var _useState = useState(function () {
-      return load("nq_done", []);
-    }),
-    _useState2 = _slicedToArray(_useState, 2),
-    done = _useState2[0],
-    setDone = _useState2[1];
-  var _useState3 = useState(function () {
+function HomeScreen(_ref3) {
+  var onSelectChapter = _ref3.onSelectChapter;
+  var _useState5 = useState(function () {
       return load("nq_xp", 0);
     }),
-    _useState4 = _slicedToArray(_useState3, 2),
-    xp = _useState4[0],
-    setXp = _useState4[1];
-  var _useState5 = useState(function () {
+    _useState6 = _slicedToArray(_useState5, 1),
+    xp = _useState6[0];
+  var _useState7 = useState(function () {
       return load("nq_streak", 0);
     }),
-    _useState6 = _slicedToArray(_useState5, 2),
-    streak = _useState6[0],
-    setStreak = _useState6[1];
+    _useState8 = _slicedToArray(_useState7, 1),
+    streak = _useState8[0];
+  var _useState9 = useState(function () {
+      return load("nq_done", []);
+    }),
+    _useState0 = _slicedToArray(_useState9, 1),
+    done = _useState0[0];
   var level = Math.floor(xp / 300) + 1;
   var xpInLevel = xp % 300;
-  var totalLessons = CHAPTER_1.length;
-  var completedCount = done.length;
-  var isUnlocked = function isUnlocked(idx) {
-    return idx === 0 || done.includes(CHAPTER_1[idx - 1].id);
-  };
-  var typeColor = {
-    intro: "#6b8bbd",
-    letters: "#c9a84c",
-    grammar: "#8bbd6b",
-    quran: "#bd6b8b"
-  };
-  var typeLabel = {
-    intro: "INTRO",
-    letters: "LETTERS",
-    grammar: "GRAMMAR",
-    quran: "QURAN"
-  };
   return /*#__PURE__*/React.createElement("div", {
     style: {
       minHeight: "100vh",
@@ -1198,7 +1386,7 @@ function HomeScreen(_ref) {
     style: {
       position: "fixed",
       inset: 0,
-      opacity: 0.025,
+      opacity: 0.02,
       zIndex: 0,
       backgroundImage: "repeating-linear-gradient(60deg,transparent,transparent 40px,#c9a84c 40px,#c9a84c 41px)"
     }
@@ -1208,7 +1396,7 @@ function HomeScreen(_ref) {
       zIndex: 1,
       maxWidth: 480,
       margin: "0 auto",
-      padding: "0 16px 48px"
+      padding: "0 16px 40px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1234,7 +1422,7 @@ function HomeScreen(_ref) {
       letterSpacing: 2,
       textTransform: "uppercase"
     }
-  }, "Quranic Arabic \u2014 Chapter 1")), /*#__PURE__*/React.createElement("div", {
+  }, "Quranic Arabic Academy")), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       gap: 10,
@@ -1251,7 +1439,7 @@ function HomeScreen(_ref) {
     }
   }, /*#__PURE__*/React.createElement(IC.Fire, null), streak), /*#__PURE__*/React.createElement("div", {
     style: {
-      background: "linear-gradient(135deg,#1a2a1a,#141824)",
+      background: "#1a2a1a",
       border: "1px solid #3a6a3a",
       borderRadius: 20,
       padding: "5px 14px",
@@ -1265,7 +1453,7 @@ function HomeScreen(_ref) {
       border: "1px solid ".concat(C.border),
       borderRadius: 14,
       padding: "14px 16px",
-      marginBottom: 16
+      marginBottom: 24
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1278,7 +1466,7 @@ function HomeScreen(_ref) {
     style: {
       color: C.muted
     }
-  }, xp, " XP"), /*#__PURE__*/React.createElement("span", {
+  }, xp, " XP total"), /*#__PURE__*/React.createElement("span", {
     style: {
       color: C.gold
     }
@@ -1295,308 +1483,206 @@ function HomeScreen(_ref) {
       width: "".concat(xpInLevel / 300 * 100, "%"),
       background: "linear-gradient(90deg,".concat(C.gold, ",#e8d5a3)"),
       borderRadius: 3,
-      transition: "width 0.6s ease"
+      transition: "width 0.6s"
     }
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       marginTop: 10,
-      display: "flex",
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr 1fr",
       gap: 8
     }
-  }, /*#__PURE__*/React.createElement("div", {
+  }, [{
+    label: "Done",
+    val: done.length,
+    color: C.green
+  }, {
+    label: "XP",
+    val: xp,
+    color: C.gold
+  }, {
+    label: "Streak",
+    val: "".concat(streak, "d"),
+    color: "#e8734a"
+  }].map(function (s) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: s.label,
+      style: {
+        background: C.navy,
+        borderRadius: 10,
+        padding: "10px 0",
+        textAlign: "center"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 17,
+        fontWeight: 700,
+        color: s.color
+      }
+    }, s.val), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 9,
+        color: C.muted,
+        textTransform: "uppercase",
+        letterSpacing: 1
+      }
+    }, s.label));
+  }))), /*#__PURE__*/React.createElement("div", {
     style: {
-      flex: 1,
-      background: C.navy,
-      borderRadius: 10,
-      padding: "10px 0",
-      textAlign: "center"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 18,
-      fontWeight: 700,
-      color: C.green
-    }
-  }, completedCount), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 9,
+      fontSize: 11,
       color: C.muted,
-      textTransform: "uppercase",
-      letterSpacing: 1
-    }
-  }, "Done")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      flex: 1,
-      background: C.navy,
-      borderRadius: 10,
-      padding: "10px 0",
-      textAlign: "center"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 18,
-      fontWeight: 700,
-      color: "#6b8bbd"
-    }
-  }, totalLessons), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 9,
-      color: C.muted,
-      textTransform: "uppercase",
-      letterSpacing: 1
-    }
-  }, "Total")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      flex: 1,
-      background: C.navy,
-      borderRadius: 10,
-      padding: "10px 0",
-      textAlign: "center"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 18,
-      fontWeight: 700,
-      color: "#e8734a"
-    }
-  }, streak, "d"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 9,
-      color: C.muted,
-      textTransform: "uppercase",
-      letterSpacing: 1
-    }
-  }, "Streak")))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: "linear-gradient(135deg,#1a2235,#12192a)",
-      border: "1px solid ".concat(C.gold, "33"),
-      borderRadius: 16,
-      padding: "18px 20px",
-      marginBottom: 20,
-      position: "relative",
-      overflow: "hidden"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      position: "absolute",
-      top: -20,
-      right: -20,
-      width: 100,
-      height: 100,
-      background: "radial-gradient(circle,".concat(C.gold, "15,transparent 70%)")
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 10,
-      color: C.gold,
       letterSpacing: 2,
       textTransform: "uppercase",
-      marginBottom: 8,
-      fontWeight: 700
+      marginBottom: 14
     }
-  }, "CHAPTER ONE"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 22,
-      color: C.gold,
-      marginBottom: 4
-    }
-  }, "\u0627\u0644\u062D\u0631\u0648\u0641 \u0627\u0644\u0639\u0631\u0628\u064A\u0629"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 14,
-      color: C.text,
-      marginBottom: 6
-    }
-  }, "The Arabic Alphabet"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: C.muted
-    }
-  }, totalLessons, " lessons \xB7 From zero to reading Al-Fatiha")), CHAPTER_1.map(function (lesson, idx) {
-    var unlocked = isUnlocked(idx);
-    var isDone = done.includes(lesson.id);
-    var isNext = !isDone && unlocked;
-    var color = typeColor[lesson.type] || C.gold;
+  }, "Chapters"), CHAPTERS.map(function (ch, idx) {
+    var lessons = ALL_LESSONS[ch.data] || [];
+    var completed = lessons.filter(function (l) {
+      return done.includes(l.id);
+    }).length;
+    var pct = completed / lessons.length * 100;
+    var isLocked = idx > 0 && !CHAPTERS[idx - 1] ? true : idx > 0 && (ALL_LESSONS[CHAPTERS[idx - 1].data] || []).some(function (l) {
+      return !done.includes(l.id);
+    });
     return /*#__PURE__*/React.createElement("button", {
-      key: lesson.id,
+      key: ch.id,
       onClick: function onClick() {
-        return unlocked && onStart(lesson, function (id, earnedXp) {
-          var newDone = done.includes(id) ? done : [].concat(_toConsumableArray(done), [id]);
-          setDone(newDone);
-          store("nq_done", newDone);
-          var newXp = done.includes(id) ? xp : xp + earnedXp;
-          setXp(newXp);
-          store("nq_xp", newXp);
-          var today = new Date().toDateString();
-          var last = load("nq_lastDate", null);
-          if (last !== today) {
-            var s = streak + 1;
-            setStreak(s);
-            store("nq_streak", s);
-            store("nq_lastDate", today);
-          }
-        });
+        return !isLocked && onSelectChapter(ch);
       },
       style: {
         width: "100%",
         textAlign: "left",
-        cursor: unlocked ? "pointer" : "default",
-        display: "flex",
-        alignItems: "center",
-        gap: 14,
-        padding: "14px 16px",
-        background: isDone ? "#111d11" : isNext ? "".concat(C.gold, "0a") : C.card,
-        border: "1px solid ".concat(isDone ? "#2a4a2a" : isNext ? "".concat(C.gold, "44") : C.border),
-        borderRadius: 14,
-        marginBottom: 10,
-        opacity: unlocked ? 1 : 0.4,
+        cursor: isLocked ? "default" : "pointer",
+        background: C.card,
+        border: "1px solid ".concat(isLocked ? C.border : ch.color + "44"),
+        borderRadius: 18,
+        padding: "20px 18px",
+        marginBottom: 14,
+        opacity: isLocked ? 0.5 : 1,
         transition: "all 0.2s"
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        width: 44,
-        height: 44,
-        borderRadius: 12,
-        flexShrink: 0,
+        display: "flex",
+        gap: 14,
+        alignItems: "flex-start"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 52,
+        height: 52,
+        borderRadius: 14,
+        background: "".concat(ch.color, "18"),
+        border: "1px solid ".concat(ch.color, "44"),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: isDone ? "#1a3a1a" : unlocked ? C.navy : "#0f1420",
-        border: "1px solid ".concat(isDone ? "#3a6a3a" : unlocked ? color + "44" : C.border),
-        color: isDone ? C.green : unlocked ? color : C.muted,
-        fontSize: 20
+        flexShrink: 0,
+        fontSize: 22,
+        color: ch.color
       }
-    }, isDone ? /*#__PURE__*/React.createElement(IC.Check, null) : unlocked ? /*#__PURE__*/React.createElement("span", {
+    }, isLocked ? /*#__PURE__*/React.createElement(IC.Lock, null) : idx === 0 ? "أ" : "ه"), /*#__PURE__*/React.createElement("div", {
       style: {
-        fontFamily: "'Amiri',serif",
-        fontSize: 22
-      }
-    }, lesson.id === "c1-l0" ? "١" : lesson.id === "c1-l1" ? "أ" : lesson.id === "c1-l2" ? "ج" : lesson.id === "c1-l3" ? "د" : lesson.id === "c1-l4" ? "س" : lesson.id === "c1-l5" ? "ع" : lesson.id === "c1-l6" ? "ف" : lesson.id === "c1-l7" ? "م" : lesson.id === "c1-l8" ? "َ" : lesson.id === "c1-l9" ? "ْ" : "ق") : /*#__PURE__*/React.createElement(IC.Lock, null)), /*#__PURE__*/React.createElement("div", {
-      style: {
-        flex: 1,
-        minWidth: 0
+        flex: 1
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
         display: "flex",
-        alignItems: "center",
-        gap: 8,
+        justifyContent: "space-between",
+        alignItems: "flex-start"
+      }
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 10,
+        color: ch.color,
+        letterSpacing: 2,
+        textTransform: "uppercase",
+        fontWeight: 700,
         marginBottom: 4
       }
-    }, /*#__PURE__*/React.createElement("span", {
+    }, "Chapter ", ch.number), /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 9,
-        padding: "2px 8px",
-        borderRadius: 6,
-        background: "".concat(color, "18"),
-        color: color,
-        textTransform: "uppercase",
-        letterSpacing: 1,
-        fontWeight: 700
+        fontSize: 20,
+        color: ch.color,
+        fontFamily: "'Amiri',serif"
       }
-    }, typeLabel[lesson.type]), isNext && /*#__PURE__*/React.createElement("span", {
+    }, ch.arabic), /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 9,
-        color: C.gold,
-        letterSpacing: 1
-      }
-    }, "\u25B6 NEXT")), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 15,
-        fontWeight: 600,
-        color: isDone ? C.green : C.text
-      }
-    }, lesson.title), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 12,
-        color: C.muted,
+        fontSize: 13,
+        color: C.text,
         marginTop: 2
       }
-    }, lesson.subtitle)), /*#__PURE__*/React.createElement("div", {
+    }, ch.english)), /*#__PURE__*/React.createElement("div", {
       style: {
         textAlign: "right",
-        flexShrink: 0
+        flexShrink: 0,
+        marginLeft: 12
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 13,
         fontWeight: 700,
-        color: isDone ? C.green : C.gold
+        color: completed === lessons.length ? C.green : C.gold
       }
-    }, "+", lesson.xp), /*#__PURE__*/React.createElement("div", {
+    }, completed, "/", lessons.length), /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 9,
         color: C.muted
       }
-    }, "XP")));
+    }, "lessons"))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: C.muted,
+        marginTop: 6,
+        marginBottom: 10
+      }
+    }, ch.desc), /*#__PURE__*/React.createElement("div", {
+      style: {
+        height: 4,
+        background: C.border,
+        borderRadius: 2,
+        overflow: "hidden"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        height: "100%",
+        width: "".concat(pct, "%"),
+        borderRadius: 2,
+        background: pct === 100 ? C.green : "linear-gradient(90deg,".concat(ch.color, ",").concat(ch.color, "aa)"),
+        transition: "width 0.5s"
+      }
+    })))));
   })), /*#__PURE__*/React.createElement("style", null, "@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap'); *{box-sizing:border-box;margin:0;padding:0} button{font-family:inherit;border:none;background:none}"));
 }
 
-// ─── LESSON SCREEN ─────────────────────────────────────────────────
-function LessonScreen(_ref2) {
-  var lesson = _ref2.lesson,
-    onBack = _ref2.onBack,
-    onComplete = _ref2.onComplete;
-  var _useState7 = useState("teach"),
-    _useState8 = _slicedToArray(_useState7, 2),
-    phase = _useState8[0],
-    setPhase = _useState8[1]; // teach | quiz | done
-  var _useState9 = useState(0),
-    _useState0 = _slicedToArray(_useState9, 2),
-    slideIdx = _useState0[0],
-    setSlideIdx = _useState0[1];
-  var _useState1 = useState(0),
+// ─── CHAPTER SCREEN ────────────────────────────────────────────────
+function ChapterScreen(_ref4) {
+  var chapter = _ref4.chapter,
+    onBack = _ref4.onBack,
+    onStartLesson = _ref4.onStartLesson;
+  var _useState1 = useState(function () {
+      return load("nq_done", []);
+    }),
     _useState10 = _slicedToArray(_useState1, 2),
-    qIdx = _useState10[0],
-    setQIdx = _useState10[1];
-  var _useState11 = useState(null),
-    _useState12 = _slicedToArray(_useState11, 2),
-    selected = _useState12[0],
-    setSelected = _useState12[1];
-  var _useState13 = useState(false),
-    _useState14 = _slicedToArray(_useState13, 2),
-    answered = _useState14[0],
-    setAnswered = _useState14[1];
-  var _useState15 = useState(0),
-    _useState16 = _slicedToArray(_useState15, 2),
-    correct = _useState16[0],
-    setCorrect = _useState16[1];
-  var _useState17 = useState(false),
-    _useState18 = _slicedToArray(_useState17, 2),
-    showExp = _useState18[0],
-    setShowExp = _useState18[1];
-  var slides = lesson.slides;
-  var quiz = lesson.quiz;
-  var slide = slides[slideIdx];
-  var q = quiz[qIdx];
-  var nextSlide = function nextSlide() {
-    if (slideIdx < slides.length - 1) setSlideIdx(function (s) {
-      return s + 1;
-    });else setPhase("quiz");
+    done = _useState10[0],
+    setDone = _useState10[1];
+  var lessons = ALL_LESSONS[chapter.data] || [];
+  var typeColor = {
+    intro: C.blue,
+    letters: C.gold,
+    grammar: "#8bbd6b",
+    vocab: "#bd8b6b",
+    quran: C.purple
   };
-  var prevSlide = function prevSlide() {
-    if (slideIdx > 0) setSlideIdx(function (s) {
-      return s - 1;
-    });
+  var typeLabel = {
+    intro: "INTRO",
+    letters: "LETTERS",
+    grammar: "GRAMMAR",
+    vocab: "VOCAB",
+    quran: "QURAN"
   };
-  var handleAnswer = function handleAnswer(i) {
-    if (answered) return;
-    setSelected(i);
-    setAnswered(true);
-    setShowExp(true);
-    if (i === q.ans) setCorrect(function (c) {
-      return c + 1;
-    });
-  };
-  var nextQ = function nextQ() {
-    setSelected(null);
-    setAnswered(false);
-    setShowExp(false);
-    if (qIdx < quiz.length - 1) setQIdx(function (i) {
-      return i + 1;
-    });else {
-      setPhase("done");
-      onComplete(lesson.id, lesson.xp);
-    }
+  var isUnlocked = function isUnlocked(idx) {
+    return idx === 0 || done.includes(lessons[idx - 1].id);
   };
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1632,18 +1718,253 @@ function LessonScreen(_ref2) {
       cursor: "pointer",
       color: C.muted
     }
+  }, /*#__PURE__*/React.createElement(IC.Arrow, null)), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 22,
+      color: chapter.color,
+      fontFamily: "'Amiri',serif"
+    }
+  }, chapter.arabic), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: C.muted
+    }
+  }, chapter.english))), lessons.map(function (lesson, idx) {
+    var unlocked = isUnlocked(idx);
+    var isDone = done.includes(lesson.id);
+    var isNext = !isDone && unlocked;
+    var color = typeColor[lesson.type] || C.gold;
+    return /*#__PURE__*/React.createElement("button", {
+      key: lesson.id,
+      onClick: function onClick() {
+        return unlocked && onStartLesson(lesson, chapter, function (id, xp) {
+          var newDone = done.includes(id) ? done : [].concat(_toConsumableArray(done), [id]);
+          setDone(newDone);
+          store("nq_done", newDone);
+          var curXp = load("nq_xp", 0);
+          var newXp = done.includes(id) ? curXp : curXp + xp;
+          store("nq_xp", newXp);
+          var today = new Date().toDateString();
+          var last = load("nq_lastDate", null);
+          if (last !== today) {
+            var s = load("nq_streak", 0) + 1;
+            store("nq_streak", s);
+            store("nq_lastDate", today);
+          }
+        });
+      },
+      style: {
+        width: "100%",
+        textAlign: "left",
+        cursor: unlocked ? "pointer" : "default",
+        display: "flex",
+        alignItems: "center",
+        gap: 14,
+        padding: "14px 16px",
+        background: isDone ? "#111d11" : isNext ? "".concat(chapter.color, "0a") : C.card,
+        border: "1px solid ".concat(isDone ? "#2a4a2a" : isNext ? "".concat(chapter.color, "44") : C.border),
+        borderRadius: 14,
+        marginBottom: 10,
+        opacity: unlocked ? 1 : 0.4,
+        transition: "all 0.2s"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        flexShrink: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: isDone ? "#1a3a1a" : unlocked ? C.navy : "#0f1420",
+        border: "1px solid ".concat(isDone ? "#3a6a3a" : unlocked ? color + "44" : C.border),
+        color: isDone ? C.green : unlocked ? color : C.muted
+      }
+    }, isDone ? /*#__PURE__*/React.createElement(IC.Check, null) : unlocked ? /*#__PURE__*/React.createElement(IC.Play, null) : /*#__PURE__*/React.createElement(IC.Lock, null)), /*#__PURE__*/React.createElement("div", {
+      style: {
+        flex: 1,
+        minWidth: 0
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        marginBottom: 4
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 9,
+        padding: "2px 8px",
+        borderRadius: 6,
+        background: "".concat(color, "18"),
+        color: color,
+        textTransform: "uppercase",
+        letterSpacing: 1,
+        fontWeight: 700
+      }
+    }, typeLabel[lesson.type]), isNext && /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 9,
+        color: chapter.color,
+        fontWeight: 700
+      }
+    }, "\u25B6 UP NEXT"), lesson.videoId && /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 9,
+        color: "#cc6666",
+        display: "flex",
+        alignItems: "center",
+        gap: 3
+      }
+    }, /*#__PURE__*/React.createElement(IC.Video, null), "VIDEO")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 15,
+        fontWeight: 600,
+        color: isDone ? C.green : C.text
+      }
+    }, lesson.title), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 12,
+        color: C.muted,
+        marginTop: 2
+      }
+    }, lesson.subtitle)), /*#__PURE__*/React.createElement("div", {
+      style: {
+        textAlign: "right",
+        flexShrink: 0
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 13,
+        fontWeight: 700,
+        color: isDone ? C.green : C.gold
+      }
+    }, "+", lesson.xp), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 9,
+        color: C.muted
+      }
+    }, "XP")));
+  })), /*#__PURE__*/React.createElement("style", null, "@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap'); *{box-sizing:border-box;margin:0;padding:0} button{font-family:inherit}"));
+}
+
+// ─── LESSON SCREEN ─────────────────────────────────────────────────
+function LessonScreen(_ref5) {
+  var lesson = _ref5.lesson,
+    chapter = _ref5.chapter,
+    onBack = _ref5.onBack,
+    onComplete = _ref5.onComplete;
+  var _useState11 = useState("teach"),
+    _useState12 = _slicedToArray(_useState11, 2),
+    phase = _useState12[0],
+    setPhase = _useState12[1];
+  var _useState13 = useState(0),
+    _useState14 = _slicedToArray(_useState13, 2),
+    slideIdx = _useState14[0],
+    setSlide = _useState14[1];
+  var _useState15 = useState(0),
+    _useState16 = _slicedToArray(_useState15, 2),
+    qIdx = _useState16[0],
+    setQIdx = _useState16[1];
+  var _useState17 = useState(null),
+    _useState18 = _slicedToArray(_useState17, 2),
+    selected = _useState18[0],
+    setSel = _useState18[1];
+  var _useState19 = useState(false),
+    _useState20 = _slicedToArray(_useState19, 2),
+    answered = _useState20[0],
+    setAns = _useState20[1];
+  var _useState21 = useState(0),
+    _useState22 = _slicedToArray(_useState21, 2),
+    correct = _useState22[0],
+    setCorr = _useState22[1];
+  var _useState23 = useState(false),
+    _useState24 = _slicedToArray(_useState23, 2),
+    showExp = _useState24[0],
+    setExp = _useState24[1];
+  var slides = lesson.slides || [];
+  var quiz = lesson.quiz || [];
+  var slide = slides[slideIdx];
+  var q = quiz[qIdx];
+  var color = (chapter === null || chapter === void 0 ? void 0 : chapter.color) || C.gold;
+  var nextSlide = function nextSlide() {
+    if (slideIdx < slides.length - 1) setSlide(function (s) {
+      return s + 1;
+    });else setPhase("quiz");
+  };
+  var prevSlide = function prevSlide() {
+    if (slideIdx > 0) setSlide(function (s) {
+      return s - 1;
+    });
+  };
+  var handleAns = function handleAns(i) {
+    if (answered) return;
+    setSel(i);
+    setAns(true);
+    setExp(true);
+    if (i === q.ans) setCorr(function (c) {
+      return c + 1;
+    });
+  };
+  var nextQ = function nextQ() {
+    setSel(null);
+    setAns(false);
+    setExp(false);
+    if (qIdx < quiz.length - 1) setQIdx(function (i) {
+      return i + 1;
+    });else {
+      setPhase("done");
+      onComplete(lesson.id, lesson.xp);
+    }
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      minHeight: "100vh",
+      background: C.bg,
+      color: C.text,
+      fontFamily: "'Amiri','Georgia',serif"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 480,
+      margin: "0 auto",
+      padding: "0 16px 40px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      padding: "18px 0 12px"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: onBack,
+    style: {
+      width: 40,
+      height: 40,
+      borderRadius: 10,
+      background: C.card,
+      border: "1px solid ".concat(C.border),
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      color: C.muted
+    }
   }, /*#__PURE__*/React.createElement(IC.Arrow, null)), /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 13,
+      fontSize: 12,
       fontWeight: 600,
       color: C.text,
-      marginBottom: 6
+      marginBottom: 5
     }
-  }, phase === "teach" ? "".concat(lesson.title) : phase === "quiz" ? "Quiz \u2014 ".concat(lesson.title) : "Complete!"), /*#__PURE__*/React.createElement("div", {
+  }, phase === "teach" ? lesson.title : phase === "quiz" ? "Quiz — " + lesson.title : "Complete!"), /*#__PURE__*/React.createElement("div", {
     style: {
       height: 4,
       background: C.border,
@@ -1653,38 +1974,41 @@ function LessonScreen(_ref2) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       height: "100%",
-      background: "linear-gradient(90deg,".concat(C.gold, ",#e8d5a3)"),
       borderRadius: 2,
-      transition: "width 0.4s ease",
+      transition: "width 0.4s",
+      background: "linear-gradient(90deg,".concat(color, ",").concat(color, "aa)"),
       width: phase === "teach" ? "".concat((slideIdx + 1) / slides.length * 50, "%") : phase === "quiz" ? "".concat(50 + (qIdx + 1) / quiz.length * 50, "%") : "100%"
     }
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       justifyContent: "space-between",
-      marginTop: 4
+      marginTop: 3
     }
   }, /*#__PURE__*/React.createElement("span", {
     style: {
       fontSize: 9,
-      color: phase === "teach" ? C.gold : C.muted,
+      color: phase === "teach" ? color : C.muted,
       textTransform: "uppercase",
       letterSpacing: 1
     }
-  }, "Lesson ", slideIdx + 1, "/", slides.length), /*#__PURE__*/React.createElement("span", {
+  }, "Slide ", slideIdx + 1, "/", slides.length), /*#__PURE__*/React.createElement("span", {
     style: {
       fontSize: 9,
-      color: phase === "quiz" ? C.gold : C.muted,
+      color: phase === "quiz" ? color : C.muted,
       textTransform: "uppercase",
       letterSpacing: 1
     }
-  }, "Quiz ", phase === "quiz" ? qIdx + 1 : 0, "/", quiz.length)))), phase === "teach" && /*#__PURE__*/React.createElement(TeachSlide, {
+  }, "Quiz ", phase === "quiz" ? qIdx + 1 : 0, "/", quiz.length)))), phase === "teach" && slideIdx === 0 && lesson.videoId && /*#__PURE__*/React.createElement(VideoPlayer, {
+    videoId: lesson.videoId
+  }), phase === "teach" && slide && /*#__PURE__*/React.createElement(TeachSlide, {
     slide: slide,
+    color: color,
     onNext: nextSlide,
     onPrev: prevSlide,
     isFirst: slideIdx === 0,
     isLast: slideIdx === slides.length - 1
-  }), phase === "quiz" && /*#__PURE__*/React.createElement("div", {
+  }), phase === "quiz" && q && /*#__PURE__*/React.createElement("div", {
     style: {
       animation: "fadeIn 0.3s ease"
     }
@@ -1699,7 +2023,7 @@ function LessonScreen(_ref2) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
-      color: C.gold,
+      color: color,
       letterSpacing: 2,
       textTransform: "uppercase",
       marginBottom: 12
@@ -1719,33 +2043,33 @@ function LessonScreen(_ref2) {
       marginBottom: 16
     }
   }, q.opts.map(function (opt, i) {
-    var isCorrect = i === q.ans;
-    var isSel = selected === i;
+    var isCorr = i === q.ans,
+      isSel = selected === i;
     var bg = C.navy,
       border = "#2a2f3e",
-      textColor = C.text;
+      tc = C.text;
     if (answered) {
-      if (isCorrect) {
+      if (isCorr) {
         bg = "#1a2a1a";
         border = "#4a8c4a";
-        textColor = C.green;
+        tc = C.green;
       } else if (isSel) {
         bg = "#2a1a1a";
         border = "#8c4a4a";
-        textColor = C.red;
+        tc = C.red;
       }
     }
     return /*#__PURE__*/React.createElement("button", {
       key: i,
       onClick: function onClick() {
-        return handleAnswer(i);
+        return handleAns(i);
       },
       style: {
         padding: "15px 18px",
         border: "1px solid ".concat(border),
         borderRadius: 12,
         background: bg,
-        color: textColor,
+        color: tc,
         fontSize: 14,
         cursor: answered ? "default" : "pointer",
         textAlign: "left",
@@ -1760,11 +2084,11 @@ function LessonScreen(_ref2) {
         borderRadius: 6,
         alignItems: "center",
         justifyContent: "center",
-        background: answered && isCorrect ? "#2a4a2a" : C.card,
+        background: answered && isCorr ? "#2a4a2a" : C.card,
         marginRight: 12,
         fontSize: 11,
         fontWeight: 700,
-        color: answered && isCorrect ? C.green : C.muted
+        color: answered && isCorr ? C.green : C.muted
       }
     }, String.fromCharCode(65 + i)), opt);
   })), showExp && /*#__PURE__*/React.createElement("div", {
@@ -1774,7 +2098,7 @@ function LessonScreen(_ref2) {
       borderRadius: 12,
       padding: "14px 16px",
       marginBottom: 16,
-      animation: "fadeIn 0.3s ease"
+      animation: "fadeIn 0.3s"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1798,12 +2122,12 @@ function LessonScreen(_ref2) {
       padding: "15px",
       border: "none",
       borderRadius: 13,
-      background: "linear-gradient(135deg,".concat(C.gold, ",#a88a3a)"),
+      background: "linear-gradient(135deg,".concat(color, ",").concat(color, "aa)"),
       color: C.bg,
       fontSize: 16,
       fontWeight: 700,
       cursor: "pointer",
-      animation: "fadeIn 0.3s ease"
+      animation: "fadeIn 0.3s"
     }
   }, qIdx < quiz.length - 1 ? "Next Question →" : "See Results →")), phase === "done" && /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1814,7 +2138,7 @@ function LessonScreen(_ref2) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       background: "linear-gradient(135deg,#1a2235,#141824)",
-      border: "1px solid ".concat(C.gold, "33"),
+      border: "1px solid ".concat(color, "33"),
       borderRadius: 22,
       padding: "36px 24px",
       marginBottom: 24
@@ -1827,7 +2151,7 @@ function LessonScreen(_ref2) {
   }, correct === quiz.length ? "🌟" : correct >= quiz.length * 0.6 ? "✅" : "📖"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
-      color: C.gold,
+      color: color,
       letterSpacing: 2,
       textTransform: "uppercase",
       marginBottom: 8
@@ -1845,7 +2169,7 @@ function LessonScreen(_ref2) {
       color: C.muted,
       marginBottom: 24
     }
-  }, correct === quiz.length ? "ما شاء الله — Perfect score!" : correct >= quiz.length * 0.6 ? "Good work — keep going!" : "Review the lesson and try again."), /*#__PURE__*/React.createElement("div", {
+  }, correct === quiz.length ? "ما شاء الله — Perfect!" : correct >= quiz.length * 0.6 ? "Good work — keep going!" : "Review the lesson and try again."), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       justifyContent: "center",
@@ -1855,15 +2179,15 @@ function LessonScreen(_ref2) {
     style: {
       fontSize: 26,
       fontWeight: 700,
-      color: C.gold
+      color: color
     }
-  }, "+", lesson.xp), /*#__PURE__*/React.createElement("div", {
+  }, " +", lesson.xp), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
       color: C.muted,
       letterSpacing: 1
     }
-  }, "XP EARNED")), /*#__PURE__*/React.createElement("div", {
+  }, "XP")), /*#__PURE__*/React.createElement("div", {
     style: {
       width: 1,
       background: C.border
@@ -1887,7 +2211,7 @@ function LessonScreen(_ref2) {
       padding: "15px",
       border: "none",
       borderRadius: 13,
-      background: "linear-gradient(135deg,".concat(C.gold, ",#a88a3a)"),
+      background: "linear-gradient(135deg,".concat(color, ",").concat(color, "aa)"),
       color: C.bg,
       fontSize: 16,
       fontWeight: 700,
@@ -1896,44 +2220,42 @@ function LessonScreen(_ref2) {
   }, "Back to Lessons \u2192"))), /*#__PURE__*/React.createElement("style", null, "@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap'); *{box-sizing:border-box;margin:0;padding:0} button{font-family:inherit} @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}"));
 }
 
-// ─── TEACH SLIDE RENDERER ──────────────────────────────────────────
-function TeachSlide(_ref3) {
-  var slide = _ref3.slide,
-    onNext = _ref3.onNext,
-    onPrev = _ref3.onPrev,
-    isFirst = _ref3.isFirst,
-    isLast = _ref3.isLast;
+// ─── TEACH SLIDE ───────────────────────────────────────────────────
+function TeachSlide(_ref6) {
+  var slide = _ref6.slide,
+    color = _ref6.color,
+    onNext = _ref6.onNext,
+    onPrev = _ref6.onPrev,
+    isFirst = _ref6.isFirst,
+    isLast = _ref6.isLast;
   return /*#__PURE__*/React.createElement("div", {
     style: {
       animation: "fadeIn 0.35s ease"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      minHeight: 420,
-      display: "flex",
-      flexDirection: "column"
+      minHeight: 380
     }
   }, slide.type === "welcome" && /*#__PURE__*/React.createElement("div", {
     style: {
       background: "linear-gradient(160deg,#1a2235,#0f1520)",
-      border: "1px solid ".concat(C.gold, "33"),
+      border: "1px solid ".concat(color, "33"),
       borderRadius: 20,
       padding: "36px 24px",
-      textAlign: "center",
-      flex: 1
+      textAlign: "center"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 56,
-      color: C.gold,
-      marginBottom: 16,
+      fontSize: 64,
+      color: color,
+      marginBottom: 14,
       fontWeight: 700
     }
   }, slide.heading), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 18,
       color: C.text,
-      marginBottom: 16
+      marginBottom: 14
     }
   }, slide.subheading), /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1946,13 +2268,12 @@ function TeachSlide(_ref3) {
       background: C.card,
       border: "1px solid ".concat(C.border),
       borderRadius: 20,
-      padding: "24px 20px",
-      flex: 1
+      padding: "24px 20px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
-      color: C.gold,
+      color: color,
       letterSpacing: 2,
       textTransform: "uppercase",
       fontWeight: 700,
@@ -1972,12 +2293,12 @@ function TeachSlide(_ref3) {
         width: 28,
         height: 28,
         borderRadius: 8,
-        background: "".concat(C.gold, "18"),
+        background: "".concat(color, "18"),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         fontSize: 13,
-        color: C.gold,
+        color: color,
         fontWeight: 700,
         flexShrink: 0
       }
@@ -1993,13 +2314,12 @@ function TeachSlide(_ref3) {
       background: C.card,
       border: "1px solid ".concat(C.border),
       borderRadius: 20,
-      padding: "24px 20px",
-      flex: 1
+      padding: "24px 20px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 14,
-      color: C.gold,
+      color: color,
       fontWeight: 700,
       marginBottom: 8
     }
@@ -2019,20 +2339,27 @@ function TeachSlide(_ref3) {
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 24,
-      color: C.gold,
+      fontSize: 22,
+      color: color,
       lineHeight: 2.2,
       fontFamily: "'Amiri',serif",
       direction: "rtl",
       letterSpacing: 4
     }
-  }, slide.letters))), slide.type === "tip" && /*#__PURE__*/React.createElement("div", {
+  }, slide.letters)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 12,
+      display: "flex",
+      justifyContent: "center"
+    }
+  }, /*#__PURE__*/React.createElement(SpeakBtn, {
+    text: slide.letters
+  }))), slide.type === "tip" && /*#__PURE__*/React.createElement("div", {
     style: {
       background: "#111d11",
       border: "1px solid #2a4a2a",
       borderRadius: 20,
-      padding: "28px 22px",
-      flex: 1
+      padding: "28px 22px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2065,7 +2392,7 @@ function TeachSlide(_ref3) {
   }, "\"", slide.tip, "\"")), slide.type === "letter" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       background: "linear-gradient(135deg,#1a2235,#0f1825)",
-      border: "1px solid ".concat(C.gold, "44"),
+      border: "1px solid ".concat(color, "44"),
       borderRadius: 20,
       padding: "28px 20px",
       textAlign: "center",
@@ -2074,7 +2401,7 @@ function TeachSlide(_ref3) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 96,
-      color: C.gold,
+      color: color,
       fontFamily: "'Amiri',serif",
       lineHeight: 1.1,
       marginBottom: 10
@@ -2088,26 +2415,29 @@ function TeachSlide(_ref3) {
     }
   }, slide.name), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 14,
-      color: C.muted
+      fontSize: 13,
+      color: C.muted,
+      marginBottom: 12
     }
-  }, slide.sound)), /*#__PURE__*/React.createElement("div", {
+  }, slide.sound), /*#__PURE__*/React.createElement(SpeakBtn, {
+    text: slide.arabic
+  })), /*#__PURE__*/React.createElement("div", {
     style: {
       background: C.card,
       border: "1px solid ".concat(C.border),
       borderRadius: 14,
       padding: "14px 16px",
-      marginBottom: 14
+      marginBottom: 12
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
-      color: "#6b8bbd",
+      color: C.blue,
       letterSpacing: 2,
       textTransform: "uppercase",
       marginBottom: 6
     }
-  }, "SHAPE GUIDE"), /*#__PURE__*/React.createElement("div", {
+  }, "SHAPE"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       color: C.text
@@ -2122,7 +2452,7 @@ function TeachSlide(_ref3) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
-      color: "#bd8bbd",
+      color: C.purple,
       letterSpacing: 2,
       textTransform: "uppercase",
       marginBottom: 10
@@ -2131,11 +2461,12 @@ function TeachSlide(_ref3) {
     style: {
       display: "flex",
       alignItems: "center",
-      gap: 16
+      gap: 14,
+      marginBottom: 10
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 42,
+      fontSize: 44,
       color: "#ddb8dd",
       fontFamily: "'Amiri',serif"
     }
@@ -2150,9 +2481,13 @@ function TeachSlide(_ref3) {
       fontSize: 13,
       color: C.muted
     }
-  }, slide.wordMeaning))), /*#__PURE__*/React.createElement("div", {
+  }, slide.wordMeaning)), /*#__PURE__*/React.createElement(SpeakBtn, {
+    text: slide.word,
     style: {
-      marginTop: 12,
+      marginLeft: "auto"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
       fontSize: 12,
       color: "#9a7a9a",
       lineHeight: 1.7,
@@ -2162,16 +2497,15 @@ function TeachSlide(_ref3) {
   }, slide.context))), slide.type === "letter_intro" && /*#__PURE__*/React.createElement("div", {
     style: {
       background: "linear-gradient(135deg,#1a2030,".concat(C.card, ")"),
-      border: "1px solid ".concat(C.gold, "33"),
+      border: "1px solid ".concat(color, "33"),
       borderRadius: 20,
       padding: "30px 22px",
-      flex: 1,
       textAlign: "center"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
-      color: C.gold,
+      color: color,
       letterSpacing: 2,
       textTransform: "uppercase",
       marginBottom: 16
@@ -2187,14 +2521,13 @@ function TeachSlide(_ref3) {
       background: C.card,
       border: "1px solid ".concat(C.border),
       borderRadius: 20,
-      padding: "24px 20px",
-      flex: 1
+      padding: "24px 20px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 14,
       fontWeight: 700,
-      color: C.gold,
+      color: color,
       marginBottom: 8
     }
   }, slide.heading), /*#__PURE__*/React.createElement("div", {
@@ -2209,7 +2542,7 @@ function TeachSlide(_ref3) {
       style: {
         display: "flex",
         alignItems: "center",
-        gap: 16,
+        gap: 14,
         background: C.navy,
         borderRadius: 12,
         padding: "14px 16px",
@@ -2218,17 +2551,20 @@ function TeachSlide(_ref3) {
     }, /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 40,
-        color: C.gold,
+        color: color,
         fontFamily: "'Amiri',serif",
         width: 50,
         textAlign: "center"
       }
     }, item.arabic), /*#__PURE__*/React.createElement("div", {
       style: {
+        flex: 1,
         fontSize: 14,
         color: C.text
       }
-    }, item.label));
+    }, item.label), /*#__PURE__*/React.createElement(SpeakBtn, {
+      text: item.arabic
+    }));
   }), slide.tip && /*#__PURE__*/React.createElement("div", {
     style: {
       marginTop: 14,
@@ -2244,14 +2580,13 @@ function TeachSlide(_ref3) {
       background: C.card,
       border: "1px solid ".concat(C.border),
       borderRadius: 20,
-      padding: "24px 20px",
-      flex: 1
+      padding: "24px 20px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 15,
       fontWeight: 700,
-      color: C.gold,
+      color: color,
       marginBottom: 14
     }
   }, slide.heading), /*#__PURE__*/React.createElement("div", {
@@ -2259,6 +2594,7 @@ function TeachSlide(_ref3) {
       fontSize: 14,
       color: C.text,
       lineHeight: 1.8,
+      whiteSpace: "pre-line",
       marginBottom: slide.items ? 16 : 0
     }
   }, slide.body), slide.items && slide.items.map(function (item, i) {
@@ -2275,18 +2611,21 @@ function TeachSlide(_ref3) {
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 36,
-        color: C.gold,
+        fontSize: 30,
+        color: color,
         fontFamily: "'Amiri',serif",
-        minWidth: 50,
+        minWidth: 60,
         textAlign: "center"
       }
     }, item.arabic), /*#__PURE__*/React.createElement("div", {
       style: {
+        flex: 1,
         fontSize: 13,
         color: C.text
       }
-    }, item.label));
+    }, item.label), /*#__PURE__*/React.createElement(SpeakBtn, {
+      text: item.arabic
+    }));
   }), slide.tip && /*#__PURE__*/React.createElement("div", {
     style: {
       marginTop: 14,
@@ -2300,7 +2639,7 @@ function TeachSlide(_ref3) {
   }, "\uD83D\uDCA1 ", slide.tip)), slide.type === "vowel" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       background: "linear-gradient(135deg,#1a2235,#0f1825)",
-      border: "1px solid ".concat(C.gold, "44"),
+      border: "1px solid ".concat(color, "44"),
       borderRadius: 20,
       padding: "24px 20px",
       textAlign: "center",
@@ -2309,7 +2648,7 @@ function TeachSlide(_ref3) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
-      color: C.gold,
+      color: color,
       letterSpacing: 2,
       textTransform: "uppercase",
       marginBottom: 10
@@ -2317,7 +2656,7 @@ function TeachSlide(_ref3) {
   }, slide.name), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 72,
-      color: C.gold,
+      color: color,
       fontFamily: "'Amiri',serif",
       marginBottom: 8
     }
@@ -2330,20 +2669,23 @@ function TeachSlide(_ref3) {
   }, slide.sound), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
-      color: C.muted
+      color: C.muted,
+      marginBottom: 12
     }
-  }, slide.position)), /*#__PURE__*/React.createElement("div", {
+  }, slide.position), /*#__PURE__*/React.createElement(SpeakBtn, {
+    text: slide.arabic
+  })), /*#__PURE__*/React.createElement("div", {
     style: {
       background: C.card,
       border: "1px solid ".concat(C.border),
       borderRadius: 14,
       padding: "16px",
-      marginBottom: 14
+      marginBottom: 12
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
-      color: "#6b8bbd",
+      color: C.blue,
       letterSpacing: 2,
       textTransform: "uppercase",
       marginBottom: 12
@@ -2360,11 +2702,19 @@ function TeachSlide(_ref3) {
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 10
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
         fontSize: 30,
-        color: C.gold,
+        color: color,
         fontFamily: "'Amiri',serif"
       }
-    }, ex.arabic), /*#__PURE__*/React.createElement("div", {
+    }, ex.arabic), /*#__PURE__*/React.createElement(SpeakBtn, {
+      text: ex.arabic
+    })), /*#__PURE__*/React.createElement("div", {
       style: {
         textAlign: "right"
       }
@@ -2390,42 +2740,112 @@ function TeachSlide(_ref3) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
-      color: "#bd8bbd",
+      color: C.purple,
       letterSpacing: 2,
       textTransform: "uppercase",
       marginBottom: 8
     }
   }, "QURANIC EXAMPLE"), /*#__PURE__*/React.createElement("div", {
     style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
       fontSize: 28,
       color: "#ddb8dd",
-      fontFamily: "'Amiri',serif",
-      marginBottom: 6
+      fontFamily: "'Amiri',serif"
     }
-  }, slide.qExample.arabic), /*#__PURE__*/React.createElement("div", {
+  }, slide.qExample.arabic), /*#__PURE__*/React.createElement(SpeakBtn, {
+    text: slide.qExample.arabic
+  })), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       color: C.text,
-      fontWeight: 600
+      fontWeight: 600,
+      marginTop: 6
     }
   }, slide.qExample.roman), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: C.muted
     }
-  }, slide.qExample.meaning))), slide.type === "reading_practice" && /*#__PURE__*/React.createElement("div", {
+  }, slide.qExample.meaning))), slide.type === "vocab_list" && /*#__PURE__*/React.createElement("div", {
     style: {
       background: C.card,
       border: "1px solid ".concat(C.border),
       borderRadius: 20,
-      padding: "24px 20px",
-      flex: 1
+      padding: "18px 16px"
+    }
+  }, slide.heading && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: color,
+      fontWeight: 700,
+      marginBottom: 14,
+      letterSpacing: 1
+    }
+  }, slide.heading), (slide.words || []).map(function (w, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        background: C.navy,
+        borderRadius: 12,
+        padding: "12px 14px",
+        marginBottom: 10
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        minWidth: 70,
+        textAlign: "center"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 28,
+        color: color,
+        fontFamily: "'Amiri',serif"
+      }
+    }, w.arabic)), /*#__PURE__*/React.createElement("div", {
+      style: {
+        flex: 1
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 14,
+        color: C.text,
+        fontWeight: 600
+      }
+    }, w.roman), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 12,
+        color: C.muted
+      }
+    }, w.meaning), w.note && /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: color,
+        marginTop: 4,
+        fontStyle: "italic"
+      }
+    }, w.note)), /*#__PURE__*/React.createElement(SpeakBtn, {
+      text: w.arabic
+    }));
+  })), slide.type === "reading_practice" && /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: C.card,
+      border: "1px solid ".concat(C.border),
+      borderRadius: 20,
+      padding: "24px 20px"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       fontWeight: 700,
-      color: C.gold,
+      color: color,
       marginBottom: 6
     }
   }, slide.heading), /*#__PURE__*/React.createElement("div", {
@@ -2434,7 +2854,7 @@ function TeachSlide(_ref3) {
       color: C.muted,
       marginBottom: 18
     }
-  }, slide.instruction), slide.words.map(function (w, i) {
+  }, slide.instruction), (slide.words || []).map(function (w, i) {
     return /*#__PURE__*/React.createElement("div", {
       key: i,
       style: {
@@ -2451,17 +2871,22 @@ function TeachSlide(_ref3) {
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 32,
-        color: C.gold,
+        fontSize: 28,
+        color: color,
         fontFamily: "'Amiri',serif"
       }
-    }, w.arabic), /*#__PURE__*/React.createElement("div", {
+    }, w.arabic), /*#__PURE__*/React.createElement(SpeakBtn, {
+      text: w.arabic
+    })), /*#__PURE__*/React.createElement("div", {
       style: {
-        textAlign: "right"
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginTop: 8
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 14,
+        fontSize: 13,
         color: C.text,
         fontWeight: 600
       }
@@ -2470,7 +2895,7 @@ function TeachSlide(_ref3) {
         fontSize: 12,
         color: C.muted
       }
-    }, w.meaning))));
+    }, w.meaning)));
   })), slide.type === "quran_verse" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       background: "linear-gradient(160deg,#1a1428,#100f20)",
@@ -2483,14 +2908,14 @@ function TeachSlide(_ref3) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
-      color: "#b08bdd",
+      color: C.purple,
       letterSpacing: 2,
       textTransform: "uppercase",
       marginBottom: 14
     }
   }, "QURANIC ARABIC"), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 28,
+      fontSize: 26,
       color: "#e0c8ff",
       fontFamily: "'Amiri',serif",
       lineHeight: 1.8,
@@ -2499,8 +2924,16 @@ function TeachSlide(_ref3) {
     }
   }, slide.arabic), /*#__PURE__*/React.createElement("div", {
     style: {
+      display: "flex",
+      justifyContent: "center",
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement(SpeakBtn, {
+    text: slide.arabic
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
       fontSize: 13,
-      color: "#b08bdd",
+      color: C.purple,
       fontStyle: "italic",
       marginBottom: 6
     }
@@ -2520,30 +2953,37 @@ function TeachSlide(_ref3) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
-      color: C.gold,
+      color: color,
       letterSpacing: 2,
       textTransform: "uppercase",
       marginBottom: 12
     }
-  }, "WORD BY WORD"), slide.breakdown.map(function (b, i) {
+  }, "WORD BY WORD"), (slide.breakdown || []).map(function (b, i) {
     return /*#__PURE__*/React.createElement("div", {
       key: i,
       style: {
         display: "flex",
         alignItems: "flex-start",
-        gap: 14,
+        gap: 12,
         padding: "10px 0",
         borderBottom: i < slide.breakdown.length - 1 ? "1px solid ".concat(C.border) : "none"
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 26,
-        color: C.gold,
-        fontFamily: "'Amiri',serif",
-        minWidth: 80,
-        textAlign: "center"
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        minWidth: 90
       }
-    }, b.word), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 26,
+        color: color,
+        fontFamily: "'Amiri',serif"
+      }
+    }, b.word), /*#__PURE__*/React.createElement(SpeakBtn, {
+      text: b.word
+    })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 14,
         color: C.text,
@@ -2581,7 +3021,7 @@ function TeachSlide(_ref3) {
       padding: "14px",
       border: "none",
       borderRadius: 13,
-      background: "linear-gradient(135deg,".concat(C.gold, ",#a88a3a)"),
+      background: "linear-gradient(135deg,".concat(color, ",").concat(color, "aa)"),
       color: C.bg,
       fontSize: 16,
       fontWeight: 700,
@@ -2592,21 +3032,39 @@ function TeachSlide(_ref3) {
 
 // ─── APP ROOT ──────────────────────────────────────────────────────
 function App() {
-  var _useState19 = useState("home"),
-    _useState20 = _slicedToArray(_useState19, 2),
-    screen = _useState20[0],
-    setScreen = _useState20[1];
-  var _useState21 = useState(null),
-    _useState22 = _slicedToArray(_useState21, 2),
-    activeLesson = _useState22[0],
-    setActiveLesson = _useState22[1];
-  var _useState23 = useState(null),
-    _useState24 = _slicedToArray(_useState23, 2),
-    completeCallback = _useState24[0],
-    setCompleteCallback = _useState24[1];
-  var handleStart = useCallback(function (lesson, cb) {
-    setActiveLesson(lesson);
-    setCompleteCallback(function () {
+  var _useState25 = useState("home"),
+    _useState26 = _slicedToArray(_useState25, 2),
+    screen = _useState26[0],
+    setScreen = _useState26[1]; // home | chapter | lesson
+  var _useState27 = useState(null),
+    _useState28 = _slicedToArray(_useState27, 2),
+    activeChapter = _useState28[0],
+    setChapter = _useState28[1];
+  var _useState29 = useState(null),
+    _useState30 = _slicedToArray(_useState29, 2),
+    activeLesson = _useState30[0],
+    setLesson = _useState30[1];
+  var _useState31 = useState(null),
+    _useState32 = _slicedToArray(_useState31, 2),
+    completeCb = _useState32[0],
+    setCb = _useState32[1];
+  var goHome = useCallback(function () {
+    setScreen("home");
+    setChapter(null);
+    setLesson(null);
+  }, []);
+  var goChapter = useCallback(function () {
+    setScreen("chapter");
+    setLesson(null);
+  }, []);
+  var handleSelectChapter = useCallback(function (ch) {
+    setChapter(ch);
+    setScreen("chapter");
+  }, []);
+  var handleStartLesson = useCallback(function (lesson, chapter, cb) {
+    setLesson(lesson);
+    setChapter(chapter);
+    setCb(function () {
       return cb;
     });
     setScreen("lesson");
@@ -2614,17 +3072,22 @@ function App() {
   if (screen === "lesson" && activeLesson) {
     return /*#__PURE__*/React.createElement(LessonScreen, {
       lesson: activeLesson,
-      onBack: function onBack() {
-        setScreen("home");
-        setActiveLesson(null);
-      },
+      chapter: activeChapter,
+      onBack: goChapter,
       onComplete: function onComplete(id, xp) {
-        completeCallback && completeCallback(id, xp);
+        completeCb && completeCb(id, xp);
       }
     });
   }
+  if (screen === "chapter" && activeChapter) {
+    return /*#__PURE__*/React.createElement(ChapterScreen, {
+      chapter: activeChapter,
+      onBack: goHome,
+      onStartLesson: handleStartLesson
+    });
+  }
   return /*#__PURE__*/React.createElement(HomeScreen, {
-    onStart: handleStart
+    onSelectChapter: handleSelectChapter
   });
 }
 
