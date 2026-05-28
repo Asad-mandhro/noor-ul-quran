@@ -1,22 +1,18 @@
 "use strict";
-var _React = React;
-var useState = _React.useState;
-var useEffect = _React.useEffect;
-var useCallback = _React.useCallback;
-var useRef = _React.useRef;
+var useState = React.useState;
+var useEffect = React.useEffect;
+var useCallback = React.useCallback;
+var useRef = React.useRef;
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.
-In order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
 function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.
-In order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-
 // ─── DATA: Course Curriculum ───────────────────────────────────────
 var ARABIC_MODULES = [{
   id: "a1",
@@ -665,6 +661,7 @@ var Icons = {
 };
 
 // ─── Main App ──────────────────────────────────────────────────────
+function QuranLearningApp() {
   var _useState = useState("home"),
     _useState2 = _slicedToArray(_useState, 2),
     screen = _useState2[0],
@@ -1302,13 +1299,7 @@ var Icons = {
         }
       }, "+", lesson.xp, " XP"))));
     })));
-  }))), /*#__PURE__*/React.createElement("style", null, "
-        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        button { font-family: inherit; }
-        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes scaleIn { from { transform: scale(0.8); opacity: 0 } to { transform: scale(1); opacity: 1 } }
-      "));
+  }))), /*#__PURE__*/React.createElement("style", null, "\n        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');\n        * { box-sizing: border-box; margin: 0; padding: 0; }\n        button { font-family: inherit; }\n        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }\n        @keyframes scaleIn { from { transform: scale(0.8); opacity: 0 } to { transform: scale(1); opacity: 1 } }\n      "));
 }
 
 // ─── Lesson Screen ─────────────────────────────────────────────────
@@ -1745,11 +1736,7 @@ function LessonScreen(_ref) {
       fontWeight: 700,
       cursor: "pointer"
     }
-  }, "Continue Learning \u2192"))), /*#__PURE__*/React.createElement("style", null, "
-        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        button { font-family: inherit; }
-        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-      "));
+  }, "Continue Learning \u2192"))), /*#__PURE__*/React.createElement("style", null, "\n        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');\n        * { box-sizing: border-box; margin: 0; padding: 0; }\n        button { font-family: inherit; }\n        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }\n      "));
 }
+
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(QuranLearningApp));
