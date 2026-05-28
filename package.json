@@ -1,0 +1,13 @@
+{
+  "name": "noor-ul-quran",
+  "version": "1.0.0",
+  "description": "Personalized Arabic & Quran learning app with Tajweed — gamified daily learning system",
+  "main": "App.jsx",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "keywords": ["quran", "arabic", "tajweed", "learning", "react", "islam"],
+  "author": "asadmandhro",
+  "license": "MIT"
+}
