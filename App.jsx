@@ -963,7 +963,7 @@ function LessonScreen({ lesson, chapter, onBack, onComplete }) {
           <VideoPlayer videoId={lesson.videoId} />
         )}
         {phase==="teach" && slideIdx===0 && (
-          <PDFDownloadBtn chapterId={lesson.id.replace("-main","")} />
+          <PDFDownloadBtn chapterId={chapter?.id} />
         )}
 
         {/* TEACH */}
