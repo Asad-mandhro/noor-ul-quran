@@ -19,7 +19,7 @@ const C = {
 };
 
 // ─── CHAPTERS DATA ─────────────────────────────────────────────────
-const BOOK_COLORS = { 1:"#8bbd6b", 2:"#6b8bbd", 3:"#b08bdd" };
+const BOOK_COLORS = { 1:"#8bbd6b", 2:"#6b8bbd", 3:"#b08bdd", tajweed:"#e8734a" };
 
 const buildAllChapters = () => {
   const inline = [
@@ -38,7 +38,15 @@ const buildAllChapters = () => {
   return [...inline, ...ext];
 };
 
+const buildTajweedChapters = () => {
+  const tj = (typeof window !== "undefined" && window.TAJWEED_CHAPTERS) || [];
+  return tj.map(ch => ({
+    ...ch, number:ch.num, desc:ch.desc||ch.english, data:ch.id,
+  }));
+};
+
 const CHAPTERS = buildAllChapters();
+const TAJWEED_CHAPTERS = buildTajweedChapters();
 
 // ─── CHAPTER 1 LESSONS (condensed but complete) ────────────────────
 const CH1_LESSONS = [
@@ -422,6 +430,7 @@ const getLessons = (chapterId) => {
   const allExt = [
     ...((typeof window !== "undefined" && window.EXTRA_CHAPTERS) || []),
     ...((typeof window !== "undefined" && window.EXTRA_CHAPTERS_B2B3) || []),
+    ...((typeof window !== "undefined" && window.TAJWEED_CHAPTERS) || []),
   ];
   const ch = allExt.find(c => c.id === chapterId);
   if (!ch || !ch.slides) return [];
@@ -454,13 +463,26 @@ const IC = {
 };
 
 // ─── SPEAK BUTTON ──────────────────────────────────────────────────
-function SpeakBtn({ text, style = {} }) {
+function SpeakBtn({ text, verseId, style = {} }) {
   const [active, setActive] = useState(false);
   const handleSpeak = (e) => {
     e.stopPropagation();
     setActive(true);
-    speak(text);
-    setTimeout(() => setActive(false), 1200);
+
+    if (verseId) {
+      // Qari recitation from everyayah.com (Mishary Alafasy 128kbps)
+      const audio = new Audio(`https://everyayah.com/data/Alafasy_128kbps/${verseId}.mp3`);
+      audio.play().catch(() => {
+        // Fallback to TTS if audio fails
+        speak(text);
+      });
+      audio.onended = () => setActive(false);
+      setTimeout(() => setActive(false), 8000);
+    } else {
+      // General Arabic — use Web Speech API
+      speak(text);
+      setTimeout(() => setActive(false), 1200);
+    }
   };
   return (
     <button onClick={handleSpeak} style={{
@@ -468,10 +490,10 @@ function SpeakBtn({ text, style = {} }) {
       border: `1px solid ${active ? C.gold : C.gold+"44"}`,
       borderRadius: 8, padding: "5px 10px",
       display:"inline-flex", alignItems:"center", gap:5,
-      color: active ? C.gold : C.muted, cursor:"pointer",
+      color: active ? C.gold : (verseId ? C.gold : C.muted), cursor:"pointer",
       fontSize:12, transition:"all 0.2s", ...style
-    }}>
-      <IC.Speaker /> {active ? "▶" : "🔊"}
+    }} title={verseId ? "Qari recitation" : "Listen"}>
+      <IC.Speaker /> {active ? "▶" : verseId ? "🕋" : "🔊"}
     </button>
   );
 }
@@ -521,8 +543,12 @@ function HomeScreen({ onSelectChapter }) {
   const [xp]     = useState(() => load("nq_xp", 0));
   const [streak] = useState(() => load("nq_streak", 0));
   const [done]   = useState(() => load("nq_done", []));
+  const [track, setTrack] = useState(() => load("nq_track", "arabic"));
   const level = Math.floor(xp / 300) + 1;
   const xpInLevel = xp % 300;
+
+  const switchTrack = (t) => { setTrack(t); store("nq_track", t); };
+  const activeChapters = track === "tajweed" ? TAJWEED_CHAPTERS : CHAPTERS;
 
   return (
     <div style={{ minHeight:"100vh", background:C.bg, color:C.text, fontFamily:"'Amiri','Georgia',serif", overflowX:"hidden" }}>
@@ -568,14 +594,35 @@ function HomeScreen({ onSelectChapter }) {
           </div>
         </div>
 
+        {/* Track Switcher */}
+        <div style={{ display:"flex", background:C.card, borderRadius:12, border:`1px solid ${C.border}`, padding:4, marginBottom:18 }}>
+          {[
+            { key:"arabic", label:"Arabic", sub:`${CHAPTERS.length} chapters`, color:C.gold },
+            { key:"tajweed", label:"Tajweed", sub:`${TAJWEED_CHAPTERS.length} chapters`, color:"#e8734a" }
+          ].map(t => (
+            <button key={t.key} onClick={()=>switchTrack(t.key)}
+              style={{
+                flex:1, padding:"11px 8px", border:"none", borderRadius:10, cursor:"pointer",
+                background: track===t.key ? `linear-gradient(135deg,${t.color}22,${t.color}11)` : "transparent",
+                borderBottom: track===t.key ? `2px solid ${t.color}` : "2px solid transparent",
+                transition:"all 0.2s"
+              }}>
+              <div style={{ fontSize:13, fontWeight:700, color: track===t.key?t.color:C.muted }}>{t.label}</div>
+              <div style={{ fontSize:10, color: track===t.key?`${t.color}aa`:C.muted, marginTop:2 }}>{t.sub}</div>
+            </button>
+          ))}
+        </div>
+
         {/* Chapters */}
-        <div style={{ fontSize:11, color:C.muted, letterSpacing:2, textTransform:"uppercase", marginBottom:14 }}>Chapters</div>
-        {CHAPTERS.map((ch, idx) => {
+        <div style={{ fontSize:11, color:C.muted, letterSpacing:2, textTransform:"uppercase", marginBottom:14 }}>
+          {track === "tajweed" ? "Tajweed Chapters" : "Arabic Chapters"}
+        </div>
+        {activeChapters.map((ch, idx) => {
           const lessons = getLessons(ch.data);
           const completed = lessons.filter(l => done.includes(l.id)).length;
           const pct = (completed / lessons.length) * 100;
-          const isLocked = idx > 0 && !CHAPTERS[idx-1] ? true :
-            idx > 0 && getLessons(CHAPTERS[idx-1].data).some(l => !done.includes(l.id));
+          const isLocked = idx > 0 && !activeChapters[idx-1] ? true :
+            idx > 0 && getLessons(activeChapters[idx-1].data).some(l => !done.includes(l.id));
 
           return (
             <button key={ch.id} onClick={() => !isLocked && onSelectChapter(ch)}
@@ -1056,8 +1103,13 @@ function TeachSlide({ slide, color, onNext, onPrev, isFirst, isLast }) {
               <div style={{ fontSize:10, color:C.purple, letterSpacing:2, textTransform:"uppercase", marginBottom:14 }}>QURANIC ARABIC</div>
               <div style={{ fontSize:26, color:"#e0c8ff", fontFamily:"'Amiri',serif", lineHeight:1.8, direction:"rtl", marginBottom:14 }}>{slide.arabic}</div>
               <div style={{ display:"flex", justifyContent:"center", marginBottom:10 }}>
-                <SpeakBtn text={slide.arabic} />
+                <SpeakBtn text={slide.arabic} verseId={slide.verseId} />
               </div>
+              {slide.verseId && (
+                <div style={{ fontSize:10, color:C.gold, marginBottom:8, letterSpacing:1 }}>
+                  🕋 Tap to hear Mishary Alafasy recite this verse
+                </div>
+              )}
               <div style={{ fontSize:13, color:C.purple, fontStyle:"italic", marginBottom:6 }}>{slide.roman}</div>
               <div style={{ fontSize:14, color:C.text, fontWeight:600 }}>{slide.meaning}</div>
             </div>
