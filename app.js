@@ -1338,16 +1338,16 @@ function SpeakBtn(_ref) {
 // PDF filenames map for Tajweed chapters
 var TJ_PDFS = {
   tj1: "Ch01-Introduction-to-Tajweed.pdf",
-  tj2: "Ch02-Makhaarij-Articulation-Points.pdf",
-  tj3: "Ch03-Sifaat-Letter-Characteristics.pdf",
-  tj4: "Ch04-Noon-Sakinah-Izhar.pdf",
-  tj5: "Ch05-Noon-Sakinah-Idgham.pdf",
-  tj6: "Ch06-Noon-Sakinah-Iqlab.pdf",
-  tj7: "Ch07-Noon-Sakinah-Ikhfa.pdf",
-  tj8: "Ch08-Meem-Sakinah.pdf",
+  tj2: "Ch02-Makhaarij-Articulation.pdf",
+  tj3: "Ch03-Letter-Characteristics.pdf",
+  tj4: "Ch04-Noon-Sakinah-—-Izhar.pdf",
+  tj5: "Ch05-Noon-Sakinah-—-Idgham.pdf",
+  tj6: "Ch06-Noon-Sakinah-—-Iqlab.pdf",
+  tj7: "Ch07-Noon-Sakinah-—-Ikhfa.pdf",
+  tj8: "Ch08-Meem-Sakinah-Rules.pdf",
   tj9: "Ch09-Madd-Elongation.pdf",
-  tj10: "Ch10-Qalqalah.pdf",
-  tj11: "Ch11-Waqf-Stopping-Starting.pdf",
+  tj10: "Ch10-Qalqalah-Bouncing.pdf",
+  tj11: "Ch11-Waqf-Stopping-Rules.pdf",
   tj12: "Ch12-Practical-Al-Fatiha.pdf"
 };
 var AR_PDFS = {
@@ -1375,23 +1375,23 @@ var AR_PDFS = {
   ch23: "Arabic-Ch23-Book1-Review.pdf",
   ch24: "Arabic-Ch24-Kana-Sisters.pdf",
   ch25: "Arabic-Ch25-Inna-Sisters.pdf",
-  ch26: "Arabic-Ch26-Masdar.pdf",
+  ch26: "Arabic-Ch26-Masdar-Verbal-Noun.pdf",
   ch27: "Arabic-Ch27-Active-Participle.pdf",
   ch28: "Arabic-Ch28-Passive-Participle.pdf",
   ch29: "Arabic-Ch29-Passive-Voice.pdf",
-  ch30: "Arabic-Ch30-Form2.pdf",
-  ch31: "Arabic-Ch31-Form3.pdf",
-  ch32: "Arabic-Ch32-Form4.pdf",
-  ch33: "Arabic-Ch33-Forms5to10.pdf",
+  ch30: "Arabic-Ch30-Form-2.pdf",
+  ch31: "Arabic-Ch31-Form-3.pdf",
+  ch32: "Arabic-Ch32-Form-4.pdf",
+  ch33: "Arabic-Ch33-Forms-5-to-10.pdf",
   ch34: "Arabic-Ch34-Relative-Pronouns.pdf",
   ch35: "Arabic-Ch35-Conditional-Comparative.pdf",
-  ch36: "Arabic-Ch36-Book2-Review.pdf",
-  ch37: "Arabic-Ch37-Parsing.pdf",
-  ch38: "Arabic-Ch38-Weak-Verbs.pdf",
-  ch39: "Arabic-Ch39-Quran-Ikhlas.pdf",
-  ch40: "Arabic-Ch40-Quran-Fatiha.pdf",
-  ch41: "Arabic-Ch41-Hadith.pdf",
-  ch42: "Arabic-Ch42-Classical-Texts.pdf"
+  ch36: "Arabic-Ch36-Book-2-Review.pdf",
+  ch37: "Arabic-Ch37-Grammatical-Parsing.pdf",
+  ch38: "Arabic-Ch38-Weak-Defective-Verbs.pdf",
+  ch39: "Arabic-Ch39-Quran-Al-Ikhlas.pdf",
+  ch40: "Arabic-Ch40-Quran-Al-Fatiha-Deep.pdf",
+  ch41: "Arabic-Ch41-Reading-Hadith.pdf",
+  ch42: "Arabic-Ch42-Classical-Arabic-Texts.pdf"
 };
 function PDFDownloadBtn(_ref2) {
   var chapterId = _ref2.chapterId;
