@@ -1340,21 +1340,40 @@ function SpeakBtn(_ref) {
 // ─── VIDEO PLAYER ──────────────────────────────────────────────────
 function VideoPlayer(_ref2) {
   var videoId = _ref2.videoId;
-  var _useState3 = useState(false),
+  var _useState3 = useState("idle"),
     _useState4 = _slicedToArray(_useState3, 2),
-    show = _useState4[0],
-    setShow = _useState4[1];
+    mode = _useState4[0],
+    setMode = _useState4[1]; // idle | embed
+  var _useState5 = useState(false),
+    _useState6 = _slicedToArray(_useState5, 2),
+    embedFailed = _useState6[0],
+    setEmbedFailed = _useState6[1];
   if (!videoId) return null;
+  var openInYouTube = function openInYouTube(e) {
+    e.stopPropagation();
+    window.open("https://www.youtube.com/watch?v=".concat(videoId), "_blank", "noopener,noreferrer");
+  };
+  var tryEmbed = function tryEmbed() {
+    setMode("embed");
+    // Detect embed failure after 2.5s — if iframe still hidden, fall back
+    setTimeout(function () {
+      var iframe = document.querySelector("iframe[data-vid=\"".concat(videoId, "\"]"));
+      if (iframe && iframe.offsetHeight < 50) setEmbedFailed(true);
+    }, 2500);
+  };
   return /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 16
     }
-  }, !show ? /*#__PURE__*/React.createElement("button", {
-    onClick: function onClick() {
-      return setShow(true);
-    },
+  }, mode === "idle" ? /*#__PURE__*/React.createElement("div", {
     style: {
-      width: "100%",
+      display: "flex",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: tryEmbed,
+    style: {
+      flex: 1,
       background: "#0f1520",
       border: "1px solid ".concat(C.border),
       borderRadius: 14,
@@ -1363,7 +1382,8 @@ function VideoPlayer(_ref2) {
       alignItems: "center",
       gap: 12,
       cursor: "pointer",
-      color: C.text
+      color: C.text,
+      textAlign: "left"
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -1376,11 +1396,7 @@ function VideoPlayer(_ref2) {
       justifyContent: "center",
       flexShrink: 0
     }
-  }, /*#__PURE__*/React.createElement(IC.Play, null)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: "left"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(IC.Play, null)), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       fontWeight: 600,
@@ -1395,24 +1411,30 @@ function VideoPlayer(_ref2) {
       alignItems: "center",
       gap: 4
     }
-  }, /*#__PURE__*/React.createElement(IC.Video, null), " Free lesson on YouTube")), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(IC.Video, null), " Play here or open YouTube"))), /*#__PURE__*/React.createElement("button", {
+    onClick: openInYouTube,
     style: {
-      marginLeft: "auto",
-      fontSize: 11,
+      background: "#1a1f2e",
+      border: "1px solid ".concat(C.border),
+      borderRadius: 14,
+      padding: "0 14px",
+      cursor: "pointer",
       color: C.gold,
-      padding: "4px 10px",
-      background: "".concat(C.gold, "15"),
-      borderRadius: 6
+      fontSize: 11,
+      fontWeight: 600,
+      minWidth: 60
     }
-  }, "Tap to load")) : /*#__PURE__*/React.createElement("div", {
+  }, "Open in", /*#__PURE__*/React.createElement("br", null), "YouTube \u2197")) : /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       borderRadius: 14,
       overflow: "hidden",
       background: "#000",
-      position: "relative"
+      position: "relative",
+      marginBottom: 6
     }
   }, /*#__PURE__*/React.createElement("iframe", {
-    src: "https://www.youtube.com/embed/".concat(videoId, "?autoplay=1&rel=0"),
+    "data-vid": videoId,
+    src: "https://www.youtube.com/embed/".concat(videoId, "?autoplay=1&rel=0&playsinline=1"),
     title: "Lesson Video",
     width: "100%",
     height: "220",
@@ -1420,35 +1442,69 @@ function VideoPlayer(_ref2) {
     allowFullScreen: true,
     allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
     style: {
-      display: "block"
+      display: "block",
+      minHeight: embedFailed ? 0 : 220
     }
-  })));
+  }), embedFailed && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "24px 18px",
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: C.muted,
+      marginBottom: 10
+    }
+  }, "This video can't be embedded here."), /*#__PURE__*/React.createElement("button", {
+    onClick: openInYouTube,
+    style: {
+      background: "#cc0000",
+      border: "none",
+      borderRadius: 10,
+      padding: "10px 18px",
+      color: "#fff",
+      fontSize: 13,
+      fontWeight: 600,
+      cursor: "pointer"
+    }
+  }, "Open in YouTube \u2197"))), /*#__PURE__*/React.createElement("button", {
+    onClick: openInYouTube,
+    style: {
+      background: "transparent",
+      border: "none",
+      color: C.muted,
+      fontSize: 11,
+      cursor: "pointer",
+      textDecoration: "underline"
+    }
+  }, "Open on YouTube \u2197")));
 }
 
 // ─── HOME SCREEN ───────────────────────────────────────────────────
 function HomeScreen(_ref3) {
   var onSelectChapter = _ref3.onSelectChapter;
-  var _useState5 = useState(function () {
+  var _useState7 = useState(function () {
       return load("nq_xp", 0);
     }),
-    _useState6 = _slicedToArray(_useState5, 1),
-    xp = _useState6[0];
-  var _useState7 = useState(function () {
+    _useState8 = _slicedToArray(_useState7, 1),
+    xp = _useState8[0];
+  var _useState9 = useState(function () {
       return load("nq_streak", 0);
     }),
-    _useState8 = _slicedToArray(_useState7, 1),
-    streak = _useState8[0];
-  var _useState9 = useState(function () {
+    _useState0 = _slicedToArray(_useState9, 1),
+    streak = _useState0[0];
+  var _useState1 = useState(function () {
       return load("nq_done", []);
     }),
-    _useState0 = _slicedToArray(_useState9, 1),
-    done = _useState0[0];
-  var _useState1 = useState(function () {
+    _useState10 = _slicedToArray(_useState1, 1),
+    done = _useState10[0];
+  var _useState11 = useState(function () {
       return load("nq_track", "arabic");
     }),
-    _useState10 = _slicedToArray(_useState1, 2),
-    track = _useState10[0],
-    setTrack = _useState10[1];
+    _useState12 = _slicedToArray(_useState11, 2),
+    track = _useState12[0],
+    setTrack = _useState12[1];
   var level = Math.floor(xp / 300) + 1;
   var xpInLevel = xp % 300;
   var switchTrack = function switchTrack(t) {
@@ -1790,12 +1846,12 @@ function ChapterScreen(_ref4) {
   var chapter = _ref4.chapter,
     onBack = _ref4.onBack,
     onStartLesson = _ref4.onStartLesson;
-  var _useState11 = useState(function () {
+  var _useState13 = useState(function () {
       return load("nq_done", []);
     }),
-    _useState12 = _slicedToArray(_useState11, 2),
-    done = _useState12[0],
-    setDone = _useState12[1];
+    _useState14 = _slicedToArray(_useState13, 2),
+    done = _useState14[0],
+    setDone = _useState14[1];
   var lessons = getLessons(chapter.data);
   var typeColor = {
     intro: C.blue,
@@ -1986,34 +2042,34 @@ function LessonScreen(_ref5) {
     chapter = _ref5.chapter,
     onBack = _ref5.onBack,
     onComplete = _ref5.onComplete;
-  var _useState13 = useState("teach"),
-    _useState14 = _slicedToArray(_useState13, 2),
-    phase = _useState14[0],
-    setPhase = _useState14[1];
-  var _useState15 = useState(0),
+  var _useState15 = useState("teach"),
     _useState16 = _slicedToArray(_useState15, 2),
-    slideIdx = _useState16[0],
-    setSlide = _useState16[1];
+    phase = _useState16[0],
+    setPhase = _useState16[1];
   var _useState17 = useState(0),
     _useState18 = _slicedToArray(_useState17, 2),
-    qIdx = _useState18[0],
-    setQIdx = _useState18[1];
-  var _useState19 = useState(null),
+    slideIdx = _useState18[0],
+    setSlide = _useState18[1];
+  var _useState19 = useState(0),
     _useState20 = _slicedToArray(_useState19, 2),
-    selected = _useState20[0],
-    setSel = _useState20[1];
-  var _useState21 = useState(false),
+    qIdx = _useState20[0],
+    setQIdx = _useState20[1];
+  var _useState21 = useState(null),
     _useState22 = _slicedToArray(_useState21, 2),
-    answered = _useState22[0],
-    setAns = _useState22[1];
-  var _useState23 = useState(0),
+    selected = _useState22[0],
+    setSel = _useState22[1];
+  var _useState23 = useState(false),
     _useState24 = _slicedToArray(_useState23, 2),
-    correct = _useState24[0],
-    setCorr = _useState24[1];
-  var _useState25 = useState(false),
+    answered = _useState24[0],
+    setAns = _useState24[1];
+  var _useState25 = useState(0),
     _useState26 = _slicedToArray(_useState25, 2),
-    showExp = _useState26[0],
-    setExp = _useState26[1];
+    correct = _useState26[0],
+    setCorr = _useState26[1];
+  var _useState27 = useState(false),
+    _useState28 = _slicedToArray(_useState27, 2),
+    showExp = _useState28[0],
+    setExp = _useState28[1];
   var slides = lesson.slides || [];
   var quiz = lesson.quiz || [];
   var slide = slides[slideIdx];
@@ -3170,22 +3226,22 @@ function TeachSlide(_ref6) {
 
 // ─── APP ROOT ──────────────────────────────────────────────────────
 function App() {
-  var _useState27 = useState("home"),
-    _useState28 = _slicedToArray(_useState27, 2),
-    screen = _useState28[0],
-    setScreen = _useState28[1]; // home | chapter | lesson
-  var _useState29 = useState(null),
+  var _useState29 = useState("home"),
     _useState30 = _slicedToArray(_useState29, 2),
-    activeChapter = _useState30[0],
-    setChapter = _useState30[1];
+    screen = _useState30[0],
+    setScreen = _useState30[1]; // home | chapter | lesson
   var _useState31 = useState(null),
     _useState32 = _slicedToArray(_useState31, 2),
-    activeLesson = _useState32[0],
-    setLesson = _useState32[1];
+    activeChapter = _useState32[0],
+    setChapter = _useState32[1];
   var _useState33 = useState(null),
     _useState34 = _slicedToArray(_useState33, 2),
-    completeCb = _useState34[0],
-    setCb = _useState34[1];
+    activeLesson = _useState34[0],
+    setLesson = _useState34[1];
+  var _useState35 = useState(null),
+    _useState36 = _slicedToArray(_useState35, 2),
+    completeCb = _useState36[0],
+    setCb = _useState36[1];
   var goHome = useCallback(function () {
     setScreen("home");
     setChapter(null);
