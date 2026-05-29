@@ -500,38 +500,84 @@ function SpeakBtn({ text, verseId, style = {} }) {
 
 // ─── VIDEO PLAYER ──────────────────────────────────────────────────
 function VideoPlayer({ videoId }) {
-  const [show, setShow] = useState(false);
+  const [mode, setMode] = useState("idle"); // idle | embed
+  const [embedFailed, setEmbedFailed] = useState(false);
   if (!videoId) return null;
+
+  const openInYouTube = (e) => {
+    e.stopPropagation();
+    window.open(`https://www.youtube.com/watch?v=${videoId}`, "_blank", "noopener,noreferrer");
+  };
+
+  const tryEmbed = () => {
+    setMode("embed");
+    // Detect embed failure after 2.5s — if iframe still hidden, fall back
+    setTimeout(() => {
+      const iframe = document.querySelector(`iframe[data-vid="${videoId}"]`);
+      if (iframe && iframe.offsetHeight < 50) setEmbedFailed(true);
+    }, 2500);
+  };
+
   return (
     <div style={{ marginBottom:16 }}>
-      {!show ? (
-        <button onClick={() => setShow(true)} style={{
-          width:"100%", background:"#0f1520", border:`1px solid ${C.border}`,
-          borderRadius:14, padding:"16px", display:"flex", alignItems:"center",
-          gap:12, cursor:"pointer", color:C.text
-        }}>
-          <div style={{ width:44, height:44, borderRadius:10, background:"#cc0000",
-            display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-            <IC.Play />
-          </div>
-          <div style={{ textAlign:"left" }}>
-            <div style={{ fontSize:13, fontWeight:600, color:C.text }}>Watch Video Lesson</div>
-            <div style={{ fontSize:11, color:C.muted, marginTop:2, display:"flex", alignItems:"center", gap:4 }}>
-              <IC.Video /> Free lesson on YouTube
+      {mode === "idle" ? (
+        <div style={{ display:"flex", gap:8 }}>
+          <button onClick={tryEmbed} style={{
+            flex:1, background:"#0f1520", border:`1px solid ${C.border}`,
+            borderRadius:14, padding:"16px", display:"flex", alignItems:"center",
+            gap:12, cursor:"pointer", color:C.text, textAlign:"left"
+          }}>
+            <div style={{ width:44, height:44, borderRadius:10, background:"#cc0000",
+              display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+              <IC.Play />
             </div>
-          </div>
-          <div style={{ marginLeft:"auto", fontSize:11, color:C.gold, padding:"4px 10px",
-            background:`${C.gold}15`, borderRadius:6 }}>Tap to load</div>
-        </button>
+            <div>
+              <div style={{ fontSize:13, fontWeight:600, color:C.text }}>Watch Video Lesson</div>
+              <div style={{ fontSize:11, color:C.muted, marginTop:2, display:"flex", alignItems:"center", gap:4 }}>
+                <IC.Video /> Play here or open YouTube
+              </div>
+            </div>
+          </button>
+          <button onClick={openInYouTube} style={{
+            background:"#1a1f2e", border:`1px solid ${C.border}`, borderRadius:14,
+            padding:"0 14px", cursor:"pointer", color:C.gold, fontSize:11, fontWeight:600,
+            minWidth:60
+          }}>
+            Open in<br/>YouTube ↗
+          </button>
+        </div>
       ) : (
-        <div style={{ borderRadius:14, overflow:"hidden", background:"#000", position:"relative" }}>
-          <iframe
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
-            title="Lesson Video" width="100%" height="220"
-            frameBorder="0" allowFullScreen
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            style={{ display:"block" }}
-          />
+        <div>
+          <div style={{ borderRadius:14, overflow:"hidden", background:"#000", position:"relative", marginBottom:6 }}>
+            <iframe
+              data-vid={videoId}
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&playsinline=1`}
+              title="Lesson Video" width="100%" height="220"
+              frameBorder="0" allowFullScreen
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              style={{ display:"block", minHeight: embedFailed ? 0 : 220 }}
+            />
+            {embedFailed && (
+              <div style={{ padding:"24px 18px", textAlign:"center" }}>
+                <div style={{ fontSize:13, color:C.muted, marginBottom:10 }}>
+                  This video can't be embedded here.
+                </div>
+                <button onClick={openInYouTube} style={{
+                  background:"#cc0000", border:"none", borderRadius:10,
+                  padding:"10px 18px", color:"#fff", fontSize:13, fontWeight:600,
+                  cursor:"pointer"
+                }}>
+                  Open in YouTube ↗
+                </button>
+              </div>
+            )}
+          </div>
+          <button onClick={openInYouTube} style={{
+            background:"transparent", border:"none", color:C.muted,
+            fontSize:11, cursor:"pointer", textDecoration:"underline"
+          }}>
+            Open on YouTube ↗
+          </button>
         </div>
       )}
     </div>
