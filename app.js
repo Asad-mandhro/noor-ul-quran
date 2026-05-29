@@ -50,7 +50,8 @@ var C = {
 var BOOK_COLORS = {
   1: "#8bbd6b",
   2: "#6b8bbd",
-  3: "#b08bdd"
+  3: "#b08bdd",
+  tajweed: "#e8734a"
 };
 var buildAllChapters = function buildAllChapters() {
   var inline = [{
@@ -85,7 +86,18 @@ var buildAllChapters = function buildAllChapters() {
   });
   return [].concat(inline, _toConsumableArray(ext));
 };
+var buildTajweedChapters = function buildTajweedChapters() {
+  var tj = typeof window !== "undefined" && window.TAJWEED_CHAPTERS || [];
+  return tj.map(function (ch) {
+    return _objectSpread(_objectSpread({}, ch), {}, {
+      number: ch.num,
+      desc: ch.desc || ch.english,
+      data: ch.id
+    });
+  });
+};
 var CHAPTERS = buildAllChapters();
+var TAJWEED_CHAPTERS = buildTajweedChapters();
 
 // ─── CHAPTER 1 LESSONS (condensed but complete) ────────────────────
 var CH1_LESSONS = [{
@@ -1127,7 +1139,7 @@ var getLessons = function getLessons(chapterId) {
   var _ch$slides$, _ch$slides$2;
   if (ALL_LESSONS[chapterId]) return ALL_LESSONS[chapterId];
   // Find from external data
-  var allExt = [].concat(_toConsumableArray(typeof window !== "undefined" && window.EXTRA_CHAPTERS || []), _toConsumableArray(typeof window !== "undefined" && window.EXTRA_CHAPTERS_B2B3 || []));
+  var allExt = [].concat(_toConsumableArray(typeof window !== "undefined" && window.EXTRA_CHAPTERS || []), _toConsumableArray(typeof window !== "undefined" && window.EXTRA_CHAPTERS_B2B3 || []), _toConsumableArray(typeof window !== "undefined" && window.TAJWEED_CHAPTERS || []));
   var ch = allExt.find(function (c) {
     return c.id === chapterId;
   });
@@ -1275,6 +1287,7 @@ var IC = {
 // ─── SPEAK BUTTON ──────────────────────────────────────────────────
 function SpeakBtn(_ref) {
   var text = _ref.text,
+    verseId = _ref.verseId,
     _ref$style = _ref.style,
     style = _ref$style === void 0 ? {} : _ref$style;
   var _useState = useState(false),
@@ -1284,10 +1297,26 @@ function SpeakBtn(_ref) {
   var handleSpeak = function handleSpeak(e) {
     e.stopPropagation();
     setActive(true);
-    speak(text);
-    setTimeout(function () {
-      return setActive(false);
-    }, 1200);
+    if (verseId) {
+      // Qari recitation from everyayah.com (Mishary Alafasy 128kbps)
+      var audio = new Audio("https://everyayah.com/data/Alafasy_128kbps/".concat(verseId, ".mp3"));
+      audio.play().catch(function () {
+        // Fallback to TTS if audio fails
+        speak(text);
+      });
+      audio.onended = function () {
+        return setActive(false);
+      };
+      setTimeout(function () {
+        return setActive(false);
+      }, 8000);
+    } else {
+      // General Arabic — use Web Speech API
+      speak(text);
+      setTimeout(function () {
+        return setActive(false);
+      }, 1200);
+    }
   };
   return /*#__PURE__*/React.createElement("button", {
     onClick: handleSpeak,
@@ -1299,12 +1328,13 @@ function SpeakBtn(_ref) {
       display: "inline-flex",
       alignItems: "center",
       gap: 5,
-      color: active ? C.gold : C.muted,
+      color: active ? C.gold : verseId ? C.gold : C.muted,
       cursor: "pointer",
       fontSize: 12,
       transition: "all 0.2s"
-    }, style)
-  }, /*#__PURE__*/React.createElement(IC.Speaker, null), " ", active ? "▶" : "🔊");
+    }, style),
+    title: verseId ? "Qari recitation" : "Listen"
+  }, /*#__PURE__*/React.createElement(IC.Speaker, null), " ", active ? "▶" : verseId ? "🕋" : "🔊");
 }
 
 // ─── VIDEO PLAYER ──────────────────────────────────────────────────
@@ -1413,8 +1443,19 @@ function HomeScreen(_ref3) {
     }),
     _useState0 = _slicedToArray(_useState9, 1),
     done = _useState0[0];
+  var _useState1 = useState(function () {
+      return load("nq_track", "arabic");
+    }),
+    _useState10 = _slicedToArray(_useState1, 2),
+    track = _useState10[0],
+    setTrack = _useState10[1];
   var level = Math.floor(xp / 300) + 1;
   var xpInLevel = xp % 300;
+  var switchTrack = function switchTrack(t) {
+    setTrack(t);
+    store("nq_track", t);
+  };
+  var activeChapters = track === "tajweed" ? TAJWEED_CHAPTERS : CHAPTERS;
   return /*#__PURE__*/React.createElement("div", {
     style: {
       minHeight: "100vh",
@@ -1570,19 +1611,67 @@ function HomeScreen(_ref3) {
     }, s.label));
   }))), /*#__PURE__*/React.createElement("div", {
     style: {
+      display: "flex",
+      background: C.card,
+      borderRadius: 12,
+      border: "1px solid ".concat(C.border),
+      padding: 4,
+      marginBottom: 18
+    }
+  }, [{
+    key: "arabic",
+    label: "Arabic",
+    sub: "".concat(CHAPTERS.length, " chapters"),
+    color: C.gold
+  }, {
+    key: "tajweed",
+    label: "Tajweed",
+    sub: "".concat(TAJWEED_CHAPTERS.length, " chapters"),
+    color: "#e8734a"
+  }].map(function (t) {
+    return /*#__PURE__*/React.createElement("button", {
+      key: t.key,
+      onClick: function onClick() {
+        return switchTrack(t.key);
+      },
+      style: {
+        flex: 1,
+        padding: "11px 8px",
+        border: "none",
+        borderRadius: 10,
+        cursor: "pointer",
+        background: track === t.key ? "linear-gradient(135deg,".concat(t.color, "22,").concat(t.color, "11)") : "transparent",
+        borderBottom: track === t.key ? "2px solid ".concat(t.color) : "2px solid transparent",
+        transition: "all 0.2s"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 13,
+        fontWeight: 700,
+        color: track === t.key ? t.color : C.muted
+      }
+    }, t.label), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 10,
+        color: track === t.key ? "".concat(t.color, "aa") : C.muted,
+        marginTop: 2
+      }
+    }, t.sub));
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
       fontSize: 11,
       color: C.muted,
       letterSpacing: 2,
       textTransform: "uppercase",
       marginBottom: 14
     }
-  }, "Chapters"), CHAPTERS.map(function (ch, idx) {
+  }, track === "tajweed" ? "Tajweed Chapters" : "Arabic Chapters"), activeChapters.map(function (ch, idx) {
     var lessons = getLessons(ch.data);
     var completed = lessons.filter(function (l) {
       return done.includes(l.id);
     }).length;
     var pct = completed / lessons.length * 100;
-    var isLocked = idx > 0 && !CHAPTERS[idx - 1] ? true : idx > 0 && getLessons(CHAPTERS[idx - 1].data).some(function (l) {
+    var isLocked = idx > 0 && !activeChapters[idx - 1] ? true : idx > 0 && getLessons(activeChapters[idx - 1].data).some(function (l) {
       return !done.includes(l.id);
     });
     return /*#__PURE__*/React.createElement("button", {
@@ -1701,12 +1790,12 @@ function ChapterScreen(_ref4) {
   var chapter = _ref4.chapter,
     onBack = _ref4.onBack,
     onStartLesson = _ref4.onStartLesson;
-  var _useState1 = useState(function () {
+  var _useState11 = useState(function () {
       return load("nq_done", []);
     }),
-    _useState10 = _slicedToArray(_useState1, 2),
-    done = _useState10[0],
-    setDone = _useState10[1];
+    _useState12 = _slicedToArray(_useState11, 2),
+    done = _useState12[0],
+    setDone = _useState12[1];
   var lessons = getLessons(chapter.data);
   var typeColor = {
     intro: C.blue,
@@ -1897,34 +1986,34 @@ function LessonScreen(_ref5) {
     chapter = _ref5.chapter,
     onBack = _ref5.onBack,
     onComplete = _ref5.onComplete;
-  var _useState11 = useState("teach"),
-    _useState12 = _slicedToArray(_useState11, 2),
-    phase = _useState12[0],
-    setPhase = _useState12[1];
-  var _useState13 = useState(0),
+  var _useState13 = useState("teach"),
     _useState14 = _slicedToArray(_useState13, 2),
-    slideIdx = _useState14[0],
-    setSlide = _useState14[1];
+    phase = _useState14[0],
+    setPhase = _useState14[1];
   var _useState15 = useState(0),
     _useState16 = _slicedToArray(_useState15, 2),
-    qIdx = _useState16[0],
-    setQIdx = _useState16[1];
-  var _useState17 = useState(null),
+    slideIdx = _useState16[0],
+    setSlide = _useState16[1];
+  var _useState17 = useState(0),
     _useState18 = _slicedToArray(_useState17, 2),
-    selected = _useState18[0],
-    setSel = _useState18[1];
-  var _useState19 = useState(false),
+    qIdx = _useState18[0],
+    setQIdx = _useState18[1];
+  var _useState19 = useState(null),
     _useState20 = _slicedToArray(_useState19, 2),
-    answered = _useState20[0],
-    setAns = _useState20[1];
-  var _useState21 = useState(0),
+    selected = _useState20[0],
+    setSel = _useState20[1];
+  var _useState21 = useState(false),
     _useState22 = _slicedToArray(_useState21, 2),
-    correct = _useState22[0],
-    setCorr = _useState22[1];
-  var _useState23 = useState(false),
+    answered = _useState22[0],
+    setAns = _useState22[1];
+  var _useState23 = useState(0),
     _useState24 = _slicedToArray(_useState23, 2),
-    showExp = _useState24[0],
-    setExp = _useState24[1];
+    correct = _useState24[0],
+    setCorr = _useState24[1];
+  var _useState25 = useState(false),
+    _useState26 = _slicedToArray(_useState25, 2),
+    showExp = _useState26[0],
+    setExp = _useState26[1];
   var slides = lesson.slides || [];
   var quiz = lesson.quiz || [];
   var slide = slides[slideIdx];
@@ -2970,8 +3059,16 @@ function TeachSlide(_ref6) {
       marginBottom: 10
     }
   }, /*#__PURE__*/React.createElement(SpeakBtn, {
-    text: slide.arabic
-  })), /*#__PURE__*/React.createElement("div", {
+    text: slide.arabic,
+    verseId: slide.verseId
+  })), slide.verseId && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: C.gold,
+      marginBottom: 8,
+      letterSpacing: 1
+    }
+  }, "\uD83D\uDD4B Tap to hear Mishary Alafasy recite this verse"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       color: C.purple,
@@ -3073,22 +3170,22 @@ function TeachSlide(_ref6) {
 
 // ─── APP ROOT ──────────────────────────────────────────────────────
 function App() {
-  var _useState25 = useState("home"),
-    _useState26 = _slicedToArray(_useState25, 2),
-    screen = _useState26[0],
-    setScreen = _useState26[1]; // home | chapter | lesson
-  var _useState27 = useState(null),
+  var _useState27 = useState("home"),
     _useState28 = _slicedToArray(_useState27, 2),
-    activeChapter = _useState28[0],
-    setChapter = _useState28[1];
+    screen = _useState28[0],
+    setScreen = _useState28[1]; // home | chapter | lesson
   var _useState29 = useState(null),
     _useState30 = _slicedToArray(_useState29, 2),
-    activeLesson = _useState30[0],
-    setLesson = _useState30[1];
+    activeChapter = _useState30[0],
+    setChapter = _useState30[1];
   var _useState31 = useState(null),
     _useState32 = _slicedToArray(_useState31, 2),
-    completeCb = _useState32[0],
-    setCb = _useState32[1];
+    activeLesson = _useState32[0],
+    setLesson = _useState32[1];
+  var _useState33 = useState(null),
+    _useState34 = _slicedToArray(_useState33, 2),
+    completeCb = _useState34[0],
+    setCb = _useState34[1];
   var goHome = useCallback(function () {
     setScreen("home");
     setChapter(null);
