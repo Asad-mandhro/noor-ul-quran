@@ -1338,8 +1338,100 @@ function SpeakBtn(_ref) {
 }
 
 // ─── VIDEO PLAYER ──────────────────────────────────────────────────
-function VideoPlayer(_ref2) {
-  var videoId = _ref2.videoId;
+// PDF filenames map for Tajweed chapters
+var TJ_PDFS = {
+  tj1: "Ch01-Introduction-to-Tajweed.pdf",
+  tj2: "Ch02-Makhaarij-Articulation-Points.pdf",
+  tj3: "Ch03-Sifaat-Letter-Characteristics.pdf",
+  tj4: "Ch04-Noon-Sakinah-Izhar.pdf",
+  tj5: "Ch05-Noon-Sakinah-Idgham.pdf",
+  tj6: "Ch06-Noon-Sakinah-Iqlab.pdf",
+  tj7: "Ch07-Noon-Sakinah-Ikhfa.pdf",
+  tj8: "Ch08-Meem-Sakinah.pdf",
+  tj9: "Ch09-Madd-Elongation.pdf",
+  tj10: "Ch10-Qalqalah.pdf",
+  tj11: "Ch11-Waqf-Stopping-Starting.pdf",
+  tj12: "Ch12-Practical-Al-Fatiha.pdf"
+};
+function PDFDownloadBtn(_ref2) {
+  var chapterId = _ref2.chapterId;
+  var filename = TJ_PDFS[chapterId];
+  if (!filename) return null;
+  var url = "https://asad-mandhro.github.io/noor-ul-quran/pdfs/".concat(filename);
+  return /*#__PURE__*/React.createElement("a", {
+    href: url,
+    target: "_blank",
+    rel: "noopener noreferrer",
+    download: filename,
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      background: "linear-gradient(135deg,#1a2818,#111d11)",
+      border: "1px solid #3a6a3a",
+      borderRadius: 13,
+      padding: "13px 16px",
+      textDecoration: "none",
+      marginBottom: 12,
+      transition: "all 0.2s"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 38,
+      height: 38,
+      borderRadius: 10,
+      background: "#cc2200",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "18",
+    height: "18",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "white",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+  }), /*#__PURE__*/React.createElement("polyline", {
+    points: "14 2 14 8 20 8"
+  }), /*#__PURE__*/React.createElement("line", {
+    x1: "12",
+    y1: "18",
+    x2: "12",
+    y2: "12"
+  }), /*#__PURE__*/React.createElement("polyline", {
+    points: "9 15 12 18 15 15"
+  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 700,
+      color: "#7ac97a"
+    }
+  }, "Download Study Notes (PDF)"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "#5a8a5a",
+      marginTop: 2
+    }
+  }, "Summary \xB7 Key rules \xB7 Tables \xB7 Quranic examples")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginLeft: "auto",
+      fontSize: 10,
+      color: "#7ac97a",
+      background: "#2a4a2a",
+      padding: "3px 8px",
+      borderRadius: 6,
+      fontWeight: 600
+    }
+  }, "PDF \u2193"));
+}
+function VideoPlayer(_ref3) {
+  var videoId = _ref3.videoId;
   var _useState3 = useState("idle"),
     _useState4 = _slicedToArray(_useState3, 2),
     mode = _useState4[0],
@@ -1482,8 +1574,8 @@ function VideoPlayer(_ref2) {
 }
 
 // ─── HOME SCREEN ───────────────────────────────────────────────────
-function HomeScreen(_ref3) {
-  var onSelectChapter = _ref3.onSelectChapter;
+function HomeScreen(_ref4) {
+  var onSelectChapter = _ref4.onSelectChapter;
   var _useState7 = useState(function () {
       return load("nq_xp", 0);
     }),
@@ -1842,10 +1934,10 @@ function HomeScreen(_ref3) {
 }
 
 // ─── CHAPTER SCREEN ────────────────────────────────────────────────
-function ChapterScreen(_ref4) {
-  var chapter = _ref4.chapter,
-    onBack = _ref4.onBack,
-    onStartLesson = _ref4.onStartLesson;
+function ChapterScreen(_ref5) {
+  var chapter = _ref5.chapter,
+    onBack = _ref5.onBack,
+    onStartLesson = _ref5.onStartLesson;
   var _useState13 = useState(function () {
       return load("nq_done", []);
     }),
@@ -2037,11 +2129,11 @@ function ChapterScreen(_ref4) {
 }
 
 // ─── LESSON SCREEN ─────────────────────────────────────────────────
-function LessonScreen(_ref5) {
-  var lesson = _ref5.lesson,
-    chapter = _ref5.chapter,
-    onBack = _ref5.onBack,
-    onComplete = _ref5.onComplete;
+function LessonScreen(_ref6) {
+  var lesson = _ref6.lesson,
+    chapter = _ref6.chapter,
+    onBack = _ref6.onBack,
+    onComplete = _ref6.onComplete;
   var _useState15 = useState("teach"),
     _useState16 = _slicedToArray(_useState15, 2),
     phase = _useState16[0],
@@ -2187,6 +2279,8 @@ function LessonScreen(_ref5) {
     }
   }, "Quiz ", phase === "quiz" ? qIdx + 1 : 0, "/", quiz.length)))), phase === "teach" && slideIdx === 0 && lesson.videoId && /*#__PURE__*/React.createElement(VideoPlayer, {
     videoId: lesson.videoId
+  }), phase === "teach" && slideIdx === 0 && /*#__PURE__*/React.createElement(PDFDownloadBtn, {
+    chapterId: lesson.id.replace("-main", "")
   }), phase === "teach" && slide && /*#__PURE__*/React.createElement(TeachSlide, {
     slide: slide,
     color: color,
@@ -2407,13 +2501,13 @@ function LessonScreen(_ref5) {
 }
 
 // ─── TEACH SLIDE ───────────────────────────────────────────────────
-function TeachSlide(_ref6) {
-  var slide = _ref6.slide,
-    color = _ref6.color,
-    onNext = _ref6.onNext,
-    onPrev = _ref6.onPrev,
-    isFirst = _ref6.isFirst,
-    isLast = _ref6.isLast;
+function TeachSlide(_ref7) {
+  var slide = _ref7.slide,
+    color = _ref7.color,
+    onNext = _ref7.onNext,
+    onPrev = _ref7.onPrev,
+    isFirst = _ref7.isFirst,
+    isLast = _ref7.isLast;
   return /*#__PURE__*/React.createElement("div", {
     style: {
       animation: "fadeIn 0.35s ease"
@@ -3284,5 +3378,4 @@ function App() {
     onSelectChapter: handleSelectChapter
   });
 }
-
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
