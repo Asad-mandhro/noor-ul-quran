@@ -2320,7 +2320,7 @@ function LessonScreen(_ref6) {
   }, "Quiz ", phase === "quiz" ? qIdx + 1 : 0, "/", quiz.length)))), phase === "teach" && slideIdx === 0 && lesson.videoId && /*#__PURE__*/React.createElement(VideoPlayer, {
     videoId: lesson.videoId
   }), phase === "teach" && slideIdx === 0 && /*#__PURE__*/React.createElement(PDFDownloadBtn, {
-    chapterId: lesson.id.replace("-main", "")
+    chapterId: chapter === null || chapter === void 0 ? void 0 : chapter.id
   }), phase === "teach" && slide && /*#__PURE__*/React.createElement(TeachSlide, {
     slide: slide,
     color: color,
