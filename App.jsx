@@ -499,6 +499,58 @@ function SpeakBtn({ text, verseId, style = {} }) {
 }
 
 // ─── VIDEO PLAYER ──────────────────────────────────────────────────
+// PDF filenames map for Tajweed chapters
+const TJ_PDFS = {
+  tj1:  "Ch01-Introduction-to-Tajweed.pdf",
+  tj2:  "Ch02-Makhaarij-Articulation-Points.pdf",
+  tj3:  "Ch03-Sifaat-Letter-Characteristics.pdf",
+  tj4:  "Ch04-Noon-Sakinah-Izhar.pdf",
+  tj5:  "Ch05-Noon-Sakinah-Idgham.pdf",
+  tj6:  "Ch06-Noon-Sakinah-Iqlab.pdf",
+  tj7:  "Ch07-Noon-Sakinah-Ikhfa.pdf",
+  tj8:  "Ch08-Meem-Sakinah.pdf",
+  tj9:  "Ch09-Madd-Elongation.pdf",
+  tj10: "Ch10-Qalqalah.pdf",
+  tj11: "Ch11-Waqf-Stopping-Starting.pdf",
+  tj12: "Ch12-Practical-Al-Fatiha.pdf",
+};
+
+function PDFDownloadBtn({ chapterId }) {
+  const filename = TJ_PDFS[chapterId];
+  if (!filename) return null;
+  const url = `https://asad-mandhro.github.io/noor-ul-quran/pdfs/${filename}`;
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" download={filename}
+      style={{
+        display:"flex", alignItems:"center", gap:10,
+        background:"linear-gradient(135deg,#1a2818,#111d11)",
+        border:"1px solid #3a6a3a", borderRadius:13,
+        padding:"13px 16px", textDecoration:"none",
+        marginBottom:12, transition:"all 0.2s"
+      }}>
+      <div style={{ width:38, height:38, borderRadius:10, background:"#cc2200",
+        display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <polyline points="9 15 12 18 15 15"/>
+        </svg>
+      </div>
+      <div>
+        <div style={{ fontSize:13, fontWeight:700, color:"#7ac97a" }}>Download Study Notes (PDF)</div>
+        <div style={{ fontSize:11, color:"#5a8a5a", marginTop:2 }}>
+          Summary · Key rules · Tables · Quranic examples
+        </div>
+      </div>
+      <div style={{ marginLeft:"auto", fontSize:10, color:"#7ac97a",
+        background:"#2a4a2a", padding:"3px 8px", borderRadius:6, fontWeight:600 }}>
+        PDF ↓
+      </div>
+    </a>
+  );
+}
+
 function VideoPlayer({ videoId }) {
   const [mode, setMode] = useState("idle"); // idle | embed
   const [embedFailed, setEmbedFailed] = useState(false);
@@ -862,9 +914,12 @@ function LessonScreen({ lesson, chapter, onBack, onComplete }) {
           </div>
         </div>
 
-        {/* VIDEO — show on first slide only */}
+        {/* VIDEO + PDF — show on first slide only */}
         {phase==="teach" && slideIdx===0 && lesson.videoId && (
           <VideoPlayer videoId={lesson.videoId} />
+        )}
+        {phase==="teach" && slideIdx===0 && (
+          <PDFDownloadBtn chapterId={lesson.id.replace("-main","")} />
         )}
 
         {/* TEACH */}
