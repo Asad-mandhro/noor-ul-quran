@@ -719,8 +719,8 @@ function HomeScreen({ onSelectChapter }) {
           const lessons = getLessons(ch.data);
           const completed = lessons.filter(l => done.includes(l.id)).length;
           const pct = (completed / lessons.length) * 100;
-          const isLocked = idx > 0 && !activeChapters[idx-1] ? true :
-            idx > 0 && getLessons(activeChapters[idx-1].data).some(l => !done.includes(l.id));
+          const isLocked = idx <= 1 ? false :
+            getLessons(activeChapters[idx-1].data).some(l => !done.includes(l.id));
 
           return (
             <button key={ch.id} onClick={() => !isLocked && onSelectChapter(ch)}
