@@ -4,21 +4,21 @@ var useEffect = React.useEffect;
 var useCallback = React.useCallback;
 var useRef = React.useRef;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
-function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
 function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
-function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 // ─── SPEAK UTILITY ─────────────────────────────────────────────────
 var speak = function speak(text) {
   var rate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.75;
@@ -47,27 +47,45 @@ var C = {
 };
 
 // ─── CHAPTERS DATA ─────────────────────────────────────────────────
-var CHAPTERS = [{
-  id: "ch1",
-  number: 1,
-  arabic: "الحروف العربية",
-  english: "The Arabic Alphabet",
-  desc: "Learn all 28 letters, vowels, and read Al-Fatiha",
-  lessons: 10,
-  color: C.gold,
-  videoId: "rEOQmQmApOg",
-  data: "ch1"
-}, {
-  id: "ch2",
-  number: 2,
-  arabic: "هَذَا وَهَذِهِ",
-  english: "This Is...",
-  desc: "Madinah Book 1, Lesson 1 — Demonstrative pronouns, nouns, sentences",
-  lessons: 6,
-  color: "#8bbd6b",
-  videoId: "W56bEvyXaVM",
-  data: "ch2"
-}];
+var BOOK_COLORS = {
+  1: "#8bbd6b",
+  2: "#6b8bbd",
+  3: "#b08bdd"
+};
+var buildAllChapters = function buildAllChapters() {
+  var inline = [{
+    id: "ch1",
+    number: 1,
+    book: 1,
+    arabic: "الحروف العربية",
+    english: "The Arabic Alphabet",
+    desc: "All 28 letters, vowels, and read Al-Fatiha",
+    color: "#c9a84c",
+    videoId: "rEOQmQmApOg",
+    data: "ch1"
+  }, {
+    id: "ch2",
+    number: 2,
+    book: 1,
+    arabic: "هَذَا وَهَذِهِ",
+    english: "This Is...",
+    desc: "Madinah Book 1 — Demonstrative pronouns, nouns, sentences",
+    color: "#8bbd6b",
+    videoId: "W56bEvyXaVM",
+    data: "ch2"
+  }];
+  var b1 = typeof window !== "undefined" && window.EXTRA_CHAPTERS || [];
+  var b2b3 = typeof window !== "undefined" && window.EXTRA_CHAPTERS_B2B3 || [];
+  var ext = [].concat(_toConsumableArray(b1), _toConsumableArray(b2b3)).map(function (ch) {
+    return _objectSpread(_objectSpread({}, ch), {}, {
+      number: ch.num,
+      desc: ch.desc || ch.english,
+      data: ch.id
+    });
+  });
+  return [].concat(inline, _toConsumableArray(ext));
+};
+var CHAPTERS = buildAllChapters();
 
 // ─── CHAPTER 1 LESSONS (condensed but complete) ────────────────────
 var CH1_LESSONS = [{
@@ -1104,6 +1122,29 @@ var ALL_LESSONS = {
   ch2: CH2_LESSONS
 };
 
+// Load external chapter lessons dynamically
+var getLessons = function getLessons(chapterId) {
+  var _ch$slides$, _ch$slides$2;
+  if (ALL_LESSONS[chapterId]) return ALL_LESSONS[chapterId];
+  // Find from external data
+  var allExt = [].concat(_toConsumableArray(typeof window !== "undefined" && window.EXTRA_CHAPTERS || []), _toConsumableArray(typeof window !== "undefined" && window.EXTRA_CHAPTERS_B2B3 || []));
+  var ch = allExt.find(function (c) {
+    return c.id === chapterId;
+  });
+  if (!ch || !ch.slides) return [];
+  // Each external chapter IS a single lesson with slides + quiz
+  return [{
+    id: chapterId + "-main",
+    title: ch.english,
+    subtitle: ch.arabic,
+    type: ((_ch$slides$ = ch.slides[0]) === null || _ch$slides$ === void 0 ? void 0 : _ch$slides$.type) === "fact" || ((_ch$slides$2 = ch.slides[0]) === null || _ch$slides$2 === void 0 ? void 0 : _ch$slides$2.type) === "letter_intro" ? "grammar" : "vocab",
+    xp: ch.quiz ? ch.quiz.length * 10 + 20 : 30,
+    videoId: ch.videoId,
+    slides: ch.slides,
+    quiz: ch.quiz || []
+  }];
+};
+
 // ─── STORE / LOAD ──────────────────────────────────────────────────
 var store = function store(k, v) {
   try {
@@ -1536,12 +1577,12 @@ function HomeScreen(_ref3) {
       marginBottom: 14
     }
   }, "Chapters"), CHAPTERS.map(function (ch, idx) {
-    var lessons = ALL_LESSONS[ch.data] || [];
+    var lessons = getLessons(ch.data);
     var completed = lessons.filter(function (l) {
       return done.includes(l.id);
     }).length;
     var pct = completed / lessons.length * 100;
-    var isLocked = idx > 0 && !CHAPTERS[idx - 1] ? true : idx > 0 && (ALL_LESSONS[CHAPTERS[idx - 1].data] || []).some(function (l) {
+    var isLocked = idx > 0 && !CHAPTERS[idx - 1] ? true : idx > 0 && getLessons(CHAPTERS[idx - 1].data).some(function (l) {
       return !done.includes(l.id);
     });
     return /*#__PURE__*/React.createElement("button", {
@@ -1666,7 +1707,7 @@ function ChapterScreen(_ref4) {
     _useState10 = _slicedToArray(_useState1, 2),
     done = _useState10[0],
     setDone = _useState10[1];
-  var lessons = ALL_LESSONS[chapter.data] || [];
+  var lessons = getLessons(chapter.data);
   var typeColor = {
     intro: C.blue,
     letters: C.gold,
