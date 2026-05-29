@@ -1,8 +1,5 @@
 "use strict";
-var useState = React.useState;
-var useEffect = React.useEffect;
-var useCallback = React.useCallback;
-var useRef = React.useRef;
+var useState=React.useState,useEffect=React.useEffect,useCallback=React.useCallback,useRef=React.useRef;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -1353,9 +1350,52 @@ var TJ_PDFS = {
   tj11: "Ch11-Waqf-Stopping-Starting.pdf",
   tj12: "Ch12-Practical-Al-Fatiha.pdf"
 };
+var AR_PDFS = {
+  ch2: "Arabic-Ch02-Haadha-Haadhihi.pdf",
+  ch3: "Arabic-Ch03-Dhaalika-Tilka.pdf",
+  ch4: "Arabic-Ch04-Adjectives.pdf",
+  ch5: "Arabic-Ch05-Question-Words.pdf",
+  ch6: "Arabic-Ch06-Prepositions.pdf",
+  ch7: "Arabic-Ch07-Pronouns.pdf",
+  ch8: "Arabic-Ch08-Idafa-Possession.pdf",
+  ch9: "Arabic-Ch09-Attached-Pronouns.pdf",
+  ch10: "Arabic-Ch10-Locations.pdf",
+  ch11: "Arabic-Ch11-Inda-Having.pdf",
+  ch12: "Arabic-Ch12-Numbers.pdf",
+  ch13: "Arabic-Ch13-Past-Tense-1.pdf",
+  ch14: "Arabic-Ch14-Past-Tense-Full.pdf",
+  ch15: "Arabic-Ch15-Laysa-Negation.pdf",
+  ch16: "Arabic-Ch16-Broken-Plurals.pdf",
+  ch17: "Arabic-Ch17-Sound-Masc-Plural.pdf",
+  ch18: "Arabic-Ch18-Sound-Fem-Plural.pdf",
+  ch19: "Arabic-Ch19-Dual.pdf",
+  ch20: "Arabic-Ch20-Present-Tense.pdf",
+  ch21: "Arabic-Ch21-Prohibition.pdf",
+  ch22: "Arabic-Ch22-Adjective-Agreement.pdf",
+  ch23: "Arabic-Ch23-Book1-Review.pdf",
+  ch24: "Arabic-Ch24-Kana-Sisters.pdf",
+  ch25: "Arabic-Ch25-Inna-Sisters.pdf",
+  ch26: "Arabic-Ch26-Masdar.pdf",
+  ch27: "Arabic-Ch27-Active-Participle.pdf",
+  ch28: "Arabic-Ch28-Passive-Participle.pdf",
+  ch29: "Arabic-Ch29-Passive-Voice.pdf",
+  ch30: "Arabic-Ch30-Form2.pdf",
+  ch31: "Arabic-Ch31-Form3.pdf",
+  ch32: "Arabic-Ch32-Form4.pdf",
+  ch33: "Arabic-Ch33-Forms5to10.pdf",
+  ch34: "Arabic-Ch34-Relative-Pronouns.pdf",
+  ch35: "Arabic-Ch35-Conditional-Comparative.pdf",
+  ch36: "Arabic-Ch36-Book2-Review.pdf",
+  ch37: "Arabic-Ch37-Parsing.pdf",
+  ch38: "Arabic-Ch38-Weak-Verbs.pdf",
+  ch39: "Arabic-Ch39-Quran-Ikhlas.pdf",
+  ch40: "Arabic-Ch40-Quran-Fatiha.pdf",
+  ch41: "Arabic-Ch41-Hadith.pdf",
+  ch42: "Arabic-Ch42-Classical-Texts.pdf"
+};
 function PDFDownloadBtn(_ref2) {
   var chapterId = _ref2.chapterId;
-  var filename = TJ_PDFS[chapterId];
+  var filename = TJ_PDFS[chapterId] || AR_PDFS[chapterId];
   if (!filename) return null;
   var url = "https://asad-mandhro.github.io/noor-ul-quran/pdfs/".concat(filename);
   return /*#__PURE__*/React.createElement("a", {
