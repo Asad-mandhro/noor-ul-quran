@@ -1819,7 +1819,7 @@ function HomeScreen(_ref4) {
       return done.includes(l.id);
     }).length;
     var pct = completed / lessons.length * 100;
-    var isLocked = idx > 0 && !activeChapters[idx - 1] ? true : idx > 0 && getLessons(activeChapters[idx - 1].data).some(function (l) {
+    var isLocked = idx <= 1 ? false : getLessons(activeChapters[idx - 1].data).some(function (l) {
       return !done.includes(l.id);
     });
     return /*#__PURE__*/React.createElement("button", {
