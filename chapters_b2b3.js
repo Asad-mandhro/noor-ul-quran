@@ -129,7 +129,7 @@ quiz:[
 ]},
 {id:"ch31",num:31,book:2,arabic:"بَاب III — فَاعَلَ",english:"Verb Form III",desc:"Doing with someone — mutual actions",color:"#6b8bbd",videoId:"hBV7MiorOUY",
 slides:[
-  {type:"rule",heading:"Form III — فَاعَلَ",body:"Add long alif after first root letter:\n\nجَهَدَ → جَاهَدَ (strove together)\nسَعَدَ → سَاعَدَ (helped)\nقَتَلَ → قَاتَلَ (fought against)\n\nMeaning: doing WITH someone, mutually.","tip:"جِهَاد = masdar of جَاهَدَ = striving in Allah's way."},
+  {type:"rule",heading:"Form III — فَاعَلَ",body:"Add long alif after first root letter:\n\nجَهَدَ → جَاهَدَ (strove together)\nسَعَدَ → سَاعَدَ (helped)\nقَتَلَ → قَاتَلَ (fought against)\n\nMeaning: doing WITH someone, mutually.","tip":"جِهَاد = masdar of جَاهَدَ = striving in Allah's way."},
   {type:"vocab_list",heading:"Form III Verbs",words:[
     {arabic:"جَاهَدَ",roman:"jaahada",meaning:"strove/struggled",note:"جَاهِدُوا فِي سَبِيلِ اللهِ"},
     {arabic:"سَاعَدَ",roman:"saa'ada",meaning:"helped",note:"سَاعِدْنِي = Help me"},
