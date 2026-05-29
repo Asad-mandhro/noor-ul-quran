@@ -19,24 +19,26 @@ const C = {
 };
 
 // ─── CHAPTERS DATA ─────────────────────────────────────────────────
-const CHAPTERS = [
-  {
-    id:"ch1", number:1,
-    arabic:"الحروف العربية", english:"The Arabic Alphabet",
-    desc:"Learn all 28 letters, vowels, and read Al-Fatiha",
-    lessons: 10, color: C.gold,
-    videoId: "rEOQmQmApOg",
-    data: "ch1"
-  },
-  {
-    id:"ch2", number:2,
-    arabic:"هَذَا وَهَذِهِ", english:"This Is...",
-    desc:"Madinah Book 1, Lesson 1 — Demonstrative pronouns, nouns, sentences",
-    lessons: 6, color: "#8bbd6b",
-    videoId: "W56bEvyXaVM",
-    data: "ch2"
-  }
-];
+const BOOK_COLORS = { 1:"#8bbd6b", 2:"#6b8bbd", 3:"#b08bdd" };
+
+const buildAllChapters = () => {
+  const inline = [
+    { id:"ch1", number:1, book:1, arabic:"الحروف العربية", english:"The Arabic Alphabet",
+      desc:"All 28 letters, vowels, and read Al-Fatiha", color:"#c9a84c",
+      videoId:"rEOQmQmApOg", data:"ch1" },
+    { id:"ch2", number:2, book:1, arabic:"هَذَا وَهَذِهِ", english:"This Is...",
+      desc:"Madinah Book 1 — Demonstrative pronouns, nouns, sentences", color:"#8bbd6b",
+      videoId:"W56bEvyXaVM", data:"ch2" },
+  ];
+  const b1 = (typeof window !== "undefined" && window.EXTRA_CHAPTERS) || [];
+  const b2b3 = (typeof window !== "undefined" && window.EXTRA_CHAPTERS_B2B3) || [];
+  const ext = [...b1, ...b2b3].map(ch => ({
+    ...ch, number:ch.num, desc:ch.desc||ch.english, data:ch.id,
+  }));
+  return [...inline, ...ext];
+};
+
+const CHAPTERS = buildAllChapters();
 
 // ─── CHAPTER 1 LESSONS (condensed but complete) ────────────────────
 const CH1_LESSONS = [
@@ -413,6 +415,29 @@ const CH2_LESSONS = [
 
 const ALL_LESSONS = { ch1: CH1_LESSONS, ch2: CH2_LESSONS };
 
+// Load external chapter lessons dynamically
+const getLessons = (chapterId) => {
+  if (ALL_LESSONS[chapterId]) return ALL_LESSONS[chapterId];
+  // Find from external data
+  const allExt = [
+    ...((typeof window !== "undefined" && window.EXTRA_CHAPTERS) || []),
+    ...((typeof window !== "undefined" && window.EXTRA_CHAPTERS_B2B3) || []),
+  ];
+  const ch = allExt.find(c => c.id === chapterId);
+  if (!ch || !ch.slides) return [];
+  // Each external chapter IS a single lesson with slides + quiz
+  return [{
+    id: chapterId + "-main",
+    title: ch.english,
+    subtitle: ch.arabic,
+    type: ch.slides[0]?.type === "fact" || ch.slides[0]?.type === "letter_intro" ? "grammar" : "vocab",
+    xp: ch.quiz ? ch.quiz.length * 10 + 20 : 30,
+    videoId: ch.videoId,
+    slides: ch.slides,
+    quiz: ch.quiz || [],
+  }];
+};
+
 // ─── STORE / LOAD ──────────────────────────────────────────────────
 const store = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 const load  = (k,d) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch { return d; } };
@@ -546,11 +571,11 @@ function HomeScreen({ onSelectChapter }) {
         {/* Chapters */}
         <div style={{ fontSize:11, color:C.muted, letterSpacing:2, textTransform:"uppercase", marginBottom:14 }}>Chapters</div>
         {CHAPTERS.map((ch, idx) => {
-          const lessons = ALL_LESSONS[ch.data] || [];
+          const lessons = getLessons(ch.data);
           const completed = lessons.filter(l => done.includes(l.id)).length;
           const pct = (completed / lessons.length) * 100;
           const isLocked = idx > 0 && !CHAPTERS[idx-1] ? true :
-            idx > 0 && (ALL_LESSONS[CHAPTERS[idx-1].data] || []).some(l => !done.includes(l.id));
+            idx > 0 && getLessons(CHAPTERS[idx-1].data).some(l => !done.includes(l.id));
 
           return (
             <button key={ch.id} onClick={() => !isLocked && onSelectChapter(ch)}
@@ -600,7 +625,7 @@ function HomeScreen({ onSelectChapter }) {
 // ─── CHAPTER SCREEN ────────────────────────────────────────────────
 function ChapterScreen({ chapter, onBack, onStartLesson }) {
   const [done, setDone] = useState(() => load("nq_done", []));
-  const lessons = ALL_LESSONS[chapter.data] || [];
+  const lessons = getLessons(chapter.data);
   const typeColor = { intro:C.blue, letters:C.gold, grammar:"#8bbd6b", vocab:"#bd8b6b", quran:C.purple };
   const typeLabel = { intro:"INTRO", letters:"LETTERS", grammar:"GRAMMAR", vocab:"VOCAB", quran:"QURAN" };
 
