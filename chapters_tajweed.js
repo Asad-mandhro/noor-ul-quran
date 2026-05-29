@@ -5,7 +5,7 @@
 
 window.TAJWEED_CHAPTERS = [
 {id:"tj1",num:1,book:"tajweed",arabic:"مُقَدِّمَة التَّجْوِيد",english:"Introduction to Tajweed",
-desc:"Why Tajweed matters — the rules of beautiful recitation",color:"#e8734a",videoId:"oZsT4LIcUEY",
+desc:"Why Tajweed matters — the rules of beautiful recitation",color:"#e8734a",videoId:"mU_hK4tUioM",
 slides:[
   {type:"welcome",heading:"التَّجْوِيد",subheading:"The Art of Beautiful Recitation",
    body:"Tajweed (تَجْوِيد) literally means 'to make better/improve'. In Quran, it means reciting each letter from its correct articulation point with its proper characteristics — exactly as the Prophet ﷺ recited."},
@@ -26,7 +26,7 @@ quiz:[
 ]},
 
 {id:"tj2",num:2,book:"tajweed",arabic:"مَخَارِج الحُرُوف",english:"Articulation Points — Makhaarij",
-desc:"The 5 origin areas of all Arabic letters",color:"#e8734a",videoId:"oZsT4LIcUEY",
+desc:"The 5 origin areas of all Arabic letters",color:"#e8734a",videoId:"6R29jhPK0Xw",
 slides:[
   {type:"rule",heading:"The 5 Makhaarij Areas",body:"Every Arabic letter is produced from one of 5 areas:\n\n1. الجَوْف (the Empty Space) — long vowels ا و ي\n2. الحَلْق (the Throat) — ء ه ع ح غ خ\n3. اللِّسَان (the Tongue) — most letters\n4. الشَّفَتَان (the Lips) — ف ب م و\n5. الخَيْشُوم (the Nasal Cavity) — Ghunnah of ن م","tip":"Place your finger on your throat and say ح — feel the vibration. Now say خ — feel it move higher. Different makhraj!"},
   {type:"vocab_list",heading:"Throat Letters (الحَلْق) — 6 Letters",words:[
@@ -51,7 +51,7 @@ quiz:[
 ]},
 
 {id:"tj3",num:3,book:"tajweed",arabic:"صِفَات الحُرُوف",english:"Letter Characteristics — Sifaat",
-desc:"Heavy vs light, whispered vs voiced",color:"#e8734a",videoId:"oZsT4LIcUEY",
+desc:"Heavy vs light, whispered vs voiced",color:"#e8734a",videoId:"78jBPJlU1c8",
 slides:[
   {type:"rule",heading:"What Are Sifaat?",body:"Sifaat (صِفَات) = characteristics that distinguish letters with the same makhraj.\n\nExample: ط and ت come from similar places, BUT:\n- ط is heavy (مُفَخَّم) — tongue presses firmly, sound is deep\n- ت is light (مُرَقَّق) — tongue is relaxed, sound is light\n\nThis difference is a sifa (characteristic).","tip":"Sifaat are why Arabic has 28 distinct letters from only 17 makhaarij areas. Same place + different characteristic = different letter."},
   {type:"vocab_list",heading:"Heavy vs Light Letters",words:[
@@ -76,7 +76,7 @@ quiz:[
 ]},
 
 {id:"tj4",num:4,book:"tajweed",arabic:"النُّون السَّاكِنَة — الإِظْهَار",english:"Noon Sakinah — Izhar (Clarity)",
-desc:"When ن is clearly pronounced with throat letters",color:"#e8734a",videoId:"oZsT4LIcUEY",
+desc:"When ن is clearly pronounced with throat letters",color:"#e8734a",videoId:"zbnGeRhS2yM",
 slides:[
   {type:"rule",heading:"النُّون السَّاكِنَة",body:"Noon Sakinah = the letter ن with sukoon (no vowel): نْ\nAlso applies to tanween (ـً ـٍ ـٌ).\n\nWhen ن or tanween meets the next letter, ONE of 4 rules applies:\n1. إِظْهَار (Izhar) — clear pronunciation\n2. إِدْغَام (Idgham) — merging\n3. إِقْلَاب (Iqlab) — conversion to م\n4. إِخْفَاء (Ikhfa) — concealment\n\nThis chapter: Rule 1 — Izhar.","tip":"These 4 rules cover MOST of Quranic Tajweed. Master them and your recitation transforms."},
   {type:"rule",heading:"Izhar — Clear Pronunciation",body:"Izhar happens when ن or tanween is followed by one of 6 THROAT letters:\n\nء ه ع ح غ خ\n\nThe ن is pronounced CLEARLY — no merging, no nasal sound, no concealment. Just a clean ن sound.\n\nWhy? The throat letters are far from the tongue (where ن originates), so there's no clash — the ن stays clear.","tip":"Memorize the 6 throat letters: أَخِي هَاكَ عِلْماً حَازَهُ غَيْرُ خَاسِرٍ. Each word starts with one of them."},
@@ -104,7 +104,7 @@ quiz:[
 ]},
 
 {id:"tj5",num:5,book:"tajweed",arabic:"الإِدْغَام",english:"Idgham — Merging",
-desc:"When ن merges into the next letter",color:"#e8734a",videoId:"oZsT4LIcUEY",
+desc:"When ن merges into the next letter",color:"#e8734a",videoId:"vEixPsqr7Gg",
 slides:[
   {type:"rule",heading:"Idgham — Merging",body:"Idgham happens when ن or tanween is followed by one of 6 letters:\n\nيَرْمَلُون = ي ر م ل و ن\n\nThe ن DISAPPEARS into the next letter. Two types:\n\n1. WITH ghunnah (nasalization): ي ن م و\n2. WITHOUT ghunnah: ل ر","tip":"Memorize يَرْمَلُون — each letter is one of the 6 Idgham letters."},
   {type:"vocab_list",heading:"Idgham WITH Ghunnah",words:[
@@ -134,7 +134,7 @@ quiz:[
 ]},
 
 {id:"tj6",num:6,book:"tajweed",arabic:"الإِقْلَاب",english:"Iqlab — Conversion",
-desc:"When ن becomes م before ب",color:"#e8734a",videoId:"oZsT4LIcUEY",
+desc:"When ن becomes م before ب",color:"#e8734a",videoId:"RGhBtit-ly0",
 slides:[
   {type:"rule",heading:"Iqlab — Conversion",body:"Iqlab happens when ن or tanween is followed by ONE letter: ب\n\nThe ن is converted into a hidden م sound, with ghunnah (nasalization for 2 beats).\n\nWhy? Producing ن (tongue) then immediately ب (lips) is awkward. Converting to م (also lips) makes the transition smooth.","tip":"Iqlab is the EASIEST rule — only 1 letter (ب) causes it. Look for a small م written above the ن in the mushaf."},
   {type:"quran_verse",arabic:"مِنْ بَعْدِ",roman:"mim-ba'di (NOT min ba'di)",meaning:"after — Iqlab",
@@ -162,7 +162,7 @@ quiz:[
 ]},
 
 {id:"tj7",num:7,book:"tajweed",arabic:"الإِخْفَاء",english:"Ikhfa — Concealment",
-desc:"The 15-letter middle rule — partial hiding of ن",color:"#e8734a",videoId:"oZsT4LIcUEY",
+desc:"The 15-letter middle rule — partial hiding of ن",color:"#e8734a",videoId:"ylqjMruoC40",
 slides:[
   {type:"rule",heading:"Ikhfa — Concealment",body:"Ikhfa is the rule for the REMAINING 15 letters that don't fit the other 3 rules.\n\nThe ن is NEITHER fully pronounced (Izhar) NOR fully merged (Idgham) — it's CONCEALED. You make a partial nasal sound for 2 beats (ghunnah).\n\nNot ن... not ng... something in between, with nasal hold.","tip":"Ikhfa is the MOST COMMON rule in the Quran. The 15 letters are: ت ث ج د ذ ز س ش ص ض ط ظ ف ق ك"},
   {type:"vocab_list",heading:"The 15 Ikhfa Letters",words:[
@@ -198,7 +198,7 @@ quiz:[
 ]},
 
 {id:"tj8",num:8,book:"tajweed",arabic:"المِيم السَّاكِنَة",english:"Meem Sakinah Rules",
-desc:"3 rules for م without a vowel",color:"#e8734a",videoId:"oZsT4LIcUEY",
+desc:"3 rules for م without a vowel",color:"#e8734a",videoId:"ylqjMruoC40",
 slides:[
   {type:"rule",heading:"Meem Sakinah — 3 Rules",body:"When م has sukoon (مْ), one of 3 rules applies:\n\n1. إِخْفَاء شَفَوِيّ (Lip Concealment) — before ب\n2. إِدْغَام شَفَوِيّ (Lip Merging) — before another م\n3. إِظْهَار شَفَوِيّ (Lip Clarity) — before any other letter","tip":"All 3 rules involve the LIPS (شَفَة), since م comes from the lips. That's why they're called شَفَوِيّ (labial)."},
   {type:"vocab_list",heading:"The 3 Rules",words:[
@@ -232,7 +232,7 @@ quiz:[
 ]},
 
 {id:"tj9",num:9,book:"tajweed",arabic:"المُدُود",english:"Madd — Elongation",
-desc:"Stretching vowels — natural and necessary",color:"#e8734a",videoId:"oZsT4LIcUEY",
+desc:"Stretching vowels — natural and necessary",color:"#e8734a",videoId:"mU_hK4tUioM",
 slides:[
   {type:"rule",heading:"What is Madd?",body:"Madd (مَدّ) = stretching a long vowel for 2, 4, or 6 beats.\n\nThe 3 long vowel letters:\n• ا (alif after fatha) — long 'aa'\n• و (waw with sukoon after damma) — long 'oo'\n• ي (ya with sukoon after kasra) — long 'ee'\n\nThe length of the stretch depends on what comes after.","tip":"A 'beat' (حَرَكَة) ≈ the time to say a normal short vowel like fatha. Practice tapping rhythm: 1-tap = 2 beats, 2-taps = 4 beats."},
   {type:"vocab_list",heading:"Types of Madd",words:[
@@ -276,7 +276,7 @@ quiz:[
 ]},
 
 {id:"tj10",num:10,book:"tajweed",arabic:"القَلْقَلَة",english:"Qalqalah — The Bouncing Letters",
-desc:"5 letters that 'echo' when on sukoon",color:"#e8734a",videoId:"oZsT4LIcUEY",
+desc:"5 letters that 'echo' when on sukoon",color:"#e8734a",videoId:"78jBPJlU1c8",
 slides:[
   {type:"rule",heading:"Qalqalah — The Echo",body:"Qalqalah (قَلْقَلَة) = a small bounce or echo sound on 5 specific letters when they have sukoon.\n\nThe 5 Qalqalah letters: قُطُبُ جَدٍّ = ق ط ب ج د\n\nWhen any of these has sukoon (or at a stop), you create a slight 'echo' sound after it — like a tiny vowel that isn't really there.","tip":"Memorize the mnemonic: قُطُبُ جَدٍّ (poles of grandfather). Each letter is one of the 5."},
   {type:"vocab_list",heading:"3 Strengths of Qalqalah",words:[
@@ -316,7 +316,7 @@ quiz:[
 ]},
 
 {id:"tj11",num:11,book:"tajweed",arabic:"الوَقْف وَالاِبْتِدَاء",english:"Stopping & Starting",
-desc:"Where to pause and how to restart",color:"#e8734a",videoId:"oZsT4LIcUEY",
+desc:"Where to pause and how to restart",color:"#e8734a",videoId:"mU_hK4tUioM",
 slides:[
   {type:"rule",heading:"Waqf — The Art of Stopping",body:"Waqf (وَقْف) = pausing during recitation. Knowing WHERE to stop is critical — bad stops can change meaning.\n\n5 types of waqf signs you'll see in the mushaf:\n• مـ (compulsory stop — must stop)\n• ط (good stop — should stop)\n• ج (permissible stop — can stop)\n• ز (better not to stop)\n• لا (do NOT stop here)","tip":"The signs come from words: م=مَلْزُوم (compulsory), ط=طِبَاق (good), ج=جَائِز (permissible)."},
   {type:"vocab_list",heading:"5 Stop Signs",words:[
@@ -345,7 +345,7 @@ quiz:[
 ]},
 
 {id:"tj12",num:12,book:"tajweed",arabic:"التَّجْوِيد العَمَلِيّ",english:"Tajweed in Practice — Al-Fatiha",
-desc:"Apply all rules to the Opening Surah",color:"#e8734a",videoId:"oZsT4LIcUEY",
+desc:"Apply all rules to the Opening Surah",color:"#e8734a",videoId:"mU_hK4tUioM",
 slides:[
   {type:"rule",heading:"Practice on Al-Fatiha",body:"Al-Fatiha is the BEST surah to master Tajweed. It's recited 17 times daily, has all major rules, and is short enough to perfect.\n\nIn this final lesson, we'll go verse by verse, identifying every Tajweed rule.","tip":"Listen to Mishary Alafasy or Sheikh Hudhaify reciting Al-Fatiha multiple times. Listen for every rule you've learned."},
   {type:"quran_verse",arabic:"بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيمِ",
