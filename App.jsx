@@ -1,4 +1,20 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+
+// ─── SUPABASE ──────────────────────────────────────────────────────
+const SUPA_URL  = "https://casmtopcsfujbiygmhbw.supabase.co";
+const SUPA_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhc210b3Bjc2Z1amJpeWdtaGJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMTA2NjUsImV4cCI6MjA5NTY4NjY2NX0.ljWi9serMwjKKWogRlS-rfIUf9GpNFPIDG_ZvrYQdME";
+const sb = window.supabase?.createClient(SUPA_URL, SUPA_KEY);
+
+// Load/save progress from Supabase
+const loadProgress = async (userId) => {
+  if (!sb) return null;
+  const { data } = await sb.from("user_progress").select("*").eq("user_id", userId).single();
+  return data;
+};
+const saveProgress = async (userId, patch) => {
+  if (!sb) return;
+  await sb.from("user_progress").upsert({ user_id: userId, ...patch, updated_at: new Date().toISOString() });
+};
 
 // ─── SPEAK UTILITY ─────────────────────────────────────────────────
 const speak = (text, rate = 0.75) => {
@@ -681,10 +697,104 @@ function VideoPlayer({ videoId }) {
 }
 
 // ─── HOME SCREEN ───────────────────────────────────────────────────
-function HomeScreen({ onSelectChapter }) {
-  const [xp]     = useState(() => load("nq_xp", 0));
-  const [streak] = useState(() => load("nq_streak", 0));
-  const [done]   = useState(() => load("nq_done", []));
+// ─── AUTH SCREEN ───────────────────────────────────────────────────
+function AuthScreen({ onAuth }) {
+  const [mode, setMode]     = useState("login"); // login | register
+  const [name, setName]     = useState("");
+  const [email, setEmail]   = useState("");
+  const [pass, setPass]     = useState("");
+  const [err, setErr]       = useState("");
+  const [busy, setBusy]     = useState(false);
+
+  const submit = async () => {
+    setErr(""); setBusy(true);
+    try {
+      if (mode === "register") {
+        if (!name.trim()) { setErr("Enter your name"); setBusy(false); return; }
+        const { data, error } = await sb.auth.signUp({
+          email, password: pass,
+          options: { data: { display_name: name.trim() } }
+        });
+        if (error) { setErr(error.message); setBusy(false); return; }
+        // Create initial progress row
+        if (data.user) await saveProgress(data.user.id, { xp:0, streak:0, done_lessons:[], track:"arabic" });
+        onAuth(data.user, { xp:0, streak:0, done_lessons:[], last_date:null, track:"arabic" });
+      } else {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+        if (error) { setErr(error.message); setBusy(false); return; }
+        const progress = await loadProgress(data.user.id);
+        onAuth(data.user, progress || { xp:0, streak:0, done_lessons:[], last_date:null, track:"arabic" });
+      }
+    } catch(e) { setErr("Connection error. Check internet."); }
+    setBusy(false);
+  };
+
+  const inp = {
+    background:"#0e1320", border:`1px solid ${C.border}`, borderRadius:12,
+    padding:"14px 16px", color:C.text, fontSize:15, width:"100%",
+    outline:"none", fontFamily:"inherit"
+  };
+
+  return (
+    <div style={{ minHeight:"100vh", background:C.bg, display:"flex", flexDirection:"column",
+      alignItems:"center", justifyContent:"center", padding:"24px 20px" }}>
+
+      {/* Logo */}
+      <div style={{ marginBottom:32, textAlign:"center" }}>
+        <div style={{ fontSize:48, marginBottom:8 }}>🕌</div>
+        <div style={{ fontSize:26, fontWeight:800, color:C.gold, letterSpacing:1 }}>نور القرآن</div>
+        <div style={{ fontSize:13, color:C.muted, marginTop:4 }}>Noor ul Quran Academy</div>
+      </div>
+
+      {/* Card */}
+      <div style={{ width:"100%", maxWidth:380, background:C.card,
+        border:`1px solid ${C.border}`, borderRadius:20, padding:"28px 24px" }}>
+
+        {/* Tab toggle */}
+        <div style={{ display:"flex", background:"#0a0f1a", borderRadius:12, padding:4, marginBottom:24 }}>
+          {["login","register"].map(m => (
+            <button key={m} onClick={() => { setMode(m); setErr(""); }}
+              style={{ flex:1, padding:"10px", border:"none", borderRadius:10, cursor:"pointer",
+                background: mode===m ? C.gold : "transparent",
+                color: mode===m ? "#000" : C.muted,
+                fontWeight: mode===m ? 700 : 400, fontSize:13, transition:"all 0.2s" }}>
+              {m === "login" ? "Sign In" : "Register"}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+          {mode === "register" && (
+            <input style={inp} placeholder="Your name" value={name}
+              onChange={e => setName(e.target.value)} />
+          )}
+          <input style={inp} placeholder="Email" type="email" value={email}
+            onChange={e => setEmail(e.target.value)} />
+          <input style={inp} placeholder="Password (min 6 chars)" type="password" value={pass}
+            onChange={e => setPass(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && submit()} />
+
+          {err && <div style={{ color:"#e87a7a", fontSize:12, textAlign:"center", padding:"4px 0" }}>{err}</div>}
+
+          <button onClick={submit} disabled={busy}
+            style={{ marginTop:4, padding:"15px", border:"none", borderRadius:14,
+              background: busy ? C.muted : `linear-gradient(135deg,${C.gold},#e8a83c)`,
+              color:"#000", fontWeight:700, fontSize:15, cursor: busy?"not-allowed":"pointer",
+              transition:"all 0.2s" }}>
+            {busy ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
+          </button>
+        </div>
+      </div>
+
+      <div style={{ marginTop:20, fontSize:11, color:C.muted, textAlign:"center", maxWidth:280 }}>
+        Your progress syncs across all your devices
+      </div>
+    </div>
+  );
+}
+
+// ─── HOME SCREEN ───────────────────────────────────────────────────
+function HomeScreen({ onSelectChapter, xp = 0, streak = 0, done = [], user, onLogout }) {
   const [track, setTrack] = useState(() => load("nq_track", "arabic"));
   const level = Math.floor(xp / 300) + 1;
   const xpInLevel = xp % 300;
@@ -702,14 +812,25 @@ function HomeScreen({ onSelectChapter }) {
           <div>
             <h1 style={{ fontSize:26, margin:0, fontWeight:700, background:"linear-gradient(135deg,#c9a84c,#e8d5a3)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>نور القرآن</h1>
             <p style={{ margin:"3px 0 0", fontSize:11, color:C.muted, letterSpacing:2, textTransform:"uppercase" }}>Quranic Arabic Academy</p>
+            {user && (
+              <p style={{ margin:"4px 0 0", fontSize:12, color:C.gold }}>
+                👤 {user.user_metadata?.display_name || user.email?.split("@")[0]}
+              </p>
+            )}
           </div>
-          <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+          <div style={{ display:"flex", gap:8, alignItems:"center" }}>
             <div style={{ display:"flex", alignItems:"center", gap:4, color:"#e8734a", fontSize:15, fontWeight:700 }}>
               <IC.Fire />{streak}
             </div>
             <div style={{ background:"#1a2a1a", border:"1px solid #3a6a3a", borderRadius:20, padding:"5px 14px", fontSize:13, fontWeight:700, color:C.green }}>
               Lvl {level}
             </div>
+            {onLogout && (
+              <button onClick={onLogout} style={{ background:"transparent", border:`1px solid ${C.border}`,
+                borderRadius:20, padding:"5px 12px", color:C.muted, fontSize:11, cursor:"pointer" }}>
+                Sign out
+              </button>
+            )}
           </div>
         </div>
 
@@ -812,8 +933,7 @@ function HomeScreen({ onSelectChapter }) {
 }
 
 // ─── CHAPTER SCREEN ────────────────────────────────────────────────
-function ChapterScreen({ chapter, onBack, onStartLesson }) {
-  const [done, setDone] = useState(() => load("nq_done", []));
+function ChapterScreen({ chapter, onBack, onStartLesson, done = [] }) {
   const lessons = getLessons(chapter.data);
   const typeColor = { intro:C.blue, letters:C.gold, grammar:"#8bbd6b", vocab:"#bd8b6b", quran:C.purple };
   const typeLabel = { intro:"INTRO", letters:"LETTERS", grammar:"GRAMMAR", vocab:"VOCAB", quran:"QURAN" };
@@ -844,19 +964,7 @@ function ChapterScreen({ chapter, onBack, onStartLesson }) {
           const color = typeColor[lesson.type] || C.gold;
 
           return (
-            <button key={lesson.id} onClick={() => unlocked && onStartLesson(lesson, chapter, (id, xp) => {
-              const newDone = done.includes(id) ? done : [...done, id];
-              setDone(newDone); store("nq_done", newDone);
-              const curXp = load("nq_xp", 0);
-              const newXp = done.includes(id) ? curXp : curXp + xp;
-              store("nq_xp", newXp);
-              const today = new Date().toDateString();
-              const last = load("nq_lastDate", null);
-              if (last !== today) {
-                const s = load("nq_streak", 0) + 1;
-                store("nq_streak", s); store("nq_lastDate", today);
-              }
-            })}
+            <button key={lesson.id} onClick={() => unlocked && onStartLesson(lesson, chapter)}
             style={{ width:"100%", textAlign:"left", cursor: unlocked?"pointer":"default",
               display:"flex", alignItems:"center", gap:14, padding:"14px 16px",
               background: isDone?"#111d11": isNext?`${chapter.color}0a`:C.card,
@@ -1295,24 +1403,113 @@ function TeachSlide({ slide, color, onNext, onPrev, isFirst, isLast }) {
 
 // ─── APP ROOT ──────────────────────────────────────────────────────
 export default function App() {
-  const [screen, setScreen] = useState("home");          // home | chapter | lesson
+  const [screen, setScreen]       = useState("loading");
   const [activeChapter, setChapter] = useState(null);
   const [activeLesson,  setLesson]  = useState(null);
-  const [completeCb,    setCb]      = useState(null);
+  const [user,    setUser]   = useState(null);
+  const [xp,      setXp]     = useState(0);
+  const [streak,  setStreak] = useState(0);
+  const [done,    setDone]   = useState([]);
+  const [lastDate,setLastDate]= useState(null);
+
+  // ── Boot: check existing Supabase session ──────────────────────
+  useEffect(() => {
+    if (!sb) { setScreen("home"); return; } // no Supabase fallback
+    sb.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        await initUser(session.user);
+      } else {
+        setScreen("auth");
+      }
+    });
+    const { data: { subscription } } = sb.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_OUT") { setUser(null); setScreen("auth"); }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const initUser = async (u) => {
+    setUser(u);
+    const p = await loadProgress(u.id);
+    const prog = p || { xp:0, streak:0, done_lessons:[], last_date:null, track:"arabic" };
+    setXp(prog.xp || 0);
+    setStreak(prog.streak || 0);
+    setDone(prog.done_lessons || []);
+    setLastDate(prog.last_date || null);
+    setScreen("home");
+  };
+
+  const handleAuth = async (u, prog) => {
+    setUser(u);
+    setXp(prog.xp || 0);
+    setStreak(prog.streak || 0);
+    setDone(prog.done_lessons || []);
+    setLastDate(prog.last_date || null);
+    setScreen("home");
+  };
+
+  const handleLogout = async () => {
+    await sb?.auth.signOut();
+    setUser(null); setXp(0); setStreak(0); setDone([]);
+    setScreen("auth");
+  };
 
   const goHome    = useCallback(() => { setScreen("home"); setChapter(null); setLesson(null); }, []);
   const goChapter = useCallback(() => { setScreen("chapter"); setLesson(null); }, []);
-
   const handleSelectChapter = useCallback((ch) => { setChapter(ch); setScreen("chapter"); }, []);
-  const handleStartLesson   = useCallback((lesson, chapter, cb) => {
-    setLesson(lesson); setChapter(chapter); setCb(() => cb); setScreen("lesson");
+  const handleStartLesson   = useCallback((lesson, chapter) => {
+    setLesson(lesson); setChapter(chapter); setScreen("lesson");
   }, []);
 
+  const handleLessonComplete = useCallback((lessonId, earnedXp) => {
+    const today = new Date().toDateString();
+    let newDone, newXp, newStreak, newDate;
+
+    setDone(prev => {
+      newDone = prev.includes(lessonId) ? prev : [...prev, lessonId];
+      return newDone;
+    });
+    setXp(prev => { newXp = prev + (earnedXp || 10); return newXp; });
+    setLastDate(prev => {
+      if (prev !== today) {
+        setStreak(s => { newStreak = s + 1; return newStreak; });
+        newDate = today; return today;
+      }
+      newDate = prev; return prev;
+    });
+
+    // Sync to Supabase after state settles
+    setTimeout(() => {
+      if (user?.id) {
+        saveProgress(user.id, {
+          xp: newXp, streak: newStreak || streak,
+          done_lessons: newDone, last_date: newDate
+        });
+      }
+    }, 300);
+    goChapter();
+  }, [user, streak, goChapter]);
+
+  // Loading splash
+  if (screen === "loading") return (
+    <div style={{ minHeight:"100vh", background:C.bg, display:"flex", alignItems:"center",
+      justifyContent:"center", flexDirection:"column", gap:16 }}>
+      <div style={{ fontSize:48 }}>🕌</div>
+      <div style={{ fontSize:20, color:C.gold, fontWeight:700 }}>نور القرآن</div>
+      <div style={{ fontSize:12, color:C.muted }}>Loading...</div>
+    </div>
+  );
+
+  if (screen === "auth") return <AuthScreen onAuth={handleAuth} />;
+
   if (screen==="lesson" && activeLesson) {
-    return <LessonScreen lesson={activeLesson} chapter={activeChapter} onBack={goChapter} onComplete={(id,xp)=>{ completeCb&&completeCb(id,xp); }} />;
+    return <LessonScreen lesson={activeLesson} chapter={activeChapter}
+      onBack={goChapter} onComplete={handleLessonComplete} />;
   }
   if (screen==="chapter" && activeChapter) {
-    return <ChapterScreen chapter={activeChapter} onBack={goHome} onStartLesson={handleStartLesson} />;
+    return <ChapterScreen chapter={activeChapter} onBack={goHome}
+      onStartLesson={handleStartLesson} done={done} />;
   }
-  return <HomeScreen onSelectChapter={handleSelectChapter} />;
+  return <HomeScreen onSelectChapter={handleSelectChapter}
+    xp={xp} streak={streak} done={done} user={user} onLogout={handleLogout} />;
 }
