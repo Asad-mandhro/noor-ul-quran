@@ -3146,7 +3146,7 @@ function LessonScreen(_ref0) {
         flexShrink: 0
       }
     }, String.fromCharCode(65 + i)), opt);
-  })), answered && multiplier > 1 && selected === q.ans && /*#__PURE__*/React.createElement("div", {
+  })), answered && multiplier > 1 && isCorrectOpt(selected) && /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: "center",
       marginBottom: 10,
@@ -3157,8 +3157,8 @@ function LessonScreen(_ref0) {
     }
   }, "\uD83D\uDD25 Streak Bonus! \xD7", multiplier, " = +", QXP * multiplier, " XP"), showExp && /*#__PURE__*/React.createElement("div", {
     style: {
-      background: selected === q.ans ? "#111d11" : "#1d1111",
-      border: "1px solid ".concat(selected === q.ans ? "#3a6a3a" : "#6a3a3a"),
+      background: isCorrectOpt(selected) ? "#111d11" : "#1d1111",
+      border: "1px solid ".concat(isCorrectOpt(selected) ? "#3a6a3a" : "#6a3a3a"),
       borderRadius: 12,
       padding: "14px 16px",
       marginBottom: 14,
@@ -3167,13 +3167,13 @@ function LessonScreen(_ref0) {
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
-      color: selected === q.ans ? C.green : C.red,
+      color: isCorrectOpt(selected) ? C.green : C.red,
       letterSpacing: 1,
       textTransform: "uppercase",
       fontWeight: 700,
       marginBottom: 6
     }
-  }, selected === q.ans ? "✓ Correct" : "✗ Incorrect"), /*#__PURE__*/React.createElement("div", {
+  }, isCorrectOpt(selected) ? "✓ Correct" : "✗ Incorrect"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       color: "#b0a898",
