@@ -3884,41 +3884,25 @@ function App() {
   }, []);
   var handleLessonComplete = useCallback(function (lessonId, earnedXp) {
     var today = new Date().toDateString();
-    var newDone, newXp, newStreak, newDate;
-    setDone(function (prev) {
-      newDone = prev.includes(lessonId) ? prev : [].concat(_toConsumableArray(prev), [lessonId]);
-      return newDone;
-    });
-    setXp(function (prev) {
-      newXp = prev + (earnedXp || 10);
-      return newXp;
-    });
-    setLastDate(function (prev) {
-      if (prev !== today) {
-        setStreak(function (s) {
-          newStreak = s + 1;
-          return newStreak;
-        });
-        newDate = today;
-        return today;
-      }
-      newDate = prev;
-      return prev;
-    });
+    var newDone = done.includes(lessonId) ? done : [].concat(_toConsumableArray(done), [lessonId]);
+    var newXp = xp + (earnedXp || 10);
+    var newStreak = lastDate !== today ? streak + 1 : streak;
+    setDone(newDone);
+    setXp(newXp);
+    setStreak(newStreak);
+    setLastDate(today);
 
-    // Sync to Supabase after state settles
-    setTimeout(function () {
-      if (user !== null && user !== void 0 && user.id) {
-        saveProgress(user.id, {
-          xp: newXp,
-          streak: newStreak || streak,
-          done_lessons: newDone,
-          last_date: newDate
-        });
-      }
-    }, 300);
+    // Save directly — no setState callback race
+    if (user !== null && user !== void 0 && user.id) {
+      saveProgress(user.id, {
+        xp: newXp,
+        streak: newStreak,
+        done_lessons: newDone,
+        last_date: today
+      }).catch(console.error);
+    }
     goChapter();
-  }, [user, streak, goChapter]);
+  }, [user, xp, streak, done, lastDate, goChapter]);
 
   // Loading splash
   if (screen === "loading") return /*#__PURE__*/React.createElement("div", {
