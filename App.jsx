@@ -1355,7 +1355,7 @@ function LessonScreen({ lesson, chapter, onBack, onComplete }) {
             )}
 
             {/* XP multiplier toast */}
-            {answered && multiplier > 1 && selected===q.ans && (
+            {answered && multiplier > 1 && isCorrectOpt(selected) && (
               <div style={{ textAlign:"center", marginBottom:10, animation:"fadeIn 0.3s",
                 fontSize:13, color:multiplier>=3?"#e8734a":C.gold, fontWeight:700 }}>
                 🔥 Streak Bonus! ×{multiplier} = +{QXP*multiplier} XP
@@ -1364,12 +1364,12 @@ function LessonScreen({ lesson, chapter, onBack, onComplete }) {
 
             {/* Explanation */}
             {showExp && (
-              <div style={{ background: selected===q.ans?"#111d11":"#1d1111",
-                border:`1px solid ${selected===q.ans?"#3a6a3a":"#6a3a3a"}`,
+              <div style={{ background: isCorrectOpt(selected)?"#111d11":"#1d1111",
+                border:`1px solid ${isCorrectOpt(selected)?"#3a6a3a":"#6a3a3a"}`,
                 borderRadius:12, padding:"14px 16px", marginBottom:14, animation:"fadeIn 0.3s" }}>
-                <div style={{ fontSize:11, color:selected===q.ans?C.green:C.red, letterSpacing:1,
+                <div style={{ fontSize:11, color:isCorrectOpt(selected)?C.green:C.red, letterSpacing:1,
                   textTransform:"uppercase", fontWeight:700, marginBottom:6 }}>
-                  {selected===q.ans ? "✓ Correct" : "✗ Incorrect"}
+                  {isCorrectOpt(selected) ? "✓ Correct" : "✗ Incorrect"}
                 </div>
                 <div style={{ fontSize:13, color:"#b0a898", lineHeight:1.6 }}>{q.exp}</div>
               </div>
