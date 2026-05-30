@@ -465,6 +465,78 @@ const getLessons = (chapterId) => {
 
 // ─── STORE / LOAD ──────────────────────────────────────────────────
 const store = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+// ─── SHUFFLE ───────────────────────────────────────────────────────
+const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+
+// ─── AUTO-GENERATE EXTRA QUESTIONS FROM SLIDE DATA ─────────────────
+const generateExtraQuestions = (slides = []) => {
+  const extra = [];
+  const vocabSlides = slides.filter(s => s.type === "vocab_list");
+  const verseSlides = slides.filter(s => s.type === "quran_verse" && s.verseId);
+
+  vocabSlides.forEach(slide => {
+    const words = (slide.words || []).filter(w => w.arabic && w.meaning);
+    if (words.length < 4) return;
+
+    // Fill-in-blank: pick a random word, show its meaning, pick correct Arabic
+    const target = words[Math.floor(Math.random() * words.length)];
+    const distractors = shuffle(words.filter(w => w.arabic !== target.arabic)).slice(0, 3);
+    extra.push({
+      type: "fill_blank",
+      q: `Which Arabic word means "${target.meaning}"?`,
+      answer: target.arabic,
+      opts: shuffle([target.arabic, ...distractors.map(w => w.arabic)]),
+      exp: `${target.arabic} (${target.roman || ""}) = ${target.meaning}`,
+    });
+
+    // Matching: 4 pairs
+    const matchWords = shuffle(words).slice(0, 4);
+    extra.push({
+      type: "match",
+      q: "Match each Arabic word to its meaning",
+      pairs: matchWords.map(w => ({ ar: w.arabic, en: w.meaning })),
+    });
+  });
+
+  // Listening: one audio question per verse slide with verseId
+  verseSlides.slice(0, 2).forEach(slide => {
+    const allVocab = vocabSlides.flatMap(s => s.words || []).filter(w => w.arabic);
+    const distractors = shuffle(allVocab).slice(0, 3).map(w => w.arabic);
+    extra.push({
+      type: "audio",
+      verseId: slide.verseId,
+      arabic: slide.arabic,
+      q: "Listen and identify this Quranic phrase:",
+      answer: slide.arabic,
+      opts: shuffle([slide.arabic, ...distractors]),
+      exp: `${slide.arabic} = ${slide.meaning || ""}`,
+    });
+  });
+
+  return extra;
+};
+
+// ─── EXTRACT VOCAB FOR FLASHCARDS ──────────────────────────────────
+const extractVocab = (chapters, doneIds) => {
+  const cards = [];
+  chapters.forEach(ch => {
+    const lessons = getLessons(ch.data);
+    const isDone = lessons.some(l => doneIds.includes(l.id));
+    if (!isDone) return;
+    lessons.forEach(l => {
+      (l.slides || []).forEach(slide => {
+        if (slide.type !== "vocab_list") return;
+        (slide.words || []).forEach(w => {
+          if (w.arabic && w.meaning) {
+            cards.push({ arabic: w.arabic, roman: w.roman || "", meaning: w.meaning, note: w.note || "", chapterId: ch.id });
+          }
+        });
+      });
+    });
+  });
+  return cards;
+};
+
 const load  = (k,d) => { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : d; } catch { return d; } };
 
 // ─── ICONS ─────────────────────────────────────────────────────────
@@ -860,26 +932,43 @@ function HomeScreen({ onSelectChapter, xp = 0, streak = 0, done = [], user, onLo
         {/* Track Switcher */}
         <div style={{ display:"flex", background:C.card, borderRadius:12, border:`1px solid ${C.border}`, padding:4, marginBottom:18 }}>
           {[
-            { key:"arabic", label:"Arabic", sub:`${CHAPTERS.length} chapters`, color:C.gold },
-            { key:"tajweed", label:"Tajweed", sub:`${TAJWEED_CHAPTERS.length} chapters`, color:"#e8734a" }
+            { key:"arabic",   label:"Arabic",    sub:`${CHAPTERS.length} chapters`,         color:C.gold },
+            { key:"tajweed",  label:"Tajweed",   sub:`${TAJWEED_CHAPTERS.length} chapters`,  color:"#e8734a" },
+            { key:"flashcard",label:"Review 🃏", sub:"Flashcards",                          color:"#6b8bbd" }
           ].map(t => (
             <button key={t.key} onClick={()=>switchTrack(t.key)}
               style={{
-                flex:1, padding:"11px 8px", border:"none", borderRadius:10, cursor:"pointer",
+                flex:1, padding:"11px 6px", border:"none", borderRadius:10, cursor:"pointer",
                 background: track===t.key ? `linear-gradient(135deg,${t.color}22,${t.color}11)` : "transparent",
                 borderBottom: track===t.key ? `2px solid ${t.color}` : "2px solid transparent",
                 transition:"all 0.2s"
               }}>
-              <div style={{ fontSize:13, fontWeight:700, color: track===t.key?t.color:C.muted }}>{t.label}</div>
-              <div style={{ fontSize:10, color: track===t.key?`${t.color}aa`:C.muted, marginTop:2 }}>{t.sub}</div>
+              <div style={{ fontSize:12, fontWeight:700, color: track===t.key?t.color:C.muted }}>{t.label}</div>
+              <div style={{ fontSize:9, color: track===t.key?`${t.color}aa`:C.muted, marginTop:2 }}>{t.sub}</div>
             </button>
           ))}
         </div>
 
         {/* Chapters */}
         <div style={{ fontSize:11, color:C.muted, letterSpacing:2, textTransform:"uppercase", marginBottom:14 }}>
-          {track === "tajweed" ? "Tajweed Chapters" : "Arabic Chapters"}
+          {track === "tajweed" ? "Tajweed Chapters" : track === "flashcard" ? "Flashcard Review" : "Arabic Chapters"}
         </div>
+        {track === "flashcard" && (
+          <div style={{ textAlign:"center", paddingTop:10 }}>
+            <div style={{ fontSize:48, marginBottom:12 }}>🃏</div>
+            <div style={{ fontSize:16, color:C.text, fontWeight:600, marginBottom:8 }}>Vocabulary Review</div>
+            <div style={{ fontSize:13, color:C.muted, marginBottom:24, lineHeight:1.6 }}>
+              Flashcards from all your completed chapters.{"\n"}
+              Tap to reveal, mark Got it or Again.
+            </div>
+            <button onClick={() => onSelectChapter({ id:"__flashcard__", data:"__flashcard__" })}
+              style={{ width:"100%", padding:"16px", border:"none", borderRadius:14,
+                background:`linear-gradient(135deg,#2a4a8a,#1a2a5a)`,
+                color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer" }}>
+              Start Flashcard Session →
+            </button>
+          </div>
+        )}
         {activeChapters.map((ch, idx) => {
           const lessons = getLessons(ch.data);
           const completed = lessons.filter(l => done.includes(l.id)).length;
@@ -1007,37 +1096,122 @@ function ChapterScreen({ chapter, onBack, onStartLesson, done = [] }) {
 
 // ─── LESSON SCREEN ─────────────────────────────────────────────────
 function LessonScreen({ lesson, chapter, onBack, onComplete }) {
-  const [phase, setPhase]   = useState("teach");
-  const [slideIdx, setSlide] = useState(0);
-  const [qIdx, setQIdx]     = useState(0);
-  const [selected, setSel]  = useState(null);
-  const [answered, setAns]  = useState(false);
-  const [correct, setCorr]  = useState(0);
-  const [showExp, setExp]   = useState(false);
+  const [phase, setPhase]     = useState("teach");
+  const [slideIdx, setSlide]  = useState(0);
+  const [allQ, setAllQ]       = useState(null); // built once on quiz start
+  const [qIdx, setQIdx]       = useState(0);
+  const [selected, setSel]    = useState(null);
+  const [matchSel, setMSel]   = useState({ left:null, right:null });
+  const [matchDone, setMDone] = useState([]);
+  const [answered, setAns]    = useState(false);
+  const [correct, setCorr]    = useState(0);
+  const [showExp, setExp]     = useState(false);
+  const [streak, setStreak]   = useState(0);   // consecutive correct
+  const [hiddenOpts, setHide] = useState([]);   // hint: hidden option indices
+  const [xpEarned, setXpE]    = useState(0);
+  const [audioPlayed, setAP]  = useState(false);// for shadowing
 
   const slides = lesson.slides || [];
-  const quiz   = lesson.quiz   || [];
-  const slide  = slides[slideIdx];
-  const q      = quiz[qIdx];
   const color  = chapter?.color || C.gold;
 
-  const nextSlide = () => { if (slideIdx < slides.length-1) setSlide(s=>s+1); else setPhase("quiz"); };
+  // Build quiz once when phase switches to quiz
+  const startQuiz = () => {
+    const base  = lesson.quiz || [];
+    const extra = generateExtraQuestions(slides);
+    const combined = shuffle([...base, ...extra]).slice(0, Math.max(base.length, 6));
+    setAllQ(combined);
+    setQIdx(0); setSel(null); setAns(false); setExp(false);
+    setStreak(0); setXpE(0); setMDone([]); setMSel({left:null,right:null});
+    setPhase("quiz");
+  };
+
+  const quiz = allQ || [];
+  const q    = quiz[qIdx];
+  const slide = slides[slideIdx];
+
+  const multiplier = streak >= 5 ? 3 : streak >= 3 ? 2 : 1;
+  const QXP = 10;
+
+  // ── Nav ──
+  const nextSlide = () => {
+    if (slideIdx < slides.length-1) setSlide(s=>s+1);
+    else startQuiz();
+  };
   const prevSlide = () => { if (slideIdx > 0) setSlide(s=>s-1); };
 
+  // ── MCQ / fill_blank / audio answer ──
   const handleAns = (i) => {
     if (answered) return;
+    const isCorrect = q.type === "fill_blank" || q.type === "audio"
+      ? q.opts[i] === q.answer
+      : i === q.ans;
     setSel(i); setAns(true); setExp(true);
-    if (i === q.ans) setCorr(c=>c+1);
+    if (isCorrect) {
+      const gained = QXP * multiplier;
+      setCorr(c=>c+1); setStreak(s=>s+1); setXpE(x=>x+gained);
+    } else {
+      setStreak(0);
+    }
   };
+
+  // ── Matching ──
+  const handleMatchLeft  = (i) => { if (matchDone.includes(i)) return; setMSel(s=>({...s,left:i})); };
+  const handleMatchRight = (j) => {
+    if (matchSel.left === null) return;
+    const li = matchSel.left;
+    const pairs = q.pairs;
+    if (pairs[li].en === pairs[j].en || shuffle(pairs.map(p=>p.en))[j] === pairs[li].en) {
+      // Check: left arabic index li should match right meaning index j
+    }
+    // Re-build: left is index into pairs (arabic), right is shuffled meanings
+    const correct2 = q._rightOrder[j] === li;
+    if (correct2) {
+      const newDone = [...matchDone, li];
+      setMDone(newDone);
+      setMSel({left:null,right:null});
+      if (newDone.length === pairs.length) {
+        setAns(true); setExp(false);
+        setCorr(c=>c+1); setStreak(s=>s+1); setXpE(x=>x+QXP*multiplier);
+      }
+    } else {
+      setStreak(0);
+      setMSel({left:null,right:null});
+    }
+  };
+
+  // ── Hint ──
+  const useHint = () => {
+    if (!q || answered || q.type === "match") return;
+    const ansIdx = q.type === "fill_blank" || q.type === "audio"
+      ? q.opts.indexOf(q.answer)
+      : q.ans;
+    const wrong = q.opts.map((_,i)=>i).filter(i => i !== ansIdx && !hiddenOpts.includes(i));
+    const toHide = shuffle(wrong).slice(0, 2);
+    setHide(toHide);
+    setXpE(x => Math.max(0, x-5)); // hint penalty
+  };
+
   const nextQ = () => {
-    setSel(null); setAns(false); setExp(false);
+    setSel(null); setAns(false); setExp(false); setHide([]); setMDone([]); setMSel({left:null,right:null});
     if (qIdx < quiz.length-1) setQIdx(i=>i+1);
-    else { setPhase("done"); onComplete(lesson.id, lesson.xp); }
+    else { setPhase("done"); onComplete(lesson.id, lesson.xp + xpEarned); }
   };
+
+  // ── Build matching right order once ──
+  if (q?.type === "match" && !q._rightOrder) {
+    const indices = q.pairs.map((_,i)=>i);
+    q._rightOrder = shuffle(indices);
+    q._rightLabels = q._rightOrder.map(i => q.pairs[i].en);
+  }
+
+  const isCorrectOpt = (i) => q.type === "fill_blank" || q.type === "audio"
+    ? q.opts[i] === q.answer
+    : i === q.ans;
 
   return (
     <div style={{ minHeight:"100vh", background:C.bg, color:C.text, fontFamily:"'Amiri','Georgia',serif" }}>
       <div style={{ maxWidth:480, margin:"0 auto", padding:"0 16px 40px" }}>
+
         {/* Top bar */}
         <div style={{ display:"flex", alignItems:"center", gap:12, padding:"18px 0 12px" }}>
           <button onClick={onBack} style={{ width:40, height:40, borderRadius:10, background:C.card,
@@ -1047,7 +1221,7 @@ function LessonScreen({ lesson, chapter, onBack, onComplete }) {
           </button>
           <div style={{ flex:1 }}>
             <div style={{ fontSize:12, fontWeight:600, color:C.text, marginBottom:5 }}>
-              {phase==="teach"?lesson.title : phase==="quiz"?"Quiz — "+lesson.title : "Complete!"}
+              {phase==="teach" ? lesson.title : phase==="quiz" ? "Quiz — "+lesson.title : "Complete!"}
             </div>
             <div style={{ height:4, background:C.border, borderRadius:2, overflow:"hidden" }}>
               <div style={{ height:"100%", borderRadius:2, transition:"width 0.4s",
@@ -1055,69 +1229,164 @@ function LessonScreen({ lesson, chapter, onBack, onComplete }) {
                 width: phase==="teach"?`${((slideIdx+1)/slides.length)*50}%`:
                        phase==="quiz"?`${50+((qIdx+1)/quiz.length)*50}%`:"100%" }}/>
             </div>
-            <div style={{ display:"flex", justifyContent:"space-between", marginTop:3 }}>
-              <span style={{ fontSize:9, color: phase==="teach"?color:C.muted, textTransform:"uppercase", letterSpacing:1 }}>
-                Slide {slideIdx+1}/{slides.length}
-              </span>
-              <span style={{ fontSize:9, color: phase==="quiz"?color:C.muted, textTransform:"uppercase", letterSpacing:1 }}>
-                Quiz {phase==="quiz"?qIdx+1:0}/{quiz.length}
-              </span>
-            </div>
           </div>
+          {/* Streak badge */}
+          {phase==="quiz" && streak >= 2 && (
+            <div style={{ background:streak>=5?"#3a1a00":streak>=3?"#2a1500":"#1a1000",
+              border:`1px solid ${streak>=5?"#e8734a":streak>=3?"#c9a84c":"#6a4a1a"}`,
+              borderRadius:20, padding:"4px 10px", fontSize:11, fontWeight:700,
+              color:streak>=5?"#e8734a":streak>=3?C.gold:"#8a6a3a", whiteSpace:"nowrap" }}>
+              🔥 {streak} ×{multiplier}
+            </div>
+          )}
         </div>
 
-        {/* VIDEO + PDF — show on first slide only */}
-        {phase==="teach" && slideIdx===0 && lesson.videoId && (
-          <VideoPlayer videoId={lesson.videoId} />
-        )}
-        {phase==="teach" && slideIdx===0 && (
-          <PDFDownloadBtn chapterId={chapter?.id} />
-        )}
+        {/* VIDEO + PDF */}
+        {phase==="teach" && slideIdx===0 && lesson.videoId && <VideoPlayer videoId={lesson.videoId} />}
+        {phase==="teach" && slideIdx===0 && <PDFDownloadBtn chapterId={chapter?.id} />}
 
         {/* TEACH */}
-        {phase==="teach" && slide && <TeachSlide slide={slide} color={color} onNext={nextSlide} onPrev={prevSlide} isFirst={slideIdx===0} isLast={slideIdx===slides.length-1} />}
+        {phase==="teach" && slide && (
+          <TeachSlide slide={slide} color={color}
+            onNext={nextSlide} onPrev={prevSlide}
+            isFirst={slideIdx===0} isLast={slideIdx===slides.length-1}
+            audioPlayed={audioPlayed} setAP={setAP} />
+        )}
 
         {/* QUIZ */}
         {phase==="quiz" && q && (
           <div style={{ animation:"fadeIn 0.3s ease" }}>
-            <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:18, padding:"24px 20px", marginBottom:16 }}>
-              <div style={{ fontSize:10, color, letterSpacing:2, textTransform:"uppercase", marginBottom:12 }}>Question {qIdx+1} of {quiz.length}</div>
-              <div style={{ fontSize:17, fontWeight:600, lineHeight:1.6, color:C.text }}>{q.q}</div>
-            </div>
-            <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:16 }}>
-              {q.opts.map((opt,i) => {
-                const isCorr = i===q.ans, isSel = selected===i;
-                let bg=C.navy, border="#2a2f3e", tc=C.text;
-                if (answered) {
-                  if (isCorr) { bg="#1a2a1a"; border="#4a8c4a"; tc=C.green; }
-                  else if (isSel) { bg="#2a1a1a"; border="#8c4a4a"; tc=C.red; }
-                }
-                return (
-                  <button key={i} onClick={()=>handleAns(i)} style={{ padding:"15px 18px", border:`1px solid ${border}`,
-                    borderRadius:12, background:bg, color:tc, fontSize:14, cursor:answered?"default":"pointer",
-                    textAlign:"left", fontFamily:"inherit", transition:"all 0.2s" }}>
-                    <span style={{ display:"inline-flex", width:24, height:24, borderRadius:6,
-                      alignItems:"center", justifyContent:"center", background: answered&&isCorr?"#2a4a2a":C.card,
-                      marginRight:12, fontSize:11, fontWeight:700, color: answered&&isCorr?C.green:C.muted }}>
-                      {String.fromCharCode(65+i)}
-                    </span>{opt}
+
+            {/* Question card */}
+            <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:18, padding:"20px 18px", marginBottom:14 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
+                <div style={{ fontSize:10, color, letterSpacing:2, textTransform:"uppercase" }}>
+                  {q.type==="match"?"MATCHING":q.type==="audio"?"🎧 LISTENING":q.type==="fill_blank"?"FILL IN BLANK":"QUESTION"} · {qIdx+1}/{quiz.length}
+                </div>
+                {/* Hint button */}
+                {!answered && q.type !== "match" && (
+                  <button onClick={useHint} style={{ background:"#1a1a2a", border:`1px solid ${C.border}`,
+                    borderRadius:8, padding:"4px 10px", color:C.muted, fontSize:11, cursor:"pointer" }}>
+                    💡 Hint (−5 XP)
                   </button>
-                );
-              })}
+                )}
+              </div>
+              <div style={{ fontSize:16, fontWeight:600, lineHeight:1.6, color:C.text }}>{q.q}</div>
+
+              {/* Audio play button for listening question */}
+              {q.type==="audio" && (
+                <button onClick={() => {
+                  const a = new Audio(`https://everyayah.com/data/Alafasy_128kbps/${q.verseId}.mp3`);
+                  a.play().catch(()=>{});
+                }} style={{ marginTop:12, background:`${color}18`, border:`1px solid ${color}44`,
+                  borderRadius:10, padding:"10px 20px", color, cursor:"pointer", fontSize:14, fontWeight:600 }}>
+                  🕋 Play Verse Again
+                </button>
+              )}
             </div>
+
+            {/* MATCHING UI */}
+            {q.type==="match" && !answered && (
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:14 }}>
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                  {q.pairs.map((pair, i) => (
+                    <button key={i} onClick={()=>handleMatchLeft(i)}
+                      style={{ padding:"12px 10px", borderRadius:11, fontSize:13, cursor:"pointer",
+                        fontFamily:"'Amiri',serif", textAlign:"center", lineHeight:1.5,
+                        background: matchDone.includes(i)?"#1a3a1a":matchSel.left===i?`${color}22`:C.navy,
+                        border:`1px solid ${matchDone.includes(i)?"#4a8c4a":matchSel.left===i?color:C.border}`,
+                        color: matchDone.includes(i)?C.green:matchSel.left===i?color:C.text,
+                        opacity: matchDone.includes(i)?0.6:1 }}>
+                      {pair.ar}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                  {q._rightLabels.map((label, j) => {
+                    const srcIdx = q._rightOrder[j];
+                    const isDone = matchDone.includes(srcIdx);
+                    return (
+                      <button key={j} onClick={()=>handleMatchRight(j)}
+                        style={{ padding:"12px 10px", borderRadius:11, fontSize:12, cursor:"pointer",
+                          textAlign:"center", lineHeight:1.4,
+                          background: isDone?"#1a3a1a":C.navy,
+                          border:`1px solid ${isDone?"#4a8c4a":C.border}`,
+                          color: isDone?C.green:C.text, opacity:isDone?0.6:1 }}>
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* MCQ / fill_blank / audio OPTIONS */}
+            {q.type !== "match" && (
+              <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:14 }}>
+                {q.opts.map((opt, i) => {
+                  if (hiddenOpts.includes(i)) return null;
+                  const isSel = selected===i;
+                  const isCorr = isCorrectOpt(i);
+                  let bg=C.navy, border2="#2a2f3e", tc=C.text;
+                  if (answered) {
+                    if (isCorr) { bg="#1a2a1a"; border2="#4a8c4a"; tc=C.green; }
+                    else if (isSel) { bg="#2a1a1a"; border2="#8c4a4a"; tc=C.red; }
+                  }
+                  return (
+                    <button key={i} onClick={()=>handleAns(i)}
+                      style={{ padding:"14px 16px", border:`1px solid ${border2}`, borderRadius:12,
+                        background:bg, color:tc, fontSize:14, cursor:answered?"default":"pointer",
+                        textAlign:"left", fontFamily:"inherit", transition:"all 0.2s",
+                        // Arabic opts use Amiri
+                        fontFamily: /[\u0600-\u06ff]/.test(opt) ? "'Amiri',serif" : "inherit",
+                        fontSize: /[\u0600-\u06ff]/.test(opt) ? 16 : 14,
+                        direction: /[\u0600-\u06ff]/.test(opt) ? "rtl" : "ltr" }}>
+                      <span style={{ display:"inline-flex", width:24, height:24, borderRadius:6,
+                        alignItems:"center", justifyContent:"center", background: answered&&isCorr?"#2a4a2a":C.card,
+                        marginRight:10, marginLeft:0, fontSize:11, fontWeight:700,
+                        color: answered&&isCorr?C.green:C.muted, flexShrink:0 }}>
+                        {String.fromCharCode(65+i)}
+                      </span>
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* XP multiplier toast */}
+            {answered && multiplier > 1 && selected===q.ans && (
+              <div style={{ textAlign:"center", marginBottom:10, animation:"fadeIn 0.3s",
+                fontSize:13, color:multiplier>=3?"#e8734a":C.gold, fontWeight:700 }}>
+                🔥 Streak Bonus! ×{multiplier} = +{QXP*multiplier} XP
+              </div>
+            )}
+
+            {/* Explanation */}
             {showExp && (
               <div style={{ background: selected===q.ans?"#111d11":"#1d1111",
                 border:`1px solid ${selected===q.ans?"#3a6a3a":"#6a3a3a"}`,
-                borderRadius:12, padding:"14px 16px", marginBottom:16, animation:"fadeIn 0.3s" }}>
-                <div style={{ fontSize:11, color: selected===q.ans?C.green:C.red, letterSpacing:1, textTransform:"uppercase", fontWeight:700, marginBottom:6 }}>
+                borderRadius:12, padding:"14px 16px", marginBottom:14, animation:"fadeIn 0.3s" }}>
+                <div style={{ fontSize:11, color:selected===q.ans?C.green:C.red, letterSpacing:1,
+                  textTransform:"uppercase", fontWeight:700, marginBottom:6 }}>
                   {selected===q.ans ? "✓ Correct" : "✗ Incorrect"}
                 </div>
                 <div style={{ fontSize:13, color:"#b0a898", lineHeight:1.6 }}>{q.exp}</div>
               </div>
             )}
+
+            {/* Matching complete message */}
+            {q.type==="match" && answered && (
+              <div style={{ background:"#111d11", border:"1px solid #3a6a3a",
+                borderRadius:12, padding:"14px 16px", marginBottom:14, animation:"fadeIn 0.3s" }}>
+                <div style={{ fontSize:12, color:C.green, fontWeight:700 }}>✓ All pairs matched! +{QXP*multiplier} XP</div>
+              </div>
+            )}
+
             {answered && (
               <button onClick={nextQ} style={{ width:"100%", padding:"15px", border:"none", borderRadius:13,
-                background:`linear-gradient(135deg,${color},${color}aa)`, color:C.bg, fontSize:16, fontWeight:700, cursor:"pointer", animation:"fadeIn 0.3s" }}>
+                background:`linear-gradient(135deg,${color},${color}aa)`, color:C.bg,
+                fontSize:16, fontWeight:700, cursor:"pointer", animation:"fadeIn 0.3s" }}>
                 {qIdx<quiz.length-1?"Next Question →":"See Results →"}
               </button>
             )}
@@ -1127,21 +1396,38 @@ function LessonScreen({ lesson, chapter, onBack, onComplete }) {
         {/* DONE */}
         {phase==="done" && (
           <div style={{ animation:"fadeIn 0.4s ease", textAlign:"center", paddingTop:20 }}>
-            <div style={{ background:"linear-gradient(135deg,#1a2235,#141824)", border:`1px solid ${color}33`, borderRadius:22, padding:"36px 24px", marginBottom:24 }}>
-              <div style={{ fontSize:56, marginBottom:16 }}>{correct===quiz.length?"🌟":correct>=quiz.length*0.6?"✅":"📖"}</div>
+            <div style={{ background:"linear-gradient(135deg,#1a2235,#141824)",
+              border:`1px solid ${color}33`, borderRadius:22, padding:"36px 24px", marginBottom:24 }}>
+              <div style={{ fontSize:56, marginBottom:16 }}>
+                {correct===quiz.length?"🌟":correct>=quiz.length*0.6?"✅":"📖"}
+              </div>
               <div style={{ fontSize:13, color, letterSpacing:2, textTransform:"uppercase", marginBottom:8 }}>Lesson Complete</div>
               <div style={{ fontSize:28, fontWeight:700, color:C.text, marginBottom:4 }}>{correct}/{quiz.length} Correct</div>
               <div style={{ fontSize:14, color:C.muted, marginBottom:24 }}>
                 {correct===quiz.length?"ما شاء الله — Perfect!":correct>=quiz.length*0.6?"Good work — keep going!":"Review the lesson and try again."}
               </div>
               <div style={{ display:"flex", justifyContent:"center", gap:32 }}>
-                <div><div style={{ fontSize:26, fontWeight:700, color }}> +{lesson.xp}</div><div style={{ fontSize:10, color:C.muted, letterSpacing:1 }}>XP</div></div>
+                <div>
+                  <div style={{ fontSize:26, fontWeight:700, color }}>+{lesson.xp + xpEarned}</div>
+                  <div style={{ fontSize:10, color:C.muted, letterSpacing:1 }}>XP</div>
+                </div>
                 <div style={{ width:1, background:C.border }}/>
-                <div><div style={{ fontSize:26, fontWeight:700, color:C.green }}>{Math.round(correct/quiz.length*100)}%</div><div style={{ fontSize:10, color:C.muted, letterSpacing:1 }}>ACCURACY</div></div>
+                <div>
+                  <div style={{ fontSize:26, fontWeight:700, color:C.green }}>{Math.round(correct/quiz.length*100)}%</div>
+                  <div style={{ fontSize:10, color:C.muted, letterSpacing:1 }}>ACCURACY</div>
+                </div>
+                {xpEarned > 0 && <>
+                  <div style={{ width:1, background:C.border }}/>
+                  <div>
+                    <div style={{ fontSize:26, fontWeight:700, color:"#e8734a" }}>+{xpEarned}</div>
+                    <div style={{ fontSize:10, color:C.muted, letterSpacing:1 }}>BONUS XP</div>
+                  </div>
+                </>}
               </div>
             </div>
             <button onClick={onBack} style={{ width:"100%", padding:"15px", border:"none", borderRadius:13,
-              background:`linear-gradient(135deg,${color},${color}aa)`, color:C.bg, fontSize:16, fontWeight:700, cursor:"pointer" }}>
+              background:`linear-gradient(135deg,${color},${color}aa)`, color:C.bg,
+              fontSize:16, fontWeight:700, cursor:"pointer" }}>
               Back to Lessons →
             </button>
           </div>
@@ -1152,8 +1438,215 @@ function LessonScreen({ lesson, chapter, onBack, onComplete }) {
   );
 }
 
+// ─── SHADOWING EXERCISE ────────────────────────────────────────────
+function ShadowingExercise({ verseId, arabic, audioPlayed, setAP }) {
+  const [step, setStep] = useState("idle"); // idle | playing | repeat | done
+  const play = () => {
+    setStep("playing");
+    const a = new Audio(`https://everyayah.com/data/Alafasy_128kbps/${verseId}.mp3`);
+    a.play().catch(()=>{});
+    a.onended = () => { setStep("repeat"); setAP && setAP(true); };
+    setTimeout(() => setStep(s => s==="playing"?"repeat":s), 8000);
+  };
+  if (step === "done") return (
+    <div style={{ marginTop:10, background:"#111d11", border:"1px solid #3a6a3a",
+      borderRadius:10, padding:"10px 14px", fontSize:12, color:C.green, textAlign:"center" }}>
+      ✓ Great shadowing practice! Keep repeating daily.
+    </div>
+  );
+  return (
+    <div style={{ marginTop:10, background:"#0e1520", border:`1px solid ${C.border}`,
+      borderRadius:12, padding:"12px 14px" }}>
+      <div style={{ fontSize:10, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:8 }}>
+        🎙 Shadowing Practice
+      </div>
+      {step === "idle" && (
+        <div>
+          <div style={{ fontSize:11, color:C.muted, marginBottom:8, lineHeight:1.6 }}>
+            1. Tap Play → 2. Listen carefully → 3. Pause → 4. Repeat aloud
+          </div>
+          <button onClick={play} style={{ background:`${C.gold}18`, border:`1px solid ${C.gold}44`,
+            borderRadius:8, padding:"8px 16px", color:C.gold, fontSize:12, cursor:"pointer", fontWeight:600 }}>
+            ▶ Play & Shadow
+          </button>
+        </div>
+      )}
+      {step === "playing" && (
+        <div style={{ fontSize:12, color:C.muted, animation:"pulse 1s infinite" }}>
+          🔊 Listening... focus on pronunciation
+        </div>
+      )}
+      {step === "repeat" && (
+        <div>
+          <div style={{ fontSize:12, color:C.text, marginBottom:10 }}>
+            Now repeat the verse aloud:
+          </div>
+          <div style={{ fontSize:18, color:C.gold, fontFamily:"'Amiri',serif",
+            direction:"rtl", marginBottom:12, lineHeight:1.8 }}>{arabic}</div>
+          <div style={{ display:"flex", gap:8 }}>
+            <button onClick={() => setStep("done")}
+              style={{ flex:1, padding:"10px", background:"#1a3a1a", border:"1px solid #3a6a3a",
+                borderRadius:10, color:C.green, fontSize:12, fontWeight:700, cursor:"pointer" }}>
+              ✓ I repeated it
+            </button>
+            <button onClick={play}
+              style={{ padding:"10px 14px", background:C.card, border:`1px solid ${C.border}`,
+                borderRadius:10, color:C.muted, fontSize:12, cursor:"pointer" }}>
+              ↺ Again
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── FLASHCARD SCREEN ──────────────────────────────────────────────
+function FlashcardScreen({ done, allChapters, tajweedChapters, onBack }) {
+  const allCh = [...allChapters, ...tajweedChapters];
+  const cards = extractVocab(allCh, done);
+  const [deck, setDeck]     = useState(() => shuffle(cards));
+  const [idx, setIdx]       = useState(0);
+  const [flipped, setFlip]  = useState(false);
+  const [session, setSession] = useState({ correct:0, again:0 });
+
+  if (!deck.length) return (
+    <div style={{ minHeight:"100vh", background:C.bg, color:C.text, fontFamily:"'Amiri','Georgia',serif",
+      display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:24 }}>
+      <div style={{ fontSize:48, marginBottom:16 }}>📚</div>
+      <div style={{ fontSize:18, color:C.gold, marginBottom:8 }}>No cards yet</div>
+      <div style={{ fontSize:13, color:C.muted, textAlign:"center", maxWidth:260 }}>
+        Complete at least one chapter to unlock flashcard review.
+      </div>
+      <button onClick={onBack} style={{ marginTop:24, padding:"12px 28px", background:`${C.gold}18`,
+        border:`1px solid ${C.gold}44`, borderRadius:12, color:C.gold, fontSize:14, cursor:"pointer" }}>
+        ← Back
+      </button>
+    </div>
+  );
+
+  const card = deck[idx];
+  const isLast = idx >= deck.length;
+
+  const gotIt = () => {
+    setSession(s => ({...s, correct:s.correct+1}));
+    setFlip(false);
+    setIdx(i=>i+1);
+  };
+  const again = () => {
+    setSession(s => ({...s, again:s.again+1}));
+    setFlip(false);
+    // Put card at end of deck
+    const newDeck = [...deck];
+    newDeck.push(newDeck.splice(idx,1)[0]);
+    setDeck(newDeck);
+  };
+  const restart = () => {
+    setDeck(shuffle(cards)); setIdx(0); setFlip(false);
+    setSession({ correct:0, again:0 });
+  };
+
+  return (
+    <div style={{ minHeight:"100vh", background:C.bg, color:C.text, fontFamily:"'Amiri','Georgia',serif" }}>
+      <div style={{ maxWidth:480, margin:"0 auto", padding:"0 16px 40px" }}>
+
+        {/* Header */}
+        <div style={{ display:"flex", alignItems:"center", gap:12, padding:"18px 0 14px" }}>
+          <button onClick={onBack} style={{ width:40, height:40, borderRadius:10, background:C.card,
+            border:`1px solid ${C.border}`, display:"flex", alignItems:"center", justifyContent:"center",
+            cursor:"pointer", color:C.muted }}>
+            <IC.Arrow />
+          </button>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:15, fontWeight:700, color:C.text }}>Flashcard Review</div>
+            <div style={{ fontSize:11, color:C.muted }}>{Math.min(idx, deck.length)}/{deck.length} cards</div>
+          </div>
+          <div style={{ fontSize:12, color:C.muted }}>
+            <span style={{ color:C.green }}>✓ {session.correct}</span>
+            {" · "}
+            <span style={{ color:C.red }}>↺ {session.again}</span>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ height:4, background:C.border, borderRadius:2, marginBottom:24, overflow:"hidden" }}>
+          <div style={{ height:"100%", width:`${(idx/deck.length)*100}%`,
+            background:`linear-gradient(90deg,${C.gold},#e8d5a3)`, borderRadius:2, transition:"width 0.3s" }}/>
+        </div>
+
+        {isLast ? (
+          <div style={{ textAlign:"center", paddingTop:20, animation:"fadeIn 0.4s" }}>
+            <div style={{ fontSize:56, marginBottom:16 }}>🎉</div>
+            <div style={{ fontSize:22, fontWeight:700, color:C.gold, marginBottom:8 }}>Round Complete!</div>
+            <div style={{ fontSize:14, color:C.muted, marginBottom:24 }}>
+              {session.correct} correct · {session.again} practiced again
+            </div>
+            <button onClick={restart} style={{ width:"100%", padding:"15px", border:"none", borderRadius:13,
+              background:`linear-gradient(135deg,${C.gold},#e8a83c)`, color:"#000",
+              fontSize:15, fontWeight:700, cursor:"pointer" }}>
+              ↺ Review Again
+            </button>
+            <button onClick={onBack} style={{ marginTop:10, width:"100%", padding:"14px", border:`1px solid ${C.border}`,
+              borderRadius:13, background:"transparent", color:C.muted, fontSize:14, cursor:"pointer" }}>
+              ← Back to Home
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Flashcard */}
+            <div onClick={() => setFlip(f=>!f)}
+              style={{ minHeight:220, background:"linear-gradient(160deg,#1a2235,#141824)",
+                border:`1px solid ${flipped?C.gold+"44":C.border}`, borderRadius:22,
+                padding:"36px 24px", textAlign:"center", cursor:"pointer",
+                display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+                marginBottom:20, transition:"border 0.3s", animation:"fadeIn 0.3s" }}>
+
+              {!flipped ? (
+                <>
+                  <div style={{ fontSize:38, color:C.gold, fontFamily:"'Amiri',serif",
+                    lineHeight:1.6, direction:"rtl", marginBottom:12 }}>{card.arabic}</div>
+                  <div style={{ fontSize:11, color:C.muted, letterSpacing:2, textTransform:"uppercase" }}>
+                    Tap to reveal meaning
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize:22, fontWeight:700, color:C.text, marginBottom:8 }}>{card.meaning}</div>
+                  {card.roman && <div style={{ fontSize:14, color:C.muted, marginBottom:8, fontStyle:"italic" }}>{card.roman}</div>}
+                  {card.note && <div style={{ fontSize:12, color:"#8a8070", lineHeight:1.5 }}>{card.note}</div>}
+                  <div style={{ marginTop:14 }}>
+                    <SpeakBtn text={card.arabic} />
+                  </div>
+                </>
+              )}
+            </div>
+
+            {flipped ? (
+              <div style={{ display:"flex", gap:12 }}>
+                <button onClick={again} style={{ flex:1, padding:"16px", border:`1px solid #6a3a3a`,
+                  borderRadius:14, background:"#1d1111", color:C.red, fontSize:14, fontWeight:700, cursor:"pointer" }}>
+                  ↺ Again
+                </button>
+                <button onClick={gotIt} style={{ flex:2, padding:"16px", border:"1px solid #3a6a3a",
+                  borderRadius:14, background:"#111d11", color:C.green, fontSize:14, fontWeight:700, cursor:"pointer" }}>
+                  ✓ Got it!
+                </button>
+              </div>
+            ) : (
+              <div style={{ textAlign:"center", fontSize:12, color:C.muted }}>
+                Tap the card to flip it
+              </div>
+            )}
+          </>
+        )}
+      </div>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap'); *{box-sizing:border-box;margin:0;padding:0} button{font-family:inherit} @keyframes fadeIn{from{opacity:0}to{opacity:1}}`}</style>
+    </div>
+  );
+}
+
 // ─── TEACH SLIDE ───────────────────────────────────────────────────
-function TeachSlide({ slide, color, onNext, onPrev, isFirst, isLast }) {
+function TeachSlide({ slide, color, onNext, onPrev, isFirst, isLast, audioPlayed, setAP }) {
   return (
     <div style={{ animation:"fadeIn 0.35s ease" }}>
       <div style={{ minHeight:380 }}>
@@ -1363,6 +1856,11 @@ function TeachSlide({ slide, color, onNext, onPrev, isFirst, isLast }) {
                   🕋 Tap to hear Mishary Alafasy recite this verse
                 </div>
               )}
+              {/* SHADOWING EXERCISE */}
+              {slide.verseId && (
+                <ShadowingExercise verseId={slide.verseId} arabic={slide.arabic}
+                  audioPlayed={audioPlayed} setAP={setAP} />
+              )}
               <div style={{ fontSize:13, color:C.purple, fontStyle:"italic", marginBottom:6 }}>{slide.roman}</div>
               <div style={{ fontSize:14, color:C.text, fontWeight:600 }}>{slide.meaning}</div>
             </div>
@@ -1456,7 +1954,10 @@ export default function App() {
 
   const goHome    = useCallback(() => { setScreen("home"); setChapter(null); setLesson(null); }, []);
   const goChapter = useCallback(() => { setScreen("chapter"); setLesson(null); }, []);
-  const handleSelectChapter = useCallback((ch) => { setChapter(ch); setScreen("chapter"); }, []);
+  const handleSelectChapter = useCallback((ch) => {
+    if (ch.id === "__flashcard__") { setScreen("flashcard"); return; }
+    setChapter(ch); setScreen("chapter");
+  }, []);
   const handleStartLesson   = useCallback((lesson, chapter) => {
     setLesson(lesson); setChapter(chapter); setScreen("lesson");
   }, []);
@@ -1495,6 +1996,12 @@ export default function App() {
   );
 
   if (screen === "auth") return <AuthScreen onAuth={handleAuth} />;
+
+  if (screen==="flashcard") {
+    return <FlashcardScreen done={done}
+      allChapters={CHAPTERS} tajweedChapters={TAJWEED_CHAPTERS}
+      onBack={goHome} />;
+  }
 
   if (screen==="lesson" && activeLesson) {
     return <LessonScreen lesson={activeLesson} chapter={activeChapter}
