@@ -1223,6 +1223,109 @@ var store = function store(k, v) {
     localStorage.setItem(k, JSON.stringify(v));
   } catch (_unused) {}
 };
+// ─── SHUFFLE ───────────────────────────────────────────────────────
+var shuffle = function shuffle(arr) {
+  return _toConsumableArray(arr).sort(function () {
+    return Math.random() - 0.5;
+  });
+};
+
+// ─── AUTO-GENERATE EXTRA QUESTIONS FROM SLIDE DATA ─────────────────
+var generateExtraQuestions = function generateExtraQuestions() {
+  var slides = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var extra = [];
+  var vocabSlides = slides.filter(function (s) {
+    return s.type === "vocab_list";
+  });
+  var verseSlides = slides.filter(function (s) {
+    return s.type === "quran_verse" && s.verseId;
+  });
+  vocabSlides.forEach(function (slide) {
+    var words = (slide.words || []).filter(function (w) {
+      return w.arabic && w.meaning;
+    });
+    if (words.length < 4) return;
+
+    // Fill-in-blank: pick a random word, show its meaning, pick correct Arabic
+    var target = words[Math.floor(Math.random() * words.length)];
+    var distractors = shuffle(words.filter(function (w) {
+      return w.arabic !== target.arabic;
+    })).slice(0, 3);
+    extra.push({
+      type: "fill_blank",
+      q: "Which Arabic word means \"".concat(target.meaning, "\"?"),
+      answer: target.arabic,
+      opts: shuffle([target.arabic].concat(_toConsumableArray(distractors.map(function (w) {
+        return w.arabic;
+      })))),
+      exp: "".concat(target.arabic, " (").concat(target.roman || "", ") = ").concat(target.meaning)
+    });
+
+    // Matching: 4 pairs
+    var matchWords = shuffle(words).slice(0, 4);
+    extra.push({
+      type: "match",
+      q: "Match each Arabic word to its meaning",
+      pairs: matchWords.map(function (w) {
+        return {
+          ar: w.arabic,
+          en: w.meaning
+        };
+      })
+    });
+  });
+
+  // Listening: one audio question per verse slide with verseId
+  verseSlides.slice(0, 2).forEach(function (slide) {
+    var allVocab = vocabSlides.flatMap(function (s) {
+      return s.words || [];
+    }).filter(function (w) {
+      return w.arabic;
+    });
+    var distractors = shuffle(allVocab).slice(0, 3).map(function (w) {
+      return w.arabic;
+    });
+    extra.push({
+      type: "audio",
+      verseId: slide.verseId,
+      arabic: slide.arabic,
+      q: "Listen and identify this Quranic phrase:",
+      answer: slide.arabic,
+      opts: shuffle([slide.arabic].concat(_toConsumableArray(distractors))),
+      exp: "".concat(slide.arabic, " = ").concat(slide.meaning || "")
+    });
+  });
+  return extra;
+};
+
+// ─── EXTRACT VOCAB FOR FLASHCARDS ──────────────────────────────────
+var extractVocab = function extractVocab(chapters, doneIds) {
+  var cards = [];
+  chapters.forEach(function (ch) {
+    var lessons = getLessons(ch.data);
+    var isDone = lessons.some(function (l) {
+      return doneIds.includes(l.id);
+    });
+    if (!isDone) return;
+    lessons.forEach(function (l) {
+      (l.slides || []).forEach(function (slide) {
+        if (slide.type !== "vocab_list") return;
+        (slide.words || []).forEach(function (w) {
+          if (w.arabic && w.meaning) {
+            cards.push({
+              arabic: w.arabic,
+              roman: w.roman || "",
+              meaning: w.meaning,
+              note: w.note || "",
+              chapterId: ch.id
+            });
+          }
+        });
+      });
+    });
+  });
+  return cards;
+};
 var load = function load(k, d) {
   try {
     var r = localStorage.getItem(k);
@@ -2175,6 +2278,11 @@ function HomeScreen(_ref8) {
     label: "Tajweed",
     sub: "".concat(TAJWEED_CHAPTERS.length, " chapters"),
     color: "#e8734a"
+  }, {
+    key: "flashcard",
+    label: "Review 🃏",
+    sub: "Flashcards",
+    color: "#6b8bbd"
   }].map(function (t) {
     return /*#__PURE__*/React.createElement("button", {
       key: t.key,
@@ -2183,7 +2291,7 @@ function HomeScreen(_ref8) {
       },
       style: {
         flex: 1,
-        padding: "11px 8px",
+        padding: "11px 6px",
         border: "none",
         borderRadius: 10,
         cursor: "pointer",
@@ -2193,13 +2301,13 @@ function HomeScreen(_ref8) {
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: 700,
         color: track === t.key ? t.color : C.muted
       }
     }, t.label), /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 10,
+        fontSize: 9,
         color: track === t.key ? "".concat(t.color, "aa") : C.muted,
         marginTop: 2
       }
@@ -2212,7 +2320,49 @@ function HomeScreen(_ref8) {
       textTransform: "uppercase",
       marginBottom: 14
     }
-  }, track === "tajweed" ? "Tajweed Chapters" : "Arabic Chapters"), activeChapters.map(function (ch, idx) {
+  }, track === "tajweed" ? "Tajweed Chapters" : track === "flashcard" ? "Flashcard Review" : "Arabic Chapters"), track === "flashcard" && /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      paddingTop: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 48,
+      marginBottom: 12
+    }
+  }, "\uD83C\uDCCF"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 16,
+      color: C.text,
+      fontWeight: 600,
+      marginBottom: 8
+    }
+  }, "Vocabulary Review"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: C.muted,
+      marginBottom: 24,
+      lineHeight: 1.6
+    }
+  }, "Flashcards from all your completed chapters.", "\n", "Tap to reveal, mark Got it or Again."), /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return onSelectChapter({
+        id: "__flashcard__",
+        data: "__flashcard__"
+      });
+    },
+    style: {
+      width: "100%",
+      padding: "16px",
+      border: "none",
+      borderRadius: 14,
+      background: "linear-gradient(135deg,#2a4a8a,#1a2a5a)",
+      color: "#fff",
+      fontSize: 15,
+      fontWeight: 700,
+      cursor: "pointer"
+    }
+  }, "Start Flashcard Session \u2192")), activeChapters.map(function (ch, idx) {
     var lessons = getLessons(ch.data);
     var completed = lessons.filter(function (l) {
       return done.includes(l.id);
@@ -2523,60 +2673,215 @@ function LessonScreen(_ref0) {
     _useState22 = _slicedToArray(_useState21, 2),
     slideIdx = _useState22[0],
     setSlide = _useState22[1];
-  var _useState23 = useState(0),
+  var _useState23 = useState(null),
     _useState24 = _slicedToArray(_useState23, 2),
-    qIdx = _useState24[0],
-    setQIdx = _useState24[1];
-  var _useState25 = useState(null),
+    allQ = _useState24[0],
+    setAllQ = _useState24[1]; // built once on quiz start
+  var _useState25 = useState(0),
     _useState26 = _slicedToArray(_useState25, 2),
-    selected = _useState26[0],
-    setSel = _useState26[1];
-  var _useState27 = useState(false),
+    qIdx = _useState26[0],
+    setQIdx = _useState26[1];
+  var _useState27 = useState(null),
     _useState28 = _slicedToArray(_useState27, 2),
-    answered = _useState28[0],
-    setAns = _useState28[1];
-  var _useState29 = useState(0),
+    selected = _useState28[0],
+    setSel = _useState28[1];
+  var _useState29 = useState({
+      left: null,
+      right: null
+    }),
     _useState30 = _slicedToArray(_useState29, 2),
-    correct = _useState30[0],
-    setCorr = _useState30[1];
-  var _useState31 = useState(false),
+    matchSel = _useState30[0],
+    setMSel = _useState30[1];
+  var _useState31 = useState([]),
     _useState32 = _slicedToArray(_useState31, 2),
-    showExp = _useState32[0],
-    setExp = _useState32[1];
+    matchDone = _useState32[0],
+    setMDone = _useState32[1];
+  var _useState33 = useState(false),
+    _useState34 = _slicedToArray(_useState33, 2),
+    answered = _useState34[0],
+    setAns = _useState34[1];
+  var _useState35 = useState(0),
+    _useState36 = _slicedToArray(_useState35, 2),
+    correct = _useState36[0],
+    setCorr = _useState36[1];
+  var _useState37 = useState(false),
+    _useState38 = _slicedToArray(_useState37, 2),
+    showExp = _useState38[0],
+    setExp = _useState38[1];
+  var _useState39 = useState(0),
+    _useState40 = _slicedToArray(_useState39, 2),
+    streak = _useState40[0],
+    setStreak = _useState40[1]; // consecutive correct
+  var _useState41 = useState([]),
+    _useState42 = _slicedToArray(_useState41, 2),
+    hiddenOpts = _useState42[0],
+    setHide = _useState42[1]; // hint: hidden option indices
+  var _useState43 = useState(0),
+    _useState44 = _slicedToArray(_useState43, 2),
+    xpEarned = _useState44[0],
+    setXpE = _useState44[1];
+  var _useState45 = useState(false),
+    _useState46 = _slicedToArray(_useState45, 2),
+    audioPlayed = _useState46[0],
+    setAP = _useState46[1]; // for shadowing
+
   var slides = lesson.slides || [];
-  var quiz = lesson.quiz || [];
-  var slide = slides[slideIdx];
-  var q = quiz[qIdx];
   var color = (chapter === null || chapter === void 0 ? void 0 : chapter.color) || C.gold;
+
+  // Build quiz once when phase switches to quiz
+  var startQuiz = function startQuiz() {
+    var base = lesson.quiz || [];
+    var extra = generateExtraQuestions(slides);
+    var combined = shuffle([].concat(_toConsumableArray(base), _toConsumableArray(extra))).slice(0, Math.max(base.length, 6));
+    setAllQ(combined);
+    setQIdx(0);
+    setSel(null);
+    setAns(false);
+    setExp(false);
+    setStreak(0);
+    setXpE(0);
+    setMDone([]);
+    setMSel({
+      left: null,
+      right: null
+    });
+    setPhase("quiz");
+  };
+  var quiz = allQ || [];
+  var q = quiz[qIdx];
+  var slide = slides[slideIdx];
+  var multiplier = streak >= 5 ? 3 : streak >= 3 ? 2 : 1;
+  var QXP = 10;
+
+  // ── Nav ──
   var nextSlide = function nextSlide() {
     if (slideIdx < slides.length - 1) setSlide(function (s) {
       return s + 1;
-    });else setPhase("quiz");
+    });else startQuiz();
   };
   var prevSlide = function prevSlide() {
     if (slideIdx > 0) setSlide(function (s) {
       return s - 1;
     });
   };
+
+  // ── MCQ / fill_blank / audio answer ──
   var handleAns = function handleAns(i) {
     if (answered) return;
+    var isCorrect = q.type === "fill_blank" || q.type === "audio" ? q.opts[i] === q.answer : i === q.ans;
     setSel(i);
     setAns(true);
     setExp(true);
-    if (i === q.ans) setCorr(function (c) {
-      return c + 1;
+    if (isCorrect) {
+      var gained = QXP * multiplier;
+      setCorr(function (c) {
+        return c + 1;
+      });
+      setStreak(function (s) {
+        return s + 1;
+      });
+      setXpE(function (x) {
+        return x + gained;
+      });
+    } else {
+      setStreak(0);
+    }
+  };
+
+  // ── Matching ──
+  var handleMatchLeft = function handleMatchLeft(i) {
+    if (matchDone.includes(i)) return;
+    setMSel(function (s) {
+      return _objectSpread(_objectSpread({}, s), {}, {
+        left: i
+      });
     });
+  };
+  var handleMatchRight = function handleMatchRight(j) {
+    if (matchSel.left === null) return;
+    var li = matchSel.left;
+    var pairs = q.pairs;
+    if (pairs[li].en === pairs[j].en || shuffle(pairs.map(function (p) {
+      return p.en;
+    }))[j] === pairs[li].en) {
+      // Check: left arabic index li should match right meaning index j
+    }
+    // Re-build: left is index into pairs (arabic), right is shuffled meanings
+    var correct2 = q._rightOrder[j] === li;
+    if (correct2) {
+      var newDone = [].concat(_toConsumableArray(matchDone), [li]);
+      setMDone(newDone);
+      setMSel({
+        left: null,
+        right: null
+      });
+      if (newDone.length === pairs.length) {
+        setAns(true);
+        setExp(false);
+        setCorr(function (c) {
+          return c + 1;
+        });
+        setStreak(function (s) {
+          return s + 1;
+        });
+        setXpE(function (x) {
+          return x + QXP * multiplier;
+        });
+      }
+    } else {
+      setStreak(0);
+      setMSel({
+        left: null,
+        right: null
+      });
+    }
+  };
+
+  // ── Hint ──
+  var useHint = function useHint() {
+    if (!q || answered || q.type === "match") return;
+    var ansIdx = q.type === "fill_blank" || q.type === "audio" ? q.opts.indexOf(q.answer) : q.ans;
+    var wrong = q.opts.map(function (_, i) {
+      return i;
+    }).filter(function (i) {
+      return i !== ansIdx && !hiddenOpts.includes(i);
+    });
+    var toHide = shuffle(wrong).slice(0, 2);
+    setHide(toHide);
+    setXpE(function (x) {
+      return Math.max(0, x - 5);
+    }); // hint penalty
   };
   var nextQ = function nextQ() {
     setSel(null);
     setAns(false);
     setExp(false);
+    setHide([]);
+    setMDone([]);
+    setMSel({
+      left: null,
+      right: null
+    });
     if (qIdx < quiz.length - 1) setQIdx(function (i) {
       return i + 1;
     });else {
       setPhase("done");
-      onComplete(lesson.id, lesson.xp);
+      onComplete(lesson.id, lesson.xp + xpEarned);
     }
+  };
+
+  // ── Build matching right order once ──
+  if ((q === null || q === void 0 ? void 0 : q.type) === "match" && !q._rightOrder) {
+    var indices = q.pairs.map(function (_, i) {
+      return i;
+    });
+    q._rightOrder = shuffle(indices);
+    q._rightLabels = q._rightOrder.map(function (i) {
+      return q.pairs[i].en;
+    });
+  }
+  var isCorrectOpt = function isCorrectOpt(i) {
+    return q.type === "fill_blank" || q.type === "audio" ? q.opts[i] === q.answer : i === q.ans;
   };
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -2638,27 +2943,18 @@ function LessonScreen(_ref0) {
       background: "linear-gradient(90deg,".concat(color, ",").concat(color, "aa)"),
       width: phase === "teach" ? "".concat((slideIdx + 1) / slides.length * 50, "%") : phase === "quiz" ? "".concat(50 + (qIdx + 1) / quiz.length * 50, "%") : "100%"
     }
-  })), /*#__PURE__*/React.createElement("div", {
+  }))), phase === "quiz" && streak >= 2 && /*#__PURE__*/React.createElement("div", {
     style: {
-      display: "flex",
-      justifyContent: "space-between",
-      marginTop: 3
+      background: streak >= 5 ? "#3a1a00" : streak >= 3 ? "#2a1500" : "#1a1000",
+      border: "1px solid ".concat(streak >= 5 ? "#e8734a" : streak >= 3 ? "#c9a84c" : "#6a4a1a"),
+      borderRadius: 20,
+      padding: "4px 10px",
+      fontSize: 11,
+      fontWeight: 700,
+      color: streak >= 5 ? "#e8734a" : streak >= 3 ? C.gold : "#8a6a3a",
+      whiteSpace: "nowrap"
     }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 9,
-      color: phase === "teach" ? color : C.muted,
-      textTransform: "uppercase",
-      letterSpacing: 1
-    }
-  }, "Slide ", slideIdx + 1, "/", slides.length), /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 9,
-      color: phase === "quiz" ? color : C.muted,
-      textTransform: "uppercase",
-      letterSpacing: 1
-    }
-  }, "Quiz ", phase === "quiz" ? qIdx + 1 : 0, "/", quiz.length)))), phase === "teach" && slideIdx === 0 && lesson.videoId && /*#__PURE__*/React.createElement(VideoPlayer, {
+  }, "\uD83D\uDD25 ", streak, " \xD7", multiplier)), phase === "teach" && slideIdx === 0 && lesson.videoId && /*#__PURE__*/React.createElement(VideoPlayer, {
     videoId: lesson.videoId
   }), phase === "teach" && slideIdx === 0 && /*#__PURE__*/React.createElement(PDFDownloadBtn, {
     chapterId: chapter === null || chapter === void 0 ? void 0 : chapter.id
@@ -2668,7 +2964,9 @@ function LessonScreen(_ref0) {
     onNext: nextSlide,
     onPrev: prevSlide,
     isFirst: slideIdx === 0,
-    isLast: slideIdx === slides.length - 1
+    isLast: slideIdx === slides.length - 1,
+    audioPlayed: audioPlayed,
+    setAP: setAP
   }), phase === "quiz" && q && /*#__PURE__*/React.createElement("div", {
     style: {
       animation: "fadeIn 0.3s ease"
@@ -2678,45 +2976,139 @@ function LessonScreen(_ref0) {
       background: C.card,
       border: "1px solid ".concat(C.border),
       borderRadius: 18,
-      padding: "24px 20px",
-      marginBottom: 16
+      padding: "20px 18px",
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 10
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
       color: color,
       letterSpacing: 2,
-      textTransform: "uppercase",
-      marginBottom: 12
+      textTransform: "uppercase"
     }
-  }, "Question ", qIdx + 1, " of ", quiz.length), /*#__PURE__*/React.createElement("div", {
+  }, q.type === "match" ? "MATCHING" : q.type === "audio" ? "🎧 LISTENING" : q.type === "fill_blank" ? "FILL IN BLANK" : "QUESTION", " \xB7 ", qIdx + 1, "/", quiz.length), !answered && q.type !== "match" && /*#__PURE__*/React.createElement("button", {
+    onClick: useHint,
     style: {
-      fontSize: 17,
+      background: "#1a1a2a",
+      border: "1px solid ".concat(C.border),
+      borderRadius: 8,
+      padding: "4px 10px",
+      color: C.muted,
+      fontSize: 11,
+      cursor: "pointer"
+    }
+  }, "\uD83D\uDCA1 Hint (\u22125 XP)")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 16,
       fontWeight: 600,
       lineHeight: 1.6,
       color: C.text
     }
-  }, q.q)), /*#__PURE__*/React.createElement("div", {
+  }, q.q), q.type === "audio" && /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      var a = new Audio("https://everyayah.com/data/Alafasy_128kbps/".concat(q.verseId, ".mp3"));
+      a.play().catch(function () {});
+    },
+    style: {
+      marginTop: 12,
+      background: "".concat(color, "18"),
+      border: "1px solid ".concat(color, "44"),
+      borderRadius: 10,
+      padding: "10px 20px",
+      color: color,
+      cursor: "pointer",
+      fontSize: 14,
+      fontWeight: 600
+    }
+  }, "\uD83D\uDD4B Play Verse Again")), q.type === "match" && !answered && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: 8,
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 8
+    }
+  }, q.pairs.map(function (pair, i) {
+    return /*#__PURE__*/React.createElement("button", {
+      key: i,
+      onClick: function onClick() {
+        return handleMatchLeft(i);
+      },
+      style: {
+        padding: "12px 10px",
+        borderRadius: 11,
+        fontSize: 13,
+        cursor: "pointer",
+        fontFamily: "'Amiri',serif",
+        textAlign: "center",
+        lineHeight: 1.5,
+        background: matchDone.includes(i) ? "#1a3a1a" : matchSel.left === i ? "".concat(color, "22") : C.navy,
+        border: "1px solid ".concat(matchDone.includes(i) ? "#4a8c4a" : matchSel.left === i ? color : C.border),
+        color: matchDone.includes(i) ? C.green : matchSel.left === i ? color : C.text,
+        opacity: matchDone.includes(i) ? 0.6 : 1
+      }
+    }, pair.ar);
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 8
+    }
+  }, q._rightLabels.map(function (label, j) {
+    var srcIdx = q._rightOrder[j];
+    var isDone = matchDone.includes(srcIdx);
+    return /*#__PURE__*/React.createElement("button", {
+      key: j,
+      onClick: function onClick() {
+        return handleMatchRight(j);
+      },
+      style: {
+        padding: "12px 10px",
+        borderRadius: 11,
+        fontSize: 12,
+        cursor: "pointer",
+        textAlign: "center",
+        lineHeight: 1.4,
+        background: isDone ? "#1a3a1a" : C.navy,
+        border: "1px solid ".concat(isDone ? "#4a8c4a" : C.border),
+        color: isDone ? C.green : C.text,
+        opacity: isDone ? 0.6 : 1
+      }
+    }, label);
+  }))), q.type !== "match" && /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       flexDirection: "column",
       gap: 10,
-      marginBottom: 16
+      marginBottom: 14
     }
   }, q.opts.map(function (opt, i) {
-    var isCorr = i === q.ans,
-      isSel = selected === i;
+    if (hiddenOpts.includes(i)) return null;
+    var isSel = selected === i;
+    var isCorr = isCorrectOpt(i);
     var bg = C.navy,
-      border = "#2a2f3e",
+      border2 = "#2a2f3e",
       tc = C.text;
     if (answered) {
       if (isCorr) {
         bg = "#1a2a1a";
-        border = "#4a8c4a";
+        border2 = "#4a8c4a";
         tc = C.green;
       } else if (isSel) {
         bg = "#2a1a1a";
-        border = "#8c4a4a";
+        border2 = "#8c4a4a";
         tc = C.red;
       }
     }
@@ -2725,9 +3117,9 @@ function LessonScreen(_ref0) {
       onClick: function onClick() {
         return handleAns(i);
       },
-      style: {
-        padding: "15px 18px",
-        border: "1px solid ".concat(border),
+      style: _defineProperty(_defineProperty(_defineProperty({
+        padding: "14px 16px",
+        border: "1px solid ".concat(border2),
         borderRadius: 12,
         background: bg,
         color: tc,
@@ -2736,7 +3128,7 @@ function LessonScreen(_ref0) {
         textAlign: "left",
         fontFamily: "inherit",
         transition: "all 0.2s"
-      }
+      }, "fontFamily", /[\u0600-\u06ff]/.test(opt) ? "'Amiri',serif" : "inherit"), "fontSize", /[\u0600-\u06ff]/.test(opt) ? 16 : 14), "direction", /[\u0600-\u06ff]/.test(opt) ? "rtl" : "ltr")
     }, /*#__PURE__*/React.createElement("span", {
       style: {
         display: "inline-flex",
@@ -2746,19 +3138,30 @@ function LessonScreen(_ref0) {
         alignItems: "center",
         justifyContent: "center",
         background: answered && isCorr ? "#2a4a2a" : C.card,
-        marginRight: 12,
+        marginRight: 10,
+        marginLeft: 0,
         fontSize: 11,
         fontWeight: 700,
-        color: answered && isCorr ? C.green : C.muted
+        color: answered && isCorr ? C.green : C.muted,
+        flexShrink: 0
       }
     }, String.fromCharCode(65 + i)), opt);
-  })), showExp && /*#__PURE__*/React.createElement("div", {
+  })), answered && multiplier > 1 && selected === q.ans && /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      marginBottom: 10,
+      animation: "fadeIn 0.3s",
+      fontSize: 13,
+      color: multiplier >= 3 ? "#e8734a" : C.gold,
+      fontWeight: 700
+    }
+  }, "\uD83D\uDD25 Streak Bonus! \xD7", multiplier, " = +", QXP * multiplier, " XP"), showExp && /*#__PURE__*/React.createElement("div", {
     style: {
       background: selected === q.ans ? "#111d11" : "#1d1111",
       border: "1px solid ".concat(selected === q.ans ? "#3a6a3a" : "#6a3a3a"),
       borderRadius: 12,
       padding: "14px 16px",
-      marginBottom: 16,
+      marginBottom: 14,
       animation: "fadeIn 0.3s"
     }
   }, /*#__PURE__*/React.createElement("div", {
@@ -2776,7 +3179,22 @@ function LessonScreen(_ref0) {
       color: "#b0a898",
       lineHeight: 1.6
     }
-  }, q.exp)), answered && /*#__PURE__*/React.createElement("button", {
+  }, q.exp)), q.type === "match" && answered && /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "#111d11",
+      border: "1px solid #3a6a3a",
+      borderRadius: 12,
+      padding: "14px 16px",
+      marginBottom: 14,
+      animation: "fadeIn 0.3s"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: C.green,
+      fontWeight: 700
+    }
+  }, "\u2713 All pairs matched! +", QXP * multiplier, " XP")), answered && /*#__PURE__*/React.createElement("button", {
     onClick: nextQ,
     style: {
       width: "100%",
@@ -2842,7 +3260,7 @@ function LessonScreen(_ref0) {
       fontWeight: 700,
       color: color
     }
-  }, " +", lesson.xp), /*#__PURE__*/React.createElement("div", {
+  }, "+", lesson.xp + xpEarned), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
       color: C.muted,
@@ -2865,7 +3283,24 @@ function LessonScreen(_ref0) {
       color: C.muted,
       letterSpacing: 1
     }
-  }, "ACCURACY")))), /*#__PURE__*/React.createElement("button", {
+  }, "ACCURACY")), xpEarned > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 1,
+      background: C.border
+    }
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 26,
+      fontWeight: 700,
+      color: "#e8734a"
+    }
+  }, "+", xpEarned), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: C.muted,
+      letterSpacing: 1
+    }
+  }, "BONUS XP"))))), /*#__PURE__*/React.createElement("button", {
     onClick: onBack,
     style: {
       width: "100%",
@@ -2881,14 +3316,480 @@ function LessonScreen(_ref0) {
   }, "Back to Lessons \u2192"))), /*#__PURE__*/React.createElement("style", null, "@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap'); *{box-sizing:border-box;margin:0;padding:0} button{font-family:inherit} @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}"));
 }
 
+// ─── SHADOWING EXERCISE ────────────────────────────────────────────
+function ShadowingExercise(_ref10) {
+  var verseId = _ref10.verseId,
+    arabic = _ref10.arabic,
+    audioPlayed = _ref10.audioPlayed,
+    setAP = _ref10.setAP;
+  var _useState47 = useState("idle"),
+    _useState48 = _slicedToArray(_useState47, 2),
+    step = _useState48[0],
+    setStep = _useState48[1]; // idle | playing | repeat | done
+  var play = function play() {
+    setStep("playing");
+    var a = new Audio("https://everyayah.com/data/Alafasy_128kbps/".concat(verseId, ".mp3"));
+    a.play().catch(function () {});
+    a.onended = function () {
+      setStep("repeat");
+      setAP && setAP(true);
+    };
+    setTimeout(function () {
+      return setStep(function (s) {
+        return s === "playing" ? "repeat" : s;
+      });
+    }, 8000);
+  };
+  if (step === "done") return /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 10,
+      background: "#111d11",
+      border: "1px solid #3a6a3a",
+      borderRadius: 10,
+      padding: "10px 14px",
+      fontSize: 12,
+      color: C.green,
+      textAlign: "center"
+    }
+  }, "\u2713 Great shadowing practice! Keep repeating daily.");
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 10,
+      background: "#0e1520",
+      border: "1px solid ".concat(C.border),
+      borderRadius: 12,
+      padding: "12px 14px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: C.gold,
+      letterSpacing: 2,
+      textTransform: "uppercase",
+      marginBottom: 8
+    }
+  }, "\uD83C\uDF99 Shadowing Practice"), step === "idle" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: C.muted,
+      marginBottom: 8,
+      lineHeight: 1.6
+    }
+  }, "1. Tap Play \u2192 2. Listen carefully \u2192 3. Pause \u2192 4. Repeat aloud"), /*#__PURE__*/React.createElement("button", {
+    onClick: play,
+    style: {
+      background: "".concat(C.gold, "18"),
+      border: "1px solid ".concat(C.gold, "44"),
+      borderRadius: 8,
+      padding: "8px 16px",
+      color: C.gold,
+      fontSize: 12,
+      cursor: "pointer",
+      fontWeight: 600
+    }
+  }, "\u25B6 Play & Shadow")), step === "playing" && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: C.muted,
+      animation: "pulse 1s infinite"
+    }
+  }, "\uD83D\uDD0A Listening... focus on pronunciation"), step === "repeat" && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: C.text,
+      marginBottom: 10
+    }
+  }, "Now repeat the verse aloud:"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 18,
+      color: C.gold,
+      fontFamily: "'Amiri',serif",
+      direction: "rtl",
+      marginBottom: 12,
+      lineHeight: 1.8
+    }
+  }, arabic), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: function onClick() {
+      return setStep("done");
+    },
+    style: {
+      flex: 1,
+      padding: "10px",
+      background: "#1a3a1a",
+      border: "1px solid #3a6a3a",
+      borderRadius: 10,
+      color: C.green,
+      fontSize: 12,
+      fontWeight: 700,
+      cursor: "pointer"
+    }
+  }, "\u2713 I repeated it"), /*#__PURE__*/React.createElement("button", {
+    onClick: play,
+    style: {
+      padding: "10px 14px",
+      background: C.card,
+      border: "1px solid ".concat(C.border),
+      borderRadius: 10,
+      color: C.muted,
+      fontSize: 12,
+      cursor: "pointer"
+    }
+  }, "\u21BA Again"))));
+}
+
+// ─── FLASHCARD SCREEN ──────────────────────────────────────────────
+function FlashcardScreen(_ref11) {
+  var done = _ref11.done,
+    allChapters = _ref11.allChapters,
+    tajweedChapters = _ref11.tajweedChapters,
+    onBack = _ref11.onBack;
+  var allCh = [].concat(_toConsumableArray(allChapters), _toConsumableArray(tajweedChapters));
+  var cards = extractVocab(allCh, done);
+  var _useState49 = useState(function () {
+      return shuffle(cards);
+    }),
+    _useState50 = _slicedToArray(_useState49, 2),
+    deck = _useState50[0],
+    setDeck = _useState50[1];
+  var _useState51 = useState(0),
+    _useState52 = _slicedToArray(_useState51, 2),
+    idx = _useState52[0],
+    setIdx = _useState52[1];
+  var _useState53 = useState(false),
+    _useState54 = _slicedToArray(_useState53, 2),
+    flipped = _useState54[0],
+    setFlip = _useState54[1];
+  var _useState55 = useState({
+      correct: 0,
+      again: 0
+    }),
+    _useState56 = _slicedToArray(_useState55, 2),
+    session = _useState56[0],
+    setSession = _useState56[1];
+  if (!deck.length) return /*#__PURE__*/React.createElement("div", {
+    style: {
+      minHeight: "100vh",
+      background: C.bg,
+      color: C.text,
+      fontFamily: "'Amiri','Georgia',serif",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 24
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 48,
+      marginBottom: 16
+    }
+  }, "\uD83D\uDCDA"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 18,
+      color: C.gold,
+      marginBottom: 8
+    }
+  }, "No cards yet"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: C.muted,
+      textAlign: "center",
+      maxWidth: 260
+    }
+  }, "Complete at least one chapter to unlock flashcard review."), /*#__PURE__*/React.createElement("button", {
+    onClick: onBack,
+    style: {
+      marginTop: 24,
+      padding: "12px 28px",
+      background: "".concat(C.gold, "18"),
+      border: "1px solid ".concat(C.gold, "44"),
+      borderRadius: 12,
+      color: C.gold,
+      fontSize: 14,
+      cursor: "pointer"
+    }
+  }, "\u2190 Back"));
+  var card = deck[idx];
+  var isLast = idx >= deck.length;
+  var gotIt = function gotIt() {
+    setSession(function (s) {
+      return _objectSpread(_objectSpread({}, s), {}, {
+        correct: s.correct + 1
+      });
+    });
+    setFlip(false);
+    setIdx(function (i) {
+      return i + 1;
+    });
+  };
+  var again = function again() {
+    setSession(function (s) {
+      return _objectSpread(_objectSpread({}, s), {}, {
+        again: s.again + 1
+      });
+    });
+    setFlip(false);
+    // Put card at end of deck
+    var newDeck = _toConsumableArray(deck);
+    newDeck.push(newDeck.splice(idx, 1)[0]);
+    setDeck(newDeck);
+  };
+  var restart = function restart() {
+    setDeck(shuffle(cards));
+    setIdx(0);
+    setFlip(false);
+    setSession({
+      correct: 0,
+      again: 0
+    });
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      minHeight: "100vh",
+      background: C.bg,
+      color: C.text,
+      fontFamily: "'Amiri','Georgia',serif"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 480,
+      margin: "0 auto",
+      padding: "0 16px 40px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      padding: "18px 0 14px"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: onBack,
+    style: {
+      width: 40,
+      height: 40,
+      borderRadius: 10,
+      background: C.card,
+      border: "1px solid ".concat(C.border),
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      color: C.muted
+    }
+  }, /*#__PURE__*/React.createElement(IC.Arrow, null)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 15,
+      fontWeight: 700,
+      color: C.text
+    }
+  }, "Flashcard Review"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: C.muted
+    }
+  }, Math.min(idx, deck.length), "/", deck.length, " cards")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: C.muted
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.green
+    }
+  }, "\u2713 ", session.correct), " · ", /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.red
+    }
+  }, "\u21BA ", session.again))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: 4,
+      background: C.border,
+      borderRadius: 2,
+      marginBottom: 24,
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: "100%",
+      width: "".concat(idx / deck.length * 100, "%"),
+      background: "linear-gradient(90deg,".concat(C.gold, ",#e8d5a3)"),
+      borderRadius: 2,
+      transition: "width 0.3s"
+    }
+  })), isLast ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      paddingTop: 20,
+      animation: "fadeIn 0.4s"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 56,
+      marginBottom: 16
+    }
+  }, "\uD83C\uDF89"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 22,
+      fontWeight: 700,
+      color: C.gold,
+      marginBottom: 8
+    }
+  }, "Round Complete!"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 14,
+      color: C.muted,
+      marginBottom: 24
+    }
+  }, session.correct, " correct \xB7 ", session.again, " practiced again"), /*#__PURE__*/React.createElement("button", {
+    onClick: restart,
+    style: {
+      width: "100%",
+      padding: "15px",
+      border: "none",
+      borderRadius: 13,
+      background: "linear-gradient(135deg,".concat(C.gold, ",#e8a83c)"),
+      color: "#000",
+      fontSize: 15,
+      fontWeight: 700,
+      cursor: "pointer"
+    }
+  }, "\u21BA Review Again"), /*#__PURE__*/React.createElement("button", {
+    onClick: onBack,
+    style: {
+      marginTop: 10,
+      width: "100%",
+      padding: "14px",
+      border: "1px solid ".concat(C.border),
+      borderRadius: 13,
+      background: "transparent",
+      color: C.muted,
+      fontSize: 14,
+      cursor: "pointer"
+    }
+  }, "\u2190 Back to Home")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    onClick: function onClick() {
+      return setFlip(function (f) {
+        return !f;
+      });
+    },
+    style: {
+      minHeight: 220,
+      background: "linear-gradient(160deg,#1a2235,#141824)",
+      border: "1px solid ".concat(flipped ? C.gold + "44" : C.border),
+      borderRadius: 22,
+      padding: "36px 24px",
+      textAlign: "center",
+      cursor: "pointer",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 20,
+      transition: "border 0.3s",
+      animation: "fadeIn 0.3s"
+    }
+  }, !flipped ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 38,
+      color: C.gold,
+      fontFamily: "'Amiri',serif",
+      lineHeight: 1.6,
+      direction: "rtl",
+      marginBottom: 12
+    }
+  }, card.arabic), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: C.muted,
+      letterSpacing: 2,
+      textTransform: "uppercase"
+    }
+  }, "Tap to reveal meaning")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 22,
+      fontWeight: 700,
+      color: C.text,
+      marginBottom: 8
+    }
+  }, card.meaning), card.roman && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 14,
+      color: C.muted,
+      marginBottom: 8,
+      fontStyle: "italic"
+    }
+  }, card.roman), card.note && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#8a8070",
+      lineHeight: 1.5
+    }
+  }, card.note), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 14
+    }
+  }, /*#__PURE__*/React.createElement(SpeakBtn, {
+    text: card.arabic
+  })))), flipped ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: again,
+    style: {
+      flex: 1,
+      padding: "16px",
+      border: "1px solid #6a3a3a",
+      borderRadius: 14,
+      background: "#1d1111",
+      color: C.red,
+      fontSize: 14,
+      fontWeight: 700,
+      cursor: "pointer"
+    }
+  }, "\u21BA Again"), /*#__PURE__*/React.createElement("button", {
+    onClick: gotIt,
+    style: {
+      flex: 2,
+      padding: "16px",
+      border: "1px solid #3a6a3a",
+      borderRadius: 14,
+      background: "#111d11",
+      color: C.green,
+      fontSize: 14,
+      fontWeight: 700,
+      cursor: "pointer"
+    }
+  }, "\u2713 Got it!")) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      fontSize: 12,
+      color: C.muted
+    }
+  }, "Tap the card to flip it"))), /*#__PURE__*/React.createElement("style", null, "@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap'); *{box-sizing:border-box;margin:0;padding:0} button{font-family:inherit} @keyframes fadeIn{from{opacity:0}to{opacity:1}}"));
+}
+
 // ─── TEACH SLIDE ───────────────────────────────────────────────────
-function TeachSlide(_ref1) {
-  var slide = _ref1.slide,
-    color = _ref1.color,
-    onNext = _ref1.onNext,
-    onPrev = _ref1.onPrev,
-    isFirst = _ref1.isFirst,
-    isLast = _ref1.isLast;
+function TeachSlide(_ref12) {
+  var slide = _ref12.slide,
+    color = _ref12.color,
+    onNext = _ref12.onNext,
+    onPrev = _ref12.onPrev,
+    isFirst = _ref12.isFirst,
+    isLast = _ref12.isLast,
+    audioPlayed = _ref12.audioPlayed,
+    setAP = _ref12.setAP;
   return /*#__PURE__*/React.createElement("div", {
     style: {
       animation: "fadeIn 0.35s ease"
@@ -3599,7 +4500,12 @@ function TeachSlide(_ref1) {
       marginBottom: 8,
       letterSpacing: 1
     }
-  }, "\uD83D\uDD4B Tap to hear Mishary Alafasy recite this verse"), /*#__PURE__*/React.createElement("div", {
+  }, "\uD83D\uDD4B Tap to hear Mishary Alafasy recite this verse"), slide.verseId && /*#__PURE__*/React.createElement(ShadowingExercise, {
+    verseId: slide.verseId,
+    arabic: slide.arabic,
+    audioPlayed: audioPlayed,
+    setAP: setAP
+  }), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       color: C.purple,
@@ -3701,38 +4607,38 @@ function TeachSlide(_ref1) {
 
 // ─── APP ROOT ──────────────────────────────────────────────────────
 function App() {
-  var _useState33 = useState("loading"),
-    _useState34 = _slicedToArray(_useState33, 2),
-    screen = _useState34[0],
-    setScreen = _useState34[1];
-  var _useState35 = useState(null),
-    _useState36 = _slicedToArray(_useState35, 2),
-    activeChapter = _useState36[0],
-    setChapter = _useState36[1];
-  var _useState37 = useState(null),
-    _useState38 = _slicedToArray(_useState37, 2),
-    activeLesson = _useState38[0],
-    setLesson = _useState38[1];
-  var _useState39 = useState(null),
-    _useState40 = _slicedToArray(_useState39, 2),
-    user = _useState40[0],
-    setUser = _useState40[1];
-  var _useState41 = useState(0),
-    _useState42 = _slicedToArray(_useState41, 2),
-    xp = _useState42[0],
-    setXp = _useState42[1];
-  var _useState43 = useState(0),
-    _useState44 = _slicedToArray(_useState43, 2),
-    streak = _useState44[0],
-    setStreak = _useState44[1];
-  var _useState45 = useState([]),
-    _useState46 = _slicedToArray(_useState45, 2),
-    done = _useState46[0],
-    setDone = _useState46[1];
-  var _useState47 = useState(null),
-    _useState48 = _slicedToArray(_useState47, 2),
-    lastDate = _useState48[0],
-    setLastDate = _useState48[1];
+  var _useState57 = useState("loading"),
+    _useState58 = _slicedToArray(_useState57, 2),
+    screen = _useState58[0],
+    setScreen = _useState58[1];
+  var _useState59 = useState(null),
+    _useState60 = _slicedToArray(_useState59, 2),
+    activeChapter = _useState60[0],
+    setChapter = _useState60[1];
+  var _useState61 = useState(null),
+    _useState62 = _slicedToArray(_useState61, 2),
+    activeLesson = _useState62[0],
+    setLesson = _useState62[1];
+  var _useState63 = useState(null),
+    _useState64 = _slicedToArray(_useState63, 2),
+    user = _useState64[0],
+    setUser = _useState64[1];
+  var _useState65 = useState(0),
+    _useState66 = _slicedToArray(_useState65, 2),
+    xp = _useState66[0],
+    setXp = _useState66[1];
+  var _useState67 = useState(0),
+    _useState68 = _slicedToArray(_useState67, 2),
+    streak = _useState68[0],
+    setStreak = _useState68[1];
+  var _useState69 = useState([]),
+    _useState70 = _slicedToArray(_useState69, 2),
+    done = _useState70[0],
+    setDone = _useState70[1];
+  var _useState71 = useState(null),
+    _useState72 = _slicedToArray(_useState71, 2),
+    lastDate = _useState72[0],
+    setLastDate = _useState72[1];
 
   // ── Boot: check existing Supabase session ──────────────────────
   useEffect(function () {
@@ -3741,12 +4647,12 @@ function App() {
       return;
     } // no Supabase fallback
     sb.auth.getSession().then(/*#__PURE__*/function () {
-      var _ref11 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(_ref10) {
+      var _ref14 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(_ref13) {
         var session;
         return _regenerator().w(function (_context4) {
           while (1) switch (_context4.n) {
             case 0:
-              session = _ref10.data.session;
+              session = _ref13.data.session;
               if (!(session !== null && session !== void 0 && session.user)) {
                 _context4.n = 2;
                 break;
@@ -3764,11 +4670,11 @@ function App() {
         }, _callee4);
       }));
       return function (_x4) {
-        return _ref11.apply(this, arguments);
+        return _ref14.apply(this, arguments);
       };
     }());
     var _sb$auth$onAuthStateC = sb.auth.onAuthStateChange(/*#__PURE__*/function () {
-        var _ref12 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(event, session) {
+        var _ref15 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(event, session) {
           return _regenerator().w(function (_context5) {
             while (1) switch (_context5.n) {
               case 0:
@@ -3782,7 +4688,7 @@ function App() {
           }, _callee5);
         }));
         return function (_x5, _x6) {
-          return _ref12.apply(this, arguments);
+          return _ref15.apply(this, arguments);
         };
       }()),
       subscription = _sb$auth$onAuthStateC.data.subscription;
@@ -3791,7 +4697,7 @@ function App() {
     };
   }, []);
   var initUser = /*#__PURE__*/function () {
-    var _ref13 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(u) {
+    var _ref16 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(u) {
       var p, prog;
       return _regenerator().w(function (_context6) {
         while (1) switch (_context6.n) {
@@ -3819,11 +4725,11 @@ function App() {
       }, _callee6);
     }));
     return function initUser(_x7) {
-      return _ref13.apply(this, arguments);
+      return _ref16.apply(this, arguments);
     };
   }();
   var handleAuth = /*#__PURE__*/function () {
-    var _ref14 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(u, prog) {
+    var _ref17 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(u, prog) {
       return _regenerator().w(function (_context7) {
         while (1) switch (_context7.n) {
           case 0:
@@ -3839,11 +4745,11 @@ function App() {
       }, _callee7);
     }));
     return function handleAuth(_x8, _x9) {
-      return _ref14.apply(this, arguments);
+      return _ref17.apply(this, arguments);
     };
   }();
   var handleLogout = /*#__PURE__*/function () {
-    var _ref15 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
+    var _ref18 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
       return _regenerator().w(function (_context8) {
         while (1) switch (_context8.n) {
           case 0:
@@ -3861,7 +4767,7 @@ function App() {
       }, _callee8);
     }));
     return function handleLogout() {
-      return _ref15.apply(this, arguments);
+      return _ref18.apply(this, arguments);
     };
   }();
   var goHome = useCallback(function () {
@@ -3874,6 +4780,10 @@ function App() {
     setLesson(null);
   }, []);
   var handleSelectChapter = useCallback(function (ch) {
+    if (ch.id === "__flashcard__") {
+      setScreen("flashcard");
+      return;
+    }
     setChapter(ch);
     setScreen("chapter");
   }, []);
@@ -3934,6 +4844,14 @@ function App() {
   if (screen === "auth") return /*#__PURE__*/React.createElement(AuthScreen, {
     onAuth: handleAuth
   });
+  if (screen === "flashcard") {
+    return /*#__PURE__*/React.createElement(FlashcardScreen, {
+      done: done,
+      allChapters: CHAPTERS,
+      tajweedChapters: TAJWEED_CHAPTERS,
+      onBack: goHome
+    });
+  }
   if (screen === "lesson" && activeLesson) {
     return /*#__PURE__*/React.createElement(LessonScreen, {
       lesson: activeLesson,
