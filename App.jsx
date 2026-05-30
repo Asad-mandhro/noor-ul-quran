@@ -1462,33 +1462,27 @@ export default function App() {
   }, []);
 
   const handleLessonComplete = useCallback((lessonId, earnedXp) => {
-    const today = new Date().toDateString();
-    let newDone, newXp, newStreak, newDate;
+    const today     = new Date().toDateString();
+    const newDone   = done.includes(lessonId) ? done : [...done, lessonId];
+    const newXp     = xp + (earnedXp || 10);
+    const newStreak = lastDate !== today ? streak + 1 : streak;
 
-    setDone(prev => {
-      newDone = prev.includes(lessonId) ? prev : [...prev, lessonId];
-      return newDone;
-    });
-    setXp(prev => { newXp = prev + (earnedXp || 10); return newXp; });
-    setLastDate(prev => {
-      if (prev !== today) {
-        setStreak(s => { newStreak = s + 1; return newStreak; });
-        newDate = today; return today;
-      }
-      newDate = prev; return prev;
-    });
+    setDone(newDone);
+    setXp(newXp);
+    setStreak(newStreak);
+    setLastDate(today);
 
-    // Sync to Supabase after state settles
-    setTimeout(() => {
-      if (user?.id) {
-        saveProgress(user.id, {
-          xp: newXp, streak: newStreak || streak,
-          done_lessons: newDone, last_date: newDate
-        });
-      }
-    }, 300);
+    // Save directly — no setState callback race
+    if (user?.id) {
+      saveProgress(user.id, {
+        xp: newXp,
+        streak: newStreak,
+        done_lessons: newDone,
+        last_date: today,
+      }).catch(console.error);
+    }
     goChapter();
-  }, [user, streak, goChapter]);
+  }, [user, xp, streak, done, lastDate, goChapter]);
 
   // Loading splash
   if (screen === "loading") return (
