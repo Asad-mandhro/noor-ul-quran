@@ -1,21 +1,84 @@
 "use strict";
 var useState=React.useState,useEffect=React.useEffect,useCallback=React.useCallback,useRef=React.useRef;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+var _window$supabase;
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
 function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
 function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */ var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i.return) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
+function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
+function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
+function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
+// ─── SUPABASE ──────────────────────────────────────────────────────
+var SUPA_URL = "https://casmtopcsfujbiygmhbw.supabase.co";
+var SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhc210b3Bjc2Z1amJpeWdtaGJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMTA2NjUsImV4cCI6MjA5NTY4NjY2NX0.ljWi9serMwjKKWogRlS-rfIUf9GpNFPIDG_ZvrYQdME";
+var sb = (_window$supabase = window.supabase) === null || _window$supabase === void 0 ? void 0 : _window$supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// Load/save progress from Supabase
+var loadProgress = /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(userId) {
+    var _yield$sb$from$select, data;
+    return _regenerator().w(function (_context) {
+      while (1) switch (_context.n) {
+        case 0:
+          if (sb) {
+            _context.n = 1;
+            break;
+          }
+          return _context.a(2, null);
+        case 1:
+          _context.n = 2;
+          return sb.from("user_progress").select("*").eq("user_id", userId).single();
+        case 2:
+          _yield$sb$from$select = _context.v;
+          data = _yield$sb$from$select.data;
+          return _context.a(2, data);
+      }
+    }, _callee);
+  }));
+  return function loadProgress(_x) {
+    return _ref.apply(this, arguments);
+  };
+}();
+var saveProgress = /*#__PURE__*/function () {
+  var _ref2 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2(userId, patch) {
+    return _regenerator().w(function (_context2) {
+      while (1) switch (_context2.n) {
+        case 0:
+          if (sb) {
+            _context2.n = 1;
+            break;
+          }
+          return _context2.a(2);
+        case 1:
+          _context2.n = 2;
+          return sb.from("user_progress").upsert(_objectSpread(_objectSpread({
+            user_id: userId
+          }, patch), {}, {
+            updated_at: new Date().toISOString()
+          }));
+        case 2:
+          return _context2.a(2);
+      }
+    }, _callee2);
+  }));
+  return function saveProgress(_x2, _x3) {
+    return _ref2.apply(this, arguments);
+  };
+}();
+
 // ─── SPEAK UTILITY ─────────────────────────────────────────────────
 var speak = function speak(text) {
   var rate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.75;
@@ -1282,11 +1345,11 @@ var IC = {
 };
 
 // ─── SPEAK BUTTON ──────────────────────────────────────────────────
-function SpeakBtn(_ref) {
-  var text = _ref.text,
-    verseId = _ref.verseId,
-    _ref$style = _ref.style,
-    style = _ref$style === void 0 ? {} : _ref$style;
+function SpeakBtn(_ref3) {
+  var text = _ref3.text,
+    verseId = _ref3.verseId,
+    _ref3$style = _ref3.style,
+    style = _ref3$style === void 0 ? {} : _ref3$style;
   var _useState = useState(false),
     _useState2 = _slicedToArray(_useState, 2),
     active = _useState2[0],
@@ -1393,8 +1456,8 @@ var AR_PDFS = {
   ch41: "Arabic-Ch41-Reading-Hadith.pdf",
   ch42: "Arabic-Ch42-Classical-Arabic-Texts.pdf"
 };
-function PDFDownloadBtn(_ref2) {
-  var chapterId = _ref2.chapterId;
+function PDFDownloadBtn(_ref4) {
+  var chapterId = _ref4.chapterId;
   var filename = TJ_PDFS[chapterId] || AR_PDFS[chapterId];
   if (!filename) return null;
   var url = "https://asad-mandhro.github.io/noor-ul-quran/pdfs/".concat(filename);
@@ -1470,8 +1533,8 @@ function PDFDownloadBtn(_ref2) {
     }
   }, "PDF \u2193"));
 }
-function VideoPlayer(_ref3) {
-  var videoId = _ref3.videoId;
+function VideoPlayer(_ref5) {
+  var videoId = _ref5.videoId;
   var _useState3 = useState("idle"),
     _useState4 = _slicedToArray(_useState3, 2),
     mode = _useState4[0],
@@ -1614,29 +1677,308 @@ function VideoPlayer(_ref3) {
 }
 
 // ─── HOME SCREEN ───────────────────────────────────────────────────
-function HomeScreen(_ref4) {
-  var onSelectChapter = _ref4.onSelectChapter;
-  var _useState7 = useState(function () {
-      return load("nq_xp", 0);
-    }),
-    _useState8 = _slicedToArray(_useState7, 1),
-    xp = _useState8[0];
-  var _useState9 = useState(function () {
-      return load("nq_streak", 0);
-    }),
-    _useState0 = _slicedToArray(_useState9, 1),
-    streak = _useState0[0];
-  var _useState1 = useState(function () {
-      return load("nq_done", []);
-    }),
-    _useState10 = _slicedToArray(_useState1, 1),
-    done = _useState10[0];
-  var _useState11 = useState(function () {
+// ─── AUTH SCREEN ───────────────────────────────────────────────────
+function AuthScreen(_ref6) {
+  var onAuth = _ref6.onAuth;
+  var _useState7 = useState("login"),
+    _useState8 = _slicedToArray(_useState7, 2),
+    mode = _useState8[0],
+    setMode = _useState8[1]; // login | register
+  var _useState9 = useState(""),
+    _useState0 = _slicedToArray(_useState9, 2),
+    name = _useState0[0],
+    setName = _useState0[1];
+  var _useState1 = useState(""),
+    _useState10 = _slicedToArray(_useState1, 2),
+    email = _useState10[0],
+    setEmail = _useState10[1];
+  var _useState11 = useState(""),
+    _useState12 = _slicedToArray(_useState11, 2),
+    pass = _useState12[0],
+    setPass = _useState12[1];
+  var _useState13 = useState(""),
+    _useState14 = _slicedToArray(_useState13, 2),
+    err = _useState14[0],
+    setErr = _useState14[1];
+  var _useState15 = useState(false),
+    _useState16 = _slicedToArray(_useState15, 2),
+    busy = _useState16[0],
+    setBusy = _useState16[1];
+  var submit = /*#__PURE__*/function () {
+    var _ref7 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
+      var _yield$sb$auth$signUp, data, error, _yield$sb$auth$signIn, _data, _error, progress, _t;
+      return _regenerator().w(function (_context3) {
+        while (1) switch (_context3.p = _context3.n) {
+          case 0:
+            setErr("");
+            setBusy(true);
+            _context3.p = 1;
+            if (!(mode === "register")) {
+              _context3.n = 6;
+              break;
+            }
+            if (name.trim()) {
+              _context3.n = 2;
+              break;
+            }
+            setErr("Enter your name");
+            setBusy(false);
+            return _context3.a(2);
+          case 2:
+            _context3.n = 3;
+            return sb.auth.signUp({
+              email: email,
+              password: pass,
+              options: {
+                data: {
+                  display_name: name.trim()
+                }
+              }
+            });
+          case 3:
+            _yield$sb$auth$signUp = _context3.v;
+            data = _yield$sb$auth$signUp.data;
+            error = _yield$sb$auth$signUp.error;
+            if (!error) {
+              _context3.n = 4;
+              break;
+            }
+            setErr(error.message);
+            setBusy(false);
+            return _context3.a(2);
+          case 4:
+            if (!data.user) {
+              _context3.n = 5;
+              break;
+            }
+            _context3.n = 5;
+            return saveProgress(data.user.id, {
+              xp: 0,
+              streak: 0,
+              done_lessons: [],
+              track: "arabic"
+            });
+          case 5:
+            onAuth(data.user, {
+              xp: 0,
+              streak: 0,
+              done_lessons: [],
+              last_date: null,
+              track: "arabic"
+            });
+            _context3.n = 10;
+            break;
+          case 6:
+            _context3.n = 7;
+            return sb.auth.signInWithPassword({
+              email: email,
+              password: pass
+            });
+          case 7:
+            _yield$sb$auth$signIn = _context3.v;
+            _data = _yield$sb$auth$signIn.data;
+            _error = _yield$sb$auth$signIn.error;
+            if (!_error) {
+              _context3.n = 8;
+              break;
+            }
+            setErr(_error.message);
+            setBusy(false);
+            return _context3.a(2);
+          case 8:
+            _context3.n = 9;
+            return loadProgress(_data.user.id);
+          case 9:
+            progress = _context3.v;
+            onAuth(_data.user, progress || {
+              xp: 0,
+              streak: 0,
+              done_lessons: [],
+              last_date: null,
+              track: "arabic"
+            });
+          case 10:
+            _context3.n = 12;
+            break;
+          case 11:
+            _context3.p = 11;
+            _t = _context3.v;
+            setErr("Connection error. Check internet.");
+          case 12:
+            setBusy(false);
+          case 13:
+            return _context3.a(2);
+        }
+      }, _callee3, null, [[1, 11]]);
+    }));
+    return function submit() {
+      return _ref7.apply(this, arguments);
+    };
+  }();
+  var inp = {
+    background: "#0e1320",
+    border: "1px solid ".concat(C.border),
+    borderRadius: 12,
+    padding: "14px 16px",
+    color: C.text,
+    fontSize: 15,
+    width: "100%",
+    outline: "none",
+    fontFamily: "inherit"
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      minHeight: "100vh",
+      background: C.bg,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "24px 20px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 32,
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 48,
+      marginBottom: 8
+    }
+  }, "\uD83D\uDD4C"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 26,
+      fontWeight: 800,
+      color: C.gold,
+      letterSpacing: 1
+    }
+  }, "\u0646\u0648\u0631 \u0627\u0644\u0642\u0631\u0622\u0646"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      color: C.muted,
+      marginTop: 4
+    }
+  }, "Noor ul Quran Academy")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: "100%",
+      maxWidth: 380,
+      background: C.card,
+      border: "1px solid ".concat(C.border),
+      borderRadius: 20,
+      padding: "28px 24px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      background: "#0a0f1a",
+      borderRadius: 12,
+      padding: 4,
+      marginBottom: 24
+    }
+  }, ["login", "register"].map(function (m) {
+    return /*#__PURE__*/React.createElement("button", {
+      key: m,
+      onClick: function onClick() {
+        setMode(m);
+        setErr("");
+      },
+      style: {
+        flex: 1,
+        padding: "10px",
+        border: "none",
+        borderRadius: 10,
+        cursor: "pointer",
+        background: mode === m ? C.gold : "transparent",
+        color: mode === m ? "#000" : C.muted,
+        fontWeight: mode === m ? 700 : 400,
+        fontSize: 13,
+        transition: "all 0.2s"
+      }
+    }, m === "login" ? "Sign In" : "Register");
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 12
+    }
+  }, mode === "register" && /*#__PURE__*/React.createElement("input", {
+    style: inp,
+    placeholder: "Your name",
+    value: name,
+    onChange: function onChange(e) {
+      return setName(e.target.value);
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    style: inp,
+    placeholder: "Email",
+    type: "email",
+    value: email,
+    onChange: function onChange(e) {
+      return setEmail(e.target.value);
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    style: inp,
+    placeholder: "Password (min 6 chars)",
+    type: "password",
+    value: pass,
+    onChange: function onChange(e) {
+      return setPass(e.target.value);
+    },
+    onKeyDown: function onKeyDown(e) {
+      return e.key === "Enter" && submit();
+    }
+  }), err && /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#e87a7a",
+      fontSize: 12,
+      textAlign: "center",
+      padding: "4px 0"
+    }
+  }, err), /*#__PURE__*/React.createElement("button", {
+    onClick: submit,
+    disabled: busy,
+    style: {
+      marginTop: 4,
+      padding: "15px",
+      border: "none",
+      borderRadius: 14,
+      background: busy ? C.muted : "linear-gradient(135deg,".concat(C.gold, ",#e8a83c)"),
+      color: "#000",
+      fontWeight: 700,
+      fontSize: 15,
+      cursor: busy ? "not-allowed" : "pointer",
+      transition: "all 0.2s"
+    }
+  }, busy ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 20,
+      fontSize: 11,
+      color: C.muted,
+      textAlign: "center",
+      maxWidth: 280
+    }
+  }, "Your progress syncs across all your devices"));
+}
+
+// ─── HOME SCREEN ───────────────────────────────────────────────────
+function HomeScreen(_ref8) {
+  var _user$user_metadata, _user$email;
+  var onSelectChapter = _ref8.onSelectChapter,
+    _ref8$xp = _ref8.xp,
+    xp = _ref8$xp === void 0 ? 0 : _ref8$xp,
+    _ref8$streak = _ref8.streak,
+    streak = _ref8$streak === void 0 ? 0 : _ref8$streak,
+    _ref8$done = _ref8.done,
+    done = _ref8$done === void 0 ? [] : _ref8$done,
+    user = _ref8.user,
+    onLogout = _ref8.onLogout;
+  var _useState17 = useState(function () {
       return load("nq_track", "arabic");
     }),
-    _useState12 = _slicedToArray(_useState11, 2),
-    track = _useState12[0],
-    setTrack = _useState12[1];
+    _useState18 = _slicedToArray(_useState17, 2),
+    track = _useState18[0],
+    setTrack = _useState18[1];
   var level = Math.floor(xp / 300) + 1;
   var xpInLevel = xp % 300;
   var switchTrack = function switchTrack(t) {
@@ -1692,10 +2034,16 @@ function HomeScreen(_ref4) {
       letterSpacing: 2,
       textTransform: "uppercase"
     }
-  }, "Quranic Arabic Academy")), /*#__PURE__*/React.createElement("div", {
+  }, "Quranic Arabic Academy"), user && /*#__PURE__*/React.createElement("p", {
+    style: {
+      margin: "4px 0 0",
+      fontSize: 12,
+      color: C.gold
+    }
+  }, "\uD83D\uDC64 ", ((_user$user_metadata = user.user_metadata) === null || _user$user_metadata === void 0 ? void 0 : _user$user_metadata.display_name) || ((_user$email = user.email) === null || _user$email === void 0 ? void 0 : _user$email.split("@")[0]))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
-      gap: 10,
+      gap: 8,
       alignItems: "center"
     }
   }, /*#__PURE__*/React.createElement("div", {
@@ -1717,7 +2065,18 @@ function HomeScreen(_ref4) {
       fontWeight: 700,
       color: C.green
     }
-  }, "Lvl ", level))), /*#__PURE__*/React.createElement("div", {
+  }, "Lvl ", level), onLogout && /*#__PURE__*/React.createElement("button", {
+    onClick: onLogout,
+    style: {
+      background: "transparent",
+      border: "1px solid ".concat(C.border),
+      borderRadius: 20,
+      padding: "5px 12px",
+      color: C.muted,
+      fontSize: 11,
+      cursor: "pointer"
+    }
+  }, "Sign out"))), /*#__PURE__*/React.createElement("div", {
     style: {
       background: C.card,
       border: "1px solid ".concat(C.border),
@@ -1974,16 +2333,12 @@ function HomeScreen(_ref4) {
 }
 
 // ─── CHAPTER SCREEN ────────────────────────────────────────────────
-function ChapterScreen(_ref5) {
-  var chapter = _ref5.chapter,
-    onBack = _ref5.onBack,
-    onStartLesson = _ref5.onStartLesson;
-  var _useState13 = useState(function () {
-      return load("nq_done", []);
-    }),
-    _useState14 = _slicedToArray(_useState13, 2),
-    done = _useState14[0],
-    setDone = _useState14[1];
+function ChapterScreen(_ref9) {
+  var chapter = _ref9.chapter,
+    onBack = _ref9.onBack,
+    onStartLesson = _ref9.onStartLesson,
+    _ref9$done = _ref9.done,
+    done = _ref9$done === void 0 ? [] : _ref9$done;
   var lessons = getLessons(chapter.data);
   var typeColor = {
     intro: C.blue,
@@ -2055,21 +2410,7 @@ function ChapterScreen(_ref5) {
     return /*#__PURE__*/React.createElement("button", {
       key: lesson.id,
       onClick: function onClick() {
-        return unlocked && onStartLesson(lesson, chapter, function (id, xp) {
-          var newDone = done.includes(id) ? done : [].concat(_toConsumableArray(done), [id]);
-          setDone(newDone);
-          store("nq_done", newDone);
-          var curXp = load("nq_xp", 0);
-          var newXp = done.includes(id) ? curXp : curXp + xp;
-          store("nq_xp", newXp);
-          var today = new Date().toDateString();
-          var last = load("nq_lastDate", null);
-          if (last !== today) {
-            var s = load("nq_streak", 0) + 1;
-            store("nq_streak", s);
-            store("nq_lastDate", today);
-          }
-        });
+        return unlocked && onStartLesson(lesson, chapter);
       },
       style: {
         width: "100%",
@@ -2169,39 +2510,39 @@ function ChapterScreen(_ref5) {
 }
 
 // ─── LESSON SCREEN ─────────────────────────────────────────────────
-function LessonScreen(_ref6) {
-  var lesson = _ref6.lesson,
-    chapter = _ref6.chapter,
-    onBack = _ref6.onBack,
-    onComplete = _ref6.onComplete;
-  var _useState15 = useState("teach"),
-    _useState16 = _slicedToArray(_useState15, 2),
-    phase = _useState16[0],
-    setPhase = _useState16[1];
-  var _useState17 = useState(0),
-    _useState18 = _slicedToArray(_useState17, 2),
-    slideIdx = _useState18[0],
-    setSlide = _useState18[1];
-  var _useState19 = useState(0),
+function LessonScreen(_ref0) {
+  var lesson = _ref0.lesson,
+    chapter = _ref0.chapter,
+    onBack = _ref0.onBack,
+    onComplete = _ref0.onComplete;
+  var _useState19 = useState("teach"),
     _useState20 = _slicedToArray(_useState19, 2),
-    qIdx = _useState20[0],
-    setQIdx = _useState20[1];
-  var _useState21 = useState(null),
+    phase = _useState20[0],
+    setPhase = _useState20[1];
+  var _useState21 = useState(0),
     _useState22 = _slicedToArray(_useState21, 2),
-    selected = _useState22[0],
-    setSel = _useState22[1];
-  var _useState23 = useState(false),
+    slideIdx = _useState22[0],
+    setSlide = _useState22[1];
+  var _useState23 = useState(0),
     _useState24 = _slicedToArray(_useState23, 2),
-    answered = _useState24[0],
-    setAns = _useState24[1];
-  var _useState25 = useState(0),
+    qIdx = _useState24[0],
+    setQIdx = _useState24[1];
+  var _useState25 = useState(null),
     _useState26 = _slicedToArray(_useState25, 2),
-    correct = _useState26[0],
-    setCorr = _useState26[1];
+    selected = _useState26[0],
+    setSel = _useState26[1];
   var _useState27 = useState(false),
     _useState28 = _slicedToArray(_useState27, 2),
-    showExp = _useState28[0],
-    setExp = _useState28[1];
+    answered = _useState28[0],
+    setAns = _useState28[1];
+  var _useState29 = useState(0),
+    _useState30 = _slicedToArray(_useState29, 2),
+    correct = _useState30[0],
+    setCorr = _useState30[1];
+  var _useState31 = useState(false),
+    _useState32 = _slicedToArray(_useState31, 2),
+    showExp = _useState32[0],
+    setExp = _useState32[1];
   var slides = lesson.slides || [];
   var quiz = lesson.quiz || [];
   var slide = slides[slideIdx];
@@ -2541,13 +2882,13 @@ function LessonScreen(_ref6) {
 }
 
 // ─── TEACH SLIDE ───────────────────────────────────────────────────
-function TeachSlide(_ref7) {
-  var slide = _ref7.slide,
-    color = _ref7.color,
-    onNext = _ref7.onNext,
-    onPrev = _ref7.onPrev,
-    isFirst = _ref7.isFirst,
-    isLast = _ref7.isLast;
+function TeachSlide(_ref1) {
+  var slide = _ref1.slide,
+    color = _ref1.color,
+    onNext = _ref1.onNext,
+    onPrev = _ref1.onPrev,
+    isFirst = _ref1.isFirst,
+    isLast = _ref1.isLast;
   return /*#__PURE__*/React.createElement("div", {
     style: {
       animation: "fadeIn 0.35s ease"
@@ -3360,22 +3701,169 @@ function TeachSlide(_ref7) {
 
 // ─── APP ROOT ──────────────────────────────────────────────────────
 function App() {
-  var _useState29 = useState("home"),
-    _useState30 = _slicedToArray(_useState29, 2),
-    screen = _useState30[0],
-    setScreen = _useState30[1]; // home | chapter | lesson
-  var _useState31 = useState(null),
-    _useState32 = _slicedToArray(_useState31, 2),
-    activeChapter = _useState32[0],
-    setChapter = _useState32[1];
-  var _useState33 = useState(null),
+  var _useState33 = useState("loading"),
     _useState34 = _slicedToArray(_useState33, 2),
-    activeLesson = _useState34[0],
-    setLesson = _useState34[1];
+    screen = _useState34[0],
+    setScreen = _useState34[1];
   var _useState35 = useState(null),
     _useState36 = _slicedToArray(_useState35, 2),
-    completeCb = _useState36[0],
-    setCb = _useState36[1];
+    activeChapter = _useState36[0],
+    setChapter = _useState36[1];
+  var _useState37 = useState(null),
+    _useState38 = _slicedToArray(_useState37, 2),
+    activeLesson = _useState38[0],
+    setLesson = _useState38[1];
+  var _useState39 = useState(null),
+    _useState40 = _slicedToArray(_useState39, 2),
+    user = _useState40[0],
+    setUser = _useState40[1];
+  var _useState41 = useState(0),
+    _useState42 = _slicedToArray(_useState41, 2),
+    xp = _useState42[0],
+    setXp = _useState42[1];
+  var _useState43 = useState(0),
+    _useState44 = _slicedToArray(_useState43, 2),
+    streak = _useState44[0],
+    setStreak = _useState44[1];
+  var _useState45 = useState([]),
+    _useState46 = _slicedToArray(_useState45, 2),
+    done = _useState46[0],
+    setDone = _useState46[1];
+  var _useState47 = useState(null),
+    _useState48 = _slicedToArray(_useState47, 2),
+    lastDate = _useState48[0],
+    setLastDate = _useState48[1];
+
+  // ── Boot: check existing Supabase session ──────────────────────
+  useEffect(function () {
+    if (!sb) {
+      setScreen("home");
+      return;
+    } // no Supabase fallback
+    sb.auth.getSession().then(/*#__PURE__*/function () {
+      var _ref11 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(_ref10) {
+        var session;
+        return _regenerator().w(function (_context4) {
+          while (1) switch (_context4.n) {
+            case 0:
+              session = _ref10.data.session;
+              if (!(session !== null && session !== void 0 && session.user)) {
+                _context4.n = 2;
+                break;
+              }
+              _context4.n = 1;
+              return initUser(session.user);
+            case 1:
+              _context4.n = 3;
+              break;
+            case 2:
+              setScreen("auth");
+            case 3:
+              return _context4.a(2);
+          }
+        }, _callee4);
+      }));
+      return function (_x4) {
+        return _ref11.apply(this, arguments);
+      };
+    }());
+    var _sb$auth$onAuthStateC = sb.auth.onAuthStateChange(/*#__PURE__*/function () {
+        var _ref12 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(event, session) {
+          return _regenerator().w(function (_context5) {
+            while (1) switch (_context5.n) {
+              case 0:
+                if (event === "SIGNED_OUT") {
+                  setUser(null);
+                  setScreen("auth");
+                }
+              case 1:
+                return _context5.a(2);
+            }
+          }, _callee5);
+        }));
+        return function (_x5, _x6) {
+          return _ref12.apply(this, arguments);
+        };
+      }()),
+      subscription = _sb$auth$onAuthStateC.data.subscription;
+    return function () {
+      return subscription.unsubscribe();
+    };
+  }, []);
+  var initUser = /*#__PURE__*/function () {
+    var _ref13 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(u) {
+      var p, prog;
+      return _regenerator().w(function (_context6) {
+        while (1) switch (_context6.n) {
+          case 0:
+            setUser(u);
+            _context6.n = 1;
+            return loadProgress(u.id);
+          case 1:
+            p = _context6.v;
+            prog = p || {
+              xp: 0,
+              streak: 0,
+              done_lessons: [],
+              last_date: null,
+              track: "arabic"
+            };
+            setXp(prog.xp || 0);
+            setStreak(prog.streak || 0);
+            setDone(prog.done_lessons || []);
+            setLastDate(prog.last_date || null);
+            setScreen("home");
+          case 2:
+            return _context6.a(2);
+        }
+      }, _callee6);
+    }));
+    return function initUser(_x7) {
+      return _ref13.apply(this, arguments);
+    };
+  }();
+  var handleAuth = /*#__PURE__*/function () {
+    var _ref14 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(u, prog) {
+      return _regenerator().w(function (_context7) {
+        while (1) switch (_context7.n) {
+          case 0:
+            setUser(u);
+            setXp(prog.xp || 0);
+            setStreak(prog.streak || 0);
+            setDone(prog.done_lessons || []);
+            setLastDate(prog.last_date || null);
+            setScreen("home");
+          case 1:
+            return _context7.a(2);
+        }
+      }, _callee7);
+    }));
+    return function handleAuth(_x8, _x9) {
+      return _ref14.apply(this, arguments);
+    };
+  }();
+  var handleLogout = /*#__PURE__*/function () {
+    var _ref15 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
+      return _regenerator().w(function (_context8) {
+        while (1) switch (_context8.n) {
+          case 0:
+            _context8.n = 1;
+            return sb === null || sb === void 0 ? void 0 : sb.auth.signOut();
+          case 1:
+            setUser(null);
+            setXp(0);
+            setStreak(0);
+            setDone([]);
+            setScreen("auth");
+          case 2:
+            return _context8.a(2);
+        }
+      }, _callee8);
+    }));
+    return function handleLogout() {
+      return _ref15.apply(this, arguments);
+    };
+  }();
   var goHome = useCallback(function () {
     setScreen("home");
     setChapter(null);
@@ -3389,33 +3877,102 @@ function App() {
     setChapter(ch);
     setScreen("chapter");
   }, []);
-  var handleStartLesson = useCallback(function (lesson, chapter, cb) {
+  var handleStartLesson = useCallback(function (lesson, chapter) {
     setLesson(lesson);
     setChapter(chapter);
-    setCb(function () {
-      return cb;
-    });
     setScreen("lesson");
   }, []);
+  var handleLessonComplete = useCallback(function (lessonId, earnedXp) {
+    var today = new Date().toDateString();
+    var newDone, newXp, newStreak, newDate;
+    setDone(function (prev) {
+      newDone = prev.includes(lessonId) ? prev : [].concat(_toConsumableArray(prev), [lessonId]);
+      return newDone;
+    });
+    setXp(function (prev) {
+      newXp = prev + (earnedXp || 10);
+      return newXp;
+    });
+    setLastDate(function (prev) {
+      if (prev !== today) {
+        setStreak(function (s) {
+          newStreak = s + 1;
+          return newStreak;
+        });
+        newDate = today;
+        return today;
+      }
+      newDate = prev;
+      return prev;
+    });
+
+    // Sync to Supabase after state settles
+    setTimeout(function () {
+      if (user !== null && user !== void 0 && user.id) {
+        saveProgress(user.id, {
+          xp: newXp,
+          streak: newStreak || streak,
+          done_lessons: newDone,
+          last_date: newDate
+        });
+      }
+    }, 300);
+    goChapter();
+  }, [user, streak, goChapter]);
+
+  // Loading splash
+  if (screen === "loading") return /*#__PURE__*/React.createElement("div", {
+    style: {
+      minHeight: "100vh",
+      background: C.bg,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "column",
+      gap: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 48
+    }
+  }, "\uD83D\uDD4C"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 20,
+      color: C.gold,
+      fontWeight: 700
+    }
+  }, "\u0646\u0648\u0631 \u0627\u0644\u0642\u0631\u0622\u0646"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: C.muted
+    }
+  }, "Loading..."));
+  if (screen === "auth") return /*#__PURE__*/React.createElement(AuthScreen, {
+    onAuth: handleAuth
+  });
   if (screen === "lesson" && activeLesson) {
     return /*#__PURE__*/React.createElement(LessonScreen, {
       lesson: activeLesson,
       chapter: activeChapter,
       onBack: goChapter,
-      onComplete: function onComplete(id, xp) {
-        completeCb && completeCb(id, xp);
-      }
+      onComplete: handleLessonComplete
     });
   }
   if (screen === "chapter" && activeChapter) {
     return /*#__PURE__*/React.createElement(ChapterScreen, {
       chapter: activeChapter,
       onBack: goHome,
-      onStartLesson: handleStartLesson
+      onStartLesson: handleStartLesson,
+      done: done
     });
   }
   return /*#__PURE__*/React.createElement(HomeScreen, {
-    onSelectChapter: handleSelectChapter
+    onSelectChapter: handleSelectChapter,
+    xp: xp,
+    streak: streak,
+    done: done,
+    user: user,
+    onLogout: handleLogout
   });
 }
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
